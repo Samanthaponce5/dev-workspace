@@ -3,29 +3,24 @@
  * comes from here, so the whole look can be tuned in one place.
  */
 :root {
-  /* Colour: night-time room lit by a monitor and an LED strip */
-  --color-bg: #090b14;
-  --color-bg-raised: #0f1220;
-  --color-surface: #141829;
-  --color-surface-hover: #1a1f35;
-  --color-border: rgb(150 162 255 / 14%);
-  --color-border-strong: rgb(150 162 255 / 32%);
+  /* Colour: Midnight Teal. A dark blue-green room lit by soft aqua LEDs. */
+  --color-bg: #0b1721;
+  --color-bg-raised: #0f1e2a;
+  --color-surface: #132733;
+  --color-surface-hover: #183241;
+  --color-border: rgb(174 222 209 / 14%);
+  --color-border-strong: rgb(174 222 209 / 32%);
 
-  --color-text: #eceefb;
-  --color-text-muted: #a4aac8;
-  --color-text-subtle: #7c83a6;
+  --color-text: #eef7f6;
+  --color-text-muted: #a9bdc1;
+  --color-text-subtle: #7b9398;
 
-  --color-accent: #8f9dff;
-  --color-accent-strong: #aab4ff;
-  --color-violet: #b592ff;
-  --color-glow-blue: #4f6bff;
-  --color-glow-violet: #8a5bff;
-  --color-warm: #ffb870;
-  --color-lavender: #cbbcff;
-  --color-lavender-strong: #ddd2ff;
+  --color-accent: #aeded1; /* mint: buttons, links, focus */
+  --color-accent-strong: #c9ece2;
+  --color-aqua: #71c9c8; /* LED light */
+  --color-glow: #14606a; /* pool of teal light behind the desk */
   --color-lime: #c8f55a;
-  --color-white: #ffffff;
-  --color-on-accent: #0a0c18;
+  --color-on-accent: #0b1721;
 
   /* Type */
   --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -86,7 +81,7 @@
 
   /* Light */
   --shadow-card: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 20px 40px -24px rgb(0 0 0 / 70%);
-  --glow-accent: 0 0 0 1px rgb(143 157 255 / 30%), 0 12px 40px -12px rgb(111 99 255 / 65%);
+  --glow-accent: 0 12px 36px -14px rgb(113 201 200 / 55%);
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent-strong);
 
   /* Motion */

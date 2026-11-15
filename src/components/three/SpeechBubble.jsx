@@ -17,8 +17,12 @@ const projected = new THREE.Vector3()
  * `position` is the point the tail touches. The bubble sits above it and
  * is nudged sideways or down when needed so it always stays fully on
  * screen; the tail slides to keep pointing at the anchor.
+ *
+ * To fade out instead of vanishing, either pass `durationMs` (how long
+ * the bubble will be shown, for bubbles on a timer) or set `leaving` just
+ * before removing it (for bubbles driven by an animation timeline).
  */
-export function SpeechBubble({ position, children }) {
+export function SpeechBubble({ position, durationMs, leaving = false, children }) {
   const bubbleRef = useRef(null)
 
   const calculatePosition = useCallback((object, camera, size) => {
@@ -41,7 +45,14 @@ export function SpeechBubble({ position, children }) {
   return (
     <Html position={position} calculatePosition={calculatePosition} zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
       <div className={styles.anchor} style={{ '--tail': `${TAIL}px` }}>
-        <div ref={bubbleRef} className={styles.bubble} role="status">
+        <div
+          ref={bubbleRef}
+          className={styles.bubble}
+          role="status"
+          data-timed={durationMs ? true : undefined}
+          data-leaving={leaving || undefined}
+          style={durationMs ? { '--life': `${durationMs}ms` } : undefined}
+        >
           {children}
         </div>
       </div>

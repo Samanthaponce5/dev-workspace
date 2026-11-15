@@ -3,25 +3,27 @@
  * in one place. Values are plain hex strings that three.js parses.
  */
 export const palette = {
-  platform: '#2a2570',
-  platformSide: '#1b1850',
-  deskWood: '#1f1a22',
-  deskGrain: '#32293a',
+  platform: '#2d6069',
+  platformSide: '#0f3540',
+  deskWood: '#1c1c1f',
+  deskGrain: '#2c2c31',
   metalDark: '#2a2c33',
   monitorBody: '#15161b',
   laptopBody: '#3b3e46',
   laptopKeys: '#23252b',
   chairBlack: '#15161c',
   chairWhite: '#f1f1f5',
-  ledBlue: '#4f6bff',
-  ledViolet: '#a05bff',
+  led: '#71c9c8',
+  screenGlow: '#cfe4f2',
+  laptopScreen: '#7fb2c9',
   clockWood: '#5a3b23',
   clockFace: '#1a120c',
   candleGlass: '#c8743a',
   candleWax: '#f3dcc2',
   flame: '#ffb347',
-  lampGlass: '#a8c8ff',
-  lampWater: '#2a62ff',
+  lampGlass: '#b6dfe6',
+  lampWater: '#2f8fb8',
+  lampLight: '#8fdbe6',
   jelly: '#ffd3ee',
   duck: '#ffd23f',
   duckBeak: '#ff8a3d',
@@ -40,6 +42,7 @@ export const samPalette = {
   shoes: '#f1f1f5',
   eye: '#3a2012',
   lash: '#24150c',
+  brow: '#4a2f1f',
   blush: '#f29a9a',
   mouth: '#a8504a',
 }
@@ -49,8 +52,8 @@ export const andyPalette = {
   body: '#9b6a40',
   tan: '#c79a62',
   crown: '#d2a66d',
-  mask: '#7f6249',
-  muzzle: '#5f4735',
+  mask: '#75604f',
+  muzzle: '#5c4a3d',
   ear: '#4a3122',
   white: '#f4efe8',
   nose: '#121212',
@@ -58,14 +61,20 @@ export const andyPalette = {
   tongue: '#f08aa0',
 }
 
-/* Light levels used by Lighting.jsx and the glowing props. */
+/*
+ * Light levels used by Lighting.jsx and the glowing props.
+ * The general lighting is close to white so skin, fur, the duck and the
+ * code on screen keep their own colours. The aqua LED light is weak and
+ * short-range, so it only tints the surfaces right next to the strip.
+ */
 export const lightLevels = {
-  ambient: 0.75,
-  hemisphere: 0.7,
-  key: 2.3,
-  fill: 1.1,
-  led: 6,
-  monitor: 4,
+  ambient: 0.85,
+  hemisphere: 0.6,
+  key: 2.5,
+  fill: 0.55,
+  led: 2.4,
+  ledReach: 2.1,
+  monitor: 2.6,
   candle: 1.4,
-  lamp: 2.4,
+  lamp: 1.4,
 }

@@ -4,7 +4,7 @@
   padding: var(--space-1) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  background: rgb(143 157 255 / 7%);
+  background: rgb(174 222 209 / 7%);
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-size: var(--text-xs);

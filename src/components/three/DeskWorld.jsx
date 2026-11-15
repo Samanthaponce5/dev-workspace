@@ -33,7 +33,7 @@ export function DeskWorld({ scene, animate, parallax, shadows, cameraAzimuth, in
         <Platform shadows={shadows} />
         <Desk shadows={shadows} />
         <LedStrip />
-        <Monitor shadows={shadows} />
+        <Monitor content={scene.monitor} shadows={shadows} />
         <Laptop position={[-0.1, 0, 0.34]} shadows={shadows} />
 
         {/* Shelf, either side of the monitor */}
@@ -43,7 +43,6 @@ export function DeskWorld({ scene, animate, parallax, shadows, cameraAzimuth, in
           position={[1.56, SHELF_Y, SHELF_Z + 0.1]}
           quotes={scene.duckQuotes}
           introQuote={scene.duckIntro}
-          introStarted={introStarted}
           animate={animate}
         />
 

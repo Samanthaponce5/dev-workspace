@@ -16,11 +16,11 @@ export function LedStrip() {
     <group>
       <mesh position={[0, backY, backZ]}>
         <boxGeometry args={[DESK.width - 0.3, 0.025, 0.025]} />
-        <meshStandardMaterial color={palette.ledBlue} emissive={palette.ledBlue} emissiveIntensity={3} toneMapped={false} />
+        <meshStandardMaterial color={palette.led} emissive={palette.led} emissiveIntensity={2.2} toneMapped={false} />
       </mesh>
       <mesh position={[0, underY, underZ]}>
         <boxGeometry args={[DESK.width - 0.3, 0.02, 0.02]} />
-        <meshStandardMaterial color={palette.ledViolet} emissive={palette.ledViolet} emissiveIntensity={3} toneMapped={false} />
+        <meshStandardMaterial color={palette.led} emissive={palette.led} emissiveIntensity={2.2} toneMapped={false} />
       </mesh>
     </group>
   )

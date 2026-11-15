@@ -1,6 +1,6 @@
 /*
  * Layers, back to front:
- *   .backdrop  midnight gradient and the purple/blue light pools
+ *   .backdrop  midnight teal with a soft pool of light behind the desk
  *   scene      full-bleed 3D canvas (see HeroScene)
  *   ::after    fade into the page colour along the bottom edge
  *   .layout    text, above the canvas
@@ -17,11 +17,10 @@
   position: absolute;
   inset: 0;
   z-index: -3;
-  /* Phone: indigo midnight that warms to violet around the desk. */
+  /* Phone: a broad pool of teal low down, behind the desk. */
   background:
-    radial-gradient(90% 38% at 50% 74%, rgb(124 84 255 / 42%), transparent 70%),
-    radial-gradient(70% 30% at 85% 60%, rgb(72 96 255 / 30%), transparent 70%),
-    linear-gradient(180deg, #0d0d27 0%, #121238 38%, #1a1752 78%, #15133f 100%);
+    radial-gradient(130% 50% at 50% 70%, rgb(20 96 106 / 80%) 0%, rgb(20 96 106 / 44%) 42%, transparent 80%),
+    var(--color-bg);
 }
 
 .hero::after {
@@ -52,7 +51,7 @@
 }
 
 .name {
-  color: var(--color-white);
+  color: var(--color-text);
   font-size: var(--text-display);
   font-weight: var(--weight-heavy);
   line-height: 0.98;
@@ -66,7 +65,7 @@
 .role {
   max-width: 14em;
   margin-top: var(--space-5);
-  color: var(--color-white);
+  color: var(--color-text);
   font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.625rem);
   font-weight: var(--weight-medium);
   line-height: 1.25;
@@ -118,7 +117,7 @@
   .tagline {
     display: block;
     margin-top: var(--space-4);
-    color: rgb(255 255 255 / 86%);
+    color: rgb(238 247 246 / 86%);
     font-size: var(--text-lg);
     line-height: 1.4;
   }
@@ -139,8 +138,8 @@
 
 /*
  * Desktop: text on the left around the vertical centre, the desk filling
- * most of the right. The left stays near black so the white text reads;
- * the purple and blue light spills out from behind the desk.
+ * most of the right. The left stays dark so the text reads; the teal
+ * glow sits behind the desk.
  */
 @media (min-width: 64rem) {
   .hero {
@@ -148,11 +147,10 @@
   }
 
   .backdrop {
+    /* Brightest behind the desk, fading to the navy base under the headline. */
     background:
-      radial-gradient(34% 52% at 50% 64%, rgb(128 70 255 / 46%), transparent 72%),
-      radial-gradient(36% 46% at 92% 10%, rgb(96 84 255 / 44%), transparent 72%),
-      radial-gradient(40% 50% at 100% 96%, rgb(60 70 255 / 40%), transparent 72%),
-      linear-gradient(90deg, #06060d 0%, #090916 34%, #121034 72%, #15123c 100%);
+      radial-gradient(56% 84% at 67% 52%, rgb(20 96 106 / 80%) 0%, rgb(20 96 106 / 48%) 36%, rgb(20 96 106 / 16%) 66%, transparent 88%),
+      var(--color-bg);
   }
 
   .layout {

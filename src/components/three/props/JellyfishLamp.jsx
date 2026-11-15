@@ -57,7 +57,7 @@ export function JellyfishLamp({ position, animate = true }) {
         <meshStandardMaterial color={palette.lampGlass} roughness={0.1} metalness={0.1} transparent opacity={0.22} />
       </mesh>
 
-      <pointLight position={[0, LAMP.height / 2 + 0.05, 0]} intensity={lightLevels.lamp} color="#5b8cff" distance={1.6} decay={2} />
+      <pointLight position={[0, LAMP.height / 2 + 0.05, 0]} intensity={lightLevels.lamp} color={palette.lampLight} distance={1.2} decay={2} />
     </group>
   )
 }

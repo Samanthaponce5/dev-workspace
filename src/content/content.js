@@ -30,9 +30,16 @@ export const hero = {
 
 /* Text and settings used inside the 3D desk scene. */
 export const scene = {
+  /* What the curved monitor shows beside the code: a mini preview of this site and a test run. */
+  monitor: {
+    monogram: 'SP',
+    nameLines: site.name.split(' '),
+    command: '$ npm test',
+    tests: ['renders the hero', 'keyboard accessible', 'quack\u2011test passed'],
+  },
   /* Shown on the desk clock next to the visitor's real local time. */
   clockTemperature: '73°F',
-  /* Said once on load, while Samantha waves. */
+  /* Said once on load, after Samantha has turned back to her desk. */
   /* \u2011 is a non-breaking hyphen, so "quack-test" never splits across lines. */
   duckIntro: 'She codes. I quack\u2011test.',
   /* Said in turn each time the duck is clicked. */

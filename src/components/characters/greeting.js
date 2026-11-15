@@ -14,7 +14,7 @@ const easeInOutQuad = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
  * waves, and swivels back.
  */
 export const INTRO = {
-  delay: 0.5, // pause after the scene fades in, before the wave
+  delay: 0.9, // wait for the scene's fade-in to finish before the wave
   raise: 0.4, // time to lift her arm
   waveEnd: 2.6, // wave finished; speech bubbles go away
   returnEnd: 3.8, // back at the keyboard
@@ -24,6 +24,9 @@ export const HOVER = {
   waveEnd: 3.1,
   returnEnd: 4.0,
 }
+
+/** The speech bubble starts fading this long before it goes. */
+const BUBBLE_FADE = 0.36
 
 const FULL_TURN = Math.PI * 2
 
@@ -37,6 +40,7 @@ export function setWorkingPose(pose) {
   pose.wave = 0
   pose.bounce = 0
   pose.bubble = false
+  pose.bubbleLeaving = false
 }
 
 function hop(sinceStart, animate) {
@@ -46,7 +50,8 @@ function hop(sinceStart, animate) {
 
 /*
  * Both functions write the pose for time `t` into `pose` and return true
- * once the greeting has finished. With `animate` false (reduced motion)
+ * once the greeting has finished. `bubble` says whether her speech bubble
+ * is up, and `bubbleLeaving` that it should be fading out. With `animate` false (reduced motion)
  * they hold still poses and change state without turning or bouncing.
  */
 
@@ -62,6 +67,7 @@ export function writeIntroPose(pose, t, face, animate) {
     pose.wave = t < 0 ? 0 : smoothstep(t, 0, INTRO.raise)
     pose.bounce = hop(t, animate)
     pose.bubble = t >= 0
+    pose.bubbleLeaving = t > INTRO.waveEnd - BUBBLE_FADE
     return false
   }
 
@@ -93,6 +99,7 @@ export function writeHoverPose(pose, t, face, animate) {
     pose.wave = 1
     pose.bounce = hop(t - HOVER.spinEnd, animate)
     pose.bubble = true
+    pose.bubbleLeaving = t > HOVER.waveEnd - BUBBLE_FADE
   } else {
     const progress = easeInOutQuad((t - HOVER.waveEnd) / (HOVER.returnEnd - HOVER.waveEnd))
     pose.angle = animate ? faceAfterSpin + progress * (backAtDesk - faceAfterSpin) : 0

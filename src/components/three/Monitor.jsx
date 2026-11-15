@@ -13,13 +13,13 @@ const SCREEN = {
 }
 
 /**
- * Curved ultrawide monitor on the riser shelf, showing a quiet code
- * editor. The screen is a slice of a cylinder viewed from the inside so
+ * Curved ultrawide monitor on the riser shelf: code on the left, a live
+ * preview of this site and a test run on the right. The screen is a slice of a cylinder viewed from the inside so
  * it curves toward the viewer.
  */
-export function Monitor({ shadows }) {
+export function Monitor({ content, shadows }) {
   // Viewed from inside the cylinder the UVs run right-to-left, so mirror.
-  const screenTexture = useCodeScreenTexture({ mirrorX: true })
+  const screenTexture = useCodeScreenTexture({ content, mirrorX: true })
 
   const { width, height, radius, bezel, standHeight } = SCREEN
   const arc = width / radius
@@ -77,7 +77,7 @@ export function Monitor({ shadows }) {
       </mesh>
 
       {/* Screen light spilling onto the desk and the person at it */}
-      <pointLight position={[0, screenCenterY, screenZ + 0.6]} intensity={lightLevels.monitor} color="#9fb4ff" distance={3.4} decay={2} />
+      <pointLight position={[0, screenCenterY, screenZ + 0.6]} intensity={lightLevels.monitor} color={palette.screenGlow} distance={2.8} decay={2} />
     </group>
   )
 }

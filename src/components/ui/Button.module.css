@@ -37,17 +37,17 @@
   transition: transform var(--duration-base) var(--ease-out);
 }
 
-/* Filled lavender pill with dark text. */
+/* Filled mint pill with dark text. */
 .primary {
-  background: var(--color-lavender);
+  background: var(--color-accent);
   color: var(--color-on-accent);
-  box-shadow: 0 10px 36px -14px rgb(160 130 255 / 70%);
+  box-shadow: var(--glow-accent);
 }
 
 @media (hover: hover) {
   .primary:hover {
-    background: var(--color-lavender-strong);
-    box-shadow: 0 16px 44px -12px rgb(160 130 255 / 90%);
+    background: var(--color-accent-strong);
+    box-shadow: 0 16px 44px -12px rgb(113 201 200 / 75%);
   }
 
   .button:hover .icon {
@@ -71,6 +71,6 @@
   .ghost:hover {
     background: var(--color-surface);
     border-color: var(--color-accent);
-    color: var(--color-white);
+    color: var(--color-text);
   }
 }

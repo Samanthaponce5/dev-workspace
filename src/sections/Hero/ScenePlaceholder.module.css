@@ -16,7 +16,7 @@
   width: min(70%, 34rem);
   aspect-ratio: 1.9 / 1;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(134 110 255 / 34%), rgb(92 96 255 / 16%) 55%, transparent 100%);
+  background: radial-gradient(closest-side, rgb(113 201 200 / 22%), rgb(25 68 71 / 40%) 55%, transparent 100%);
   filter: blur(18px);
   animation: breathe 1.8s var(--ease-in-out) infinite alternate;
 }

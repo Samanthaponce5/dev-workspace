@@ -1,24 +1,25 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useHoverCursor } from '../../../hooks/useHoverCursor'
 import { useSceneEvent } from '../../../hooks/useSceneEvent'
 import { useTimedValue } from '../../../hooks/useTimedValue'
 import { playSqueak } from '../../../utils/squeak'
-import { INTRO } from '../../characters/greeting'
 import { palette } from '../materials'
 import { SpeechBubble } from '../SpeechBubble'
 
 const BUBBLE_MS = 2600
+const INTRO_BUBBLE_MS = 3000
 const HOP_SECONDS = 0.7
 
 /**
  * Rubber duck debugging easter egg.
  *
- * On load it gives one silent little hop and says `introQuote`, which
- * stays up until Samantha turns back to her desk. After that, clicking
- * it squeaks, hops, and shows one of `quotes` in turn.
+ * Once per page load, when Samantha has finished her greeting and turned
+ * back to her desk, it gives a silent little hop and says `introQuote`
+ * for a few seconds. Clicking it at any time squeaks, hops, and shows one
+ * of `quotes` in turn.
  */
-export function RubberDuck({ position, quotes, introQuote, introStarted, animate = true }) {
+export function RubberDuck({ position, quotes, introQuote, animate = true }) {
   const bodyRef = useRef(null)
   const hopStart = useRef(-1)
   const nextQuote = useRef(0)
@@ -34,19 +35,16 @@ export function RubberDuck({ position, quotes, introQuote, introStarted, animate
     [setBubble],
   )
 
-  // Intro: timed to appear with Samantha's wave and leave when she turns away.
-  useEffect(() => {
-    if (!introStarted || introPlayed.current) return undefined
-    const id = window.setTimeout(() => {
-      introPlayed.current = true
-      hopAndSay(introQuote, INTRO.waveEnd * 1000)
-    }, INTRO.delay * 1000)
-    return () => window.clearTimeout(id)
-  }, [introStarted, introQuote, hopAndSay])
+  const sayIntro = useCallback(() => {
+    if (introPlayed.current) return
+    introPlayed.current = true
+    hopAndSay(introQuote, INTRO_BUBBLE_MS)
+  }, [introQuote, hopAndSay])
+  useSceneEvent('intro:finished', sayIntro)
 
   const squeak = useCallback(() => {
     playSqueak()
-    hopAndSay(quotes[nextQuote.current % quotes.length])
+    hopAndSay(quotes[nextQuote.current % quotes.length], BUBBLE_MS)
     nextQuote.current += 1
   }, [quotes, hopAndSay])
   useSceneEvent('duck:squeak', squeak)
@@ -108,7 +106,11 @@ export function RubberDuck({ position, quotes, introQuote, introStarted, animate
         ))}
       </group>
 
-      {bubble && <SpeechBubble position={[0, 0.32, 0]}>{bubble.text}</SpeechBubble>}
+      {bubble && (
+        <SpeechBubble position={[0, 0.32, 0]} durationMs={bubble.durationMs}>
+          {bubble.text}
+        </SpeechBubble>
+      )}
     </group>
   )
 }

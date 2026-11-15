@@ -81,16 +81,171 @@ function drawCodeLines(context) {
   context.globalAlpha = 1
 }
 
-/** A dark code editor with coloured bars standing in for lines of code. */
-export function useCodeScreenTexture({ mirrorX = false } = {}) {
-  const target = useMemo(() => {
-    const canvasTexture = createCanvasTexture(WIDTH, HEIGHT, { mirrorX })
-    canvasTexture.paint((context) => {
-      drawEditorChrome(context)
-      drawCodeLines(context)
+/* Right half of the screen: a live preview of this very site, above a test run. */
+const PANE = { x: 880, width: 628 }
+const PREVIEW = { y: 22, height: 300 }
+const TERMINAL = { y: 338, height: 156 }
+
+const SANS = "'Geist Variable', system-ui, sans-serif"
+const MONO = "'Geist Mono Variable', ui-monospace, monospace"
+
+function drawPreview(context, content) {
+  const { x, width } = PANE
+  const { y, height } = PREVIEW
+  const barHeight = 30
+
+  // Browser window
+  fillRoundedRect(context, x, y, width, height, 12, '#0b1721')
+  context.save()
+  context.beginPath()
+  context.roundRect(x, y, width, height, 12)
+  context.clip()
+
+  // Teal glow behind the little desk, like the real hero
+  const glow = context.createRadialGradient(x + width * 0.72, y + height * 0.62, 10, x + width * 0.72, y + height * 0.62, width * 0.5)
+  glow.addColorStop(0, 'rgba(20, 96, 106, 0.95)')
+  glow.addColorStop(1, 'rgba(20, 96, 106, 0)')
+  context.fillStyle = glow
+  context.fillRect(x, y, width, height)
+
+  // Address bar
+  context.fillStyle = '#132733'
+  context.fillRect(x, y, width, barHeight)
+  ;['#ff6b6b', '#ffd23f', '#63b06f'].forEach((color, index) => {
+    context.beginPath()
+    context.arc(x + 20 + index * 18, y + barHeight / 2, 5, 0, Math.PI * 2)
+    context.fillStyle = color
+    context.fill()
+  })
+  fillRoundedRect(context, x + 86, y + 7, 300, 16, 8, '#0b1721')
+
+  // Mini page: monogram, name, role, button
+  const left = x + 30
+  context.textBaseline = 'alphabetic'
+  context.textAlign = 'left'
+  context.fillStyle = '#eef7f6'
+  context.font = `700 17px ${SANS}`
+  context.fillText(content.monogram, left, y + 62)
+  context.beginPath()
+  context.arc(left + 28, y + 58, 3.5, 0, Math.PI * 2)
+  context.fillStyle = '#c8f55a'
+  context.fill()
+
+  context.fillStyle = '#eef7f6'
+  context.font = `760 46px ${SANS}`
+  content.nameLines.forEach((line, index) => context.fillText(line, left, y + 132 + index * 44))
+  fillRoundedRect(context, left, y + 196, 190, 9, 4.5, 'rgba(238, 247, 246, 0.8)')
+  fillRoundedRect(context, left, y + 228, 112, 32, 16, '#aeded1')
+  fillRoundedRect(context, left + 22, y + 240, 52, 8, 4, '#0b1721')
+
+  // Mini desk on its platform
+  const cx = x + width * 0.74
+  const cy = y + height * 0.66
+  const slab = (dx, dy, halfW, halfH, fill) => {
+    context.beginPath()
+    context.moveTo(cx + dx - halfW, cy + dy)
+    context.lineTo(cx + dx, cy + dy - halfH)
+    context.lineTo(cx + dx + halfW, cy + dy)
+    context.lineTo(cx + dx, cy + dy + halfH)
+    context.closePath()
+    context.fillStyle = fill
+    context.fill()
+  }
+  slab(0, 44, 140, 46, '#0f3540')
+  slab(0, 36, 140, 46, '#2d6069')
+  slab(4, 2, 92, 30, '#1c1c1f')
+  fillRoundedRect(context, cx - 52, cy - 74, 112, 44, 5, '#15161b')
+  fillRoundedRect(context, cx - 47, cy - 69, 102, 34, 3, '#0b0e17')
+  ;[
+    [0, 40, '#c792ea'],
+    [1, 62, '#82aaff'],
+    [2, 34, '#c3e88d'],
+  ].forEach(([row, barWidth, color]) => fillRoundedRect(context, cx - 40, cy - 63 + row * 9, barWidth, 4, 2, color))
+  fillRoundedRect(context, cx - 62, cy - 26, 132, 4, 2, '#71c9c8')
+
+  context.restore()
+  context.strokeStyle = 'rgba(174, 222, 209, 0.28)'
+  context.lineWidth = 2
+  context.beginPath()
+  context.roundRect(x, y, width, height, 12)
+  context.stroke()
+}
+
+function drawTinyDuck(context, x, y) {
+  context.fillStyle = '#ffd23f'
+  context.beginPath()
+  context.ellipse(x, y, 13, 9, 0, 0, Math.PI * 2)
+  context.fill()
+  context.beginPath()
+  context.arc(x + 9, y - 10, 7.5, 0, Math.PI * 2)
+  context.fill()
+  context.fillStyle = '#ff8a3d'
+  context.beginPath()
+  context.ellipse(x + 18, y - 9, 5, 2.6, 0, 0, Math.PI * 2)
+  context.fill()
+  context.fillStyle = '#1a1a1a'
+  context.beginPath()
+  context.arc(x + 11, y - 12, 1.4, 0, Math.PI * 2)
+  context.fill()
+}
+
+function drawTerminal(context, content) {
+  const { x, width } = PANE
+  const { y, height } = TERMINAL
+
+  fillRoundedRect(context, x, y, width, height, 12, '#081018')
+  context.strokeStyle = 'rgba(174, 222, 209, 0.2)'
+  context.lineWidth = 2
+  context.beginPath()
+  context.roundRect(x, y, width, height, 12)
+  context.stroke()
+
+  context.textBaseline = 'alphabetic'
+  context.textAlign = 'left'
+  context.font = `500 21px ${MONO}`
+  const left = x + 24
+  const lineHeight = 31
+
+  context.fillStyle = '#7b9398'
+  context.fillText(content.command, left, y + 38)
+
+  content.tests.forEach((label, index) => {
+    const baseline = y + 38 + (index + 1) * lineHeight
+    context.fillStyle = '#7ee0a1'
+    context.fillText('✓', left, baseline)
+    context.fillStyle = '#d7e6e6'
+    context.fillText(label, left + 30, baseline)
+    if (index === content.tests.length - 1) drawTinyDuck(context, left + 30 + context.measureText(label).width + 30, baseline - 5)
+  })
+}
+
+/**
+ * The monitor's picture: a code editor on the left; on the right, a tiny
+ * browser preview of this site above a terminal with a passing test run.
+ * `content` supplies the words (see `scene.monitor` in content.js).
+ */
+export function useCodeScreenTexture({ content, mirrorX = false }) {
+  const target = useMemo(() => createCanvasTexture(WIDTH, HEIGHT, { mirrorX }), [mirrorX])
+
+  useEffect(() => {
+    const draw = () =>
+      target.paint((context) => {
+        drawEditorChrome(context)
+        drawCodeLines(context)
+        drawPreview(context, content)
+        drawTerminal(context, content)
+      })
+
+    draw()
+    // Redraw once web fonts are in, so the text isn't left in a fallback face.
+    let cancelled = false
+    document.fonts?.ready.then(() => {
+      if (!cancelled) draw()
     })
-    return canvasTexture
-  }, [mirrorX])
+    return () => {
+      cancelled = true
+    }
+  }, [target, content])
 
   useEffect(() => () => target.dispose(), [target])
 

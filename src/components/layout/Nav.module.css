@@ -11,7 +11,7 @@
 
 /* Once the page scrolls, the bar gains a blurred backing so text stays readable. */
 .solid {
-  background: rgb(9 9 24 / 72%);
+  background: rgb(11 23 33 / 78%);
   border-bottom-color: var(--color-border);
   backdrop-filter: blur(14px) saturate(140%);
 }
@@ -41,7 +41,7 @@
   min-height: 2.75rem;
   padding-inline: var(--space-3);
   border-radius: var(--radius-pill);
-  color: var(--color-white);
+  color: var(--color-text);
   font-size: 1.0625rem;
   font-weight: var(--weight-semibold);
   text-decoration: none;
@@ -50,12 +50,12 @@
 
 @media (hover: hover) {
   .link:hover {
-    color: var(--color-lavender);
+    color: var(--color-accent);
   }
 }
 
 .link[aria-current='true'] {
-  color: var(--color-lavender);
+  color: var(--color-accent);
 }
 
 .desktopOnly {
@@ -72,7 +72,7 @@
   border: 0;
   border-radius: var(--radius-pill);
   background: transparent;
-  color: var(--color-white);
+  color: var(--color-text);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }

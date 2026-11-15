@@ -3,7 +3,7 @@ import styles from './Button.module.css'
 
 /**
  * Renders a link when given an `href`, otherwise a button.
- * Variants: "primary" (filled lavender) and "ghost" (outlined).
+ * Variants: "primary" (filled mint) and "ghost" (outlined).
  * `iconEnd` is an optional icon element shown after the label.
  */
 export function Button({ href, variant = 'primary', iconEnd, className, children, ...rest }) {

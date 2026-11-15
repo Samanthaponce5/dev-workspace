@@ -36,6 +36,33 @@
   border-radius: 2px;
 }
 
+/* When its lifetime is known, the bubble fades away over its last moments. */
+.bubble[data-timed] {
+  animation:
+    pop var(--duration-base) var(--ease-out) both,
+    leave 360ms var(--ease-in-out) calc(var(--life) - 360ms) forwards;
+}
+
+.bubble[data-leaving] {
+  animation: leave 360ms var(--ease-in-out) forwards;
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+  }
+}
+
+/* Without motion the bubble simply appears and disappears. */
+@media (prefers-reduced-motion: reduce) {
+  .bubble,
+  .bubble[data-timed],
+  .bubble[data-leaving] {
+    animation: none;
+  }
+}
+
 @keyframes pop {
   from {
     opacity: 0;

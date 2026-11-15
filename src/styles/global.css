@@ -47,8 +47,8 @@ body::after {
 body::before {
   z-index: -2;
   background-image:
-    radial-gradient(55rem 38rem at 78% -8%, rgb(79 107 255 / 17%), transparent 62%),
-    radial-gradient(44rem 34rem at -8% 42%, rgb(138 91 255 / 11%), transparent 62%);
+    radial-gradient(55rem 38rem at 78% -8%, rgb(25 68 71 / 45%), transparent 62%),
+    radial-gradient(44rem 34rem at -8% 42%, rgb(25 68 71 / 30%), transparent 62%);
   background-repeat: no-repeat;
 }
 
@@ -94,7 +94,7 @@ canvas {
 }
 
 ::selection {
-  background: rgb(143 157 255 / 35%);
+  background: rgb(174 222 209 / 30%);
   color: var(--color-text);
 }
 

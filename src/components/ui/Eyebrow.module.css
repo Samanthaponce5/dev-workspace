@@ -16,8 +16,8 @@
   width: var(--space-5);
   height: 2px;
   border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--color-glow-blue), var(--color-violet));
-  box-shadow: 0 0 12px var(--color-glow-violet);
+  background: linear-gradient(90deg, var(--color-aqua), var(--color-accent));
+  box-shadow: 0 0 12px var(--color-aqua);
 }
 
 /* On narrow phones the label may wrap, so the dash would float mid-block. */

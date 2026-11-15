@@ -33,7 +33,7 @@ export function Laptop({ position = [0, 0, 0], shadows }) {
         {/* Lit screen on the inside of the lid */}
         <mesh position={[0, -LID.thickness / 2 - 0.001, LID.height / 2]} rotation={[Math.PI / 2, 0, 0]}>
           <planeGeometry args={[BASE.width - 0.06, LID.height - 0.06]} />
-          <meshStandardMaterial color="#141a33" emissive="#6f7fff" emissiveIntensity={0.55} roughness={0.3} />
+          <meshStandardMaterial color="#12202b" emissive={palette.laptopScreen} emissiveIntensity={0.5} roughness={0.3} />
         </mesh>
       </group>
     </group>
