@@ -1,14 +1,15 @@
+/* Positioned by inline left/top/width/height once the stage slot is measured. */
 .fallback {
   position: absolute;
-  inset: 0;
+  inset: 45% 0 0;
   display: grid;
   place-items: center;
 }
 
 .art {
-  width: min(100%, 36rem);
-  height: auto;
-  filter: drop-shadow(0 20px 40px rgb(79 107 255 / 25%));
+  width: min(100%, 44rem);
+  max-height: 100%;
+  filter: drop-shadow(0 20px 50px rgb(110 90 255 / 35%));
 }
 
 /* While the 3D bundle downloads the illustration breathes gently. */

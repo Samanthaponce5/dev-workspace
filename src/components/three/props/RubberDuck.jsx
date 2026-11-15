@@ -1,74 +1,61 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Html } from '@react-three/drei'
+import { useCallback, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { palette } from '../materials'
+import { useHoverCursor } from '../../../hooks/useHoverCursor'
+import { useSceneEvent } from '../../../hooks/useSceneEvent'
+import { useTimedValue } from '../../../hooks/useTimedValue'
 import { playSqueak } from '../../../utils/squeak'
-import styles from './RubberDuck.module.css'
+import { palette } from '../materials'
+import { SpeechBubble } from '../SpeechBubble'
 
 const BUBBLE_MS = 2600
+const HOP_SECONDS = 0.7
 
 /**
- * Rubber duck debugging easter egg. Clicking it squeaks, bounces, and
- * shows a short speech bubble with one of the quotes in turn.
+ * Rubber duck debugging easter egg. Clicking it squeaks, hops, and shows
+ * a short speech bubble with one of the quotes in turn.
  */
 export function RubberDuck({ position, quotes, animate = true }) {
   const bodyRef = useRef(null)
-  const bounceStart = useRef(-1)
-  const [quoteIndex, setQuoteIndex] = useState(-1)
-  const [hovered, setHovered] = useState(false)
+  const hopStart = useRef(-1)
+  const nextQuote = useRef(0)
+  const [bubble, setBubble] = useTimedValue(BUBBLE_MS)
+  const hover = useHoverCursor()
 
-  useEffect(() => {
-    if (quoteIndex < 0) return undefined
-    const id = window.setTimeout(() => setQuoteIndex(-1), BUBBLE_MS)
-    return () => window.clearTimeout(id)
-  }, [quoteIndex])
-
-  useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : ''
-    return () => {
-      document.body.style.cursor = ''
-    }
-  }, [hovered])
-
-  const squeak = useCallback(
-    (event) => {
-      event.stopPropagation()
-      playSqueak()
-      bounceStart.current = performance.now()
-      setQuoteIndex((index) => (index + 1) % quotes.length)
-    },
-    [quotes.length],
-  )
+  const squeak = useCallback(() => {
+    playSqueak()
+    hopStart.current = performance.now()
+    setBubble({ text: quotes[nextQuote.current % quotes.length] })
+    nextQuote.current += 1
+  }, [quotes, setBubble])
+  useSceneEvent('duck:squeak', squeak)
 
   useFrame(() => {
     const body = bodyRef.current
     if (!body) return
-    if (!animate || bounceStart.current < 0) {
+
+    const t = hopStart.current < 0 ? -1 : (performance.now() - hopStart.current) / 1000
+    if (!animate || t < 0 || t > HOP_SECONDS) {
+      hopStart.current = -1
       body.position.y = 0
       body.scale.set(1, 1, 1)
       return
     }
-    const t = (performance.now() - bounceStart.current) / 1000
-    if (t > 0.7) {
-      bounceStart.current = -1
-      return
-    }
-    // A hop with a little squash on landing.
-    const hop = Math.max(0, Math.sin(t * Math.PI * 1.43)) * 0.12
+    // A hop with a little squash as it takes off.
+    const hop = Math.max(0, Math.sin((t / HOP_SECONDS) * Math.PI)) * 0.12
     const squash = t < 0.08 ? 1 - (0.08 - t) * 3 : 1
     body.position.y = hop
     body.scale.set(1 / Math.sqrt(squash), squash, 1 / Math.sqrt(squash))
   })
 
-  const quote = quoteIndex >= 0 ? quotes[quoteIndex] : null
-
   return (
     <group position={position}>
       <group
         ref={bodyRef}
-        onClick={squeak}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        {...hover}
+        onClick={(event) => {
+          event.stopPropagation()
+          squeak()
+        }}
       >
         {/* Body */}
         <mesh position={[0, 0.05, 0]} scale={[1.1, 0.85, 1.35]}>
@@ -99,13 +86,7 @@ export function RubberDuck({ position, quotes, animate = true }) {
         ))}
       </group>
 
-      {quote && (
-        <Html position={[0, 0.26, 0]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
-          <div className={styles.bubble} role="status">
-            {quote}
-          </div>
-        </Html>
-      )}
+      {bubble && <SpeechBubble position={[0, 0.3, 0]}>{bubble.text}</SpeechBubble>}
     </group>
   )
 }

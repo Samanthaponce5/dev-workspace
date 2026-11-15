@@ -1,0 +1,26 @@
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  animation: reveal var(--duration-slow) var(--ease-out) both;
+}
+
+/* Let vertical swipes scroll the page even when they start on the scene. */
+.canvas canvas {
+  touch-action: pan-y;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

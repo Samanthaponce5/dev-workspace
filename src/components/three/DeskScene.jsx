@@ -1,32 +1,37 @@
 import { Canvas } from '@react-three/fiber'
+import { CameraRig } from './camera/CameraRig'
+import { VIEWS } from './camera/views'
 import { DeskWorld } from './DeskWorld'
 
-const CAMERA = {
-  desktop: { position: [5.5, 3.4, 7.0], fov: 26 },
-  mobile: { position: [4.6, 2.8, 5.8], fov: 32 },
-}
-const TARGET = [0.25, -0.05, 0.35]
-
 /**
- * The WebGL canvas for the hero. Rendering only runs while `active`
- * (the stage is on screen and the tab is visible). Pixel ratio is capped
- * to keep the fill cost down on high-density screens.
+ * The WebGL canvas for the hero. It fills its parent (the whole hero) and
+ * the camera fits the diorama to `frame`, the part of the canvas the
+ * layout reserves for it. Rendering only runs while `active`, and the
+ * pixel ratio is capped to keep the fill cost down on dense screens.
  */
-export function DeskScene({ scene, active, animate, isMobile }) {
-  const camera = isMobile ? CAMERA.mobile : CAMERA.desktop
+export function DeskScene({ scene, frame, active, animate, isMobile }) {
+  const view = isMobile ? VIEWS.mobile : VIEWS.desktop
   const shadows = !isMobile
+
+  // Label the <canvas> itself, so speech bubbles rendered beside it in the
+  // DOM are still announced by screen readers.
+  const describeCanvas = ({ gl }) => {
+    gl.domElement.setAttribute('role', 'img')
+    gl.domElement.setAttribute('aria-label', scene.description)
+  }
 
   return (
     <Canvas
       dpr={isMobile ? [1, 1.5] : [1, 1.75]}
       frameloop={active ? 'always' : 'never'}
       shadows={shadows}
-      camera={{ position: camera.position, fov: camera.fov, near: 0.5, far: 40 }}
+      camera={{ fov: view.fov, near: 0.5, far: 80, position: [5, 3, 7] }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      onCreated={({ camera: cam }) => cam.lookAt(...TARGET)}
+      onCreated={describeCanvas}
       style={{ background: 'transparent' }}
     >
-      <DeskWorld scene={scene} animate={animate} parallax={!isMobile} shadows={shadows} simplified={isMobile} />
+      <CameraRig view={view} frame={frame ?? view.defaultFrame} />
+      <DeskWorld scene={scene} animate={animate} parallax={!isMobile} shadows={shadows} facingAngle={view.azimuth} />
     </Canvas>
   )
 }

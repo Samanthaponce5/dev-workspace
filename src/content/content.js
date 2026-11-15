@@ -9,25 +9,27 @@ export const site = {
   company: 'Podchaser',
 }
 
+/*
+ * Header links, in display order. `pinned` links stay visible in the bar on
+ * phones; the rest live in the menu there.
+ */
 export const nav = [
+  { id: 'work', label: 'Work', pinned: true },
   { id: 'about', label: 'About' },
-  { id: 'work', label: 'What I do' },
   { id: 'experience', label: 'Experience' },
   { id: 'contact', label: 'Contact' },
 ]
 
 export const hero = {
-  eyebrow: 'Front-End Developer · Growing Into Full-Stack',
   title: site.name,
-  intro:
-    'I’m a Front-End Developer at Podchaser, building fast, accessible interfaces and growing into Full-Stack work. I care about the small details that make software feel good to use.',
-  primaryAction: { label: 'See my work', href: '#work' },
-  secondaryAction: { label: 'Say hi', href: '#contact' },
+  role: `${site.role} at ${site.company}`,
+  /* Shown on tablet and desktop only, to keep the phone hero compact. */
+  tagline: 'I build fast, accessible interfaces.',
+  primaryAction: { label: 'View work', href: '#work' },
 }
 
 /* Text and settings used inside the 3D desk scene. */
 export const scene = {
-  monitorLines: [site.name, site.role],
   /* Shown on the desk clock next to the visitor's real local time. */
   clockTemperature: '73°F',
   duckQuotes: [
@@ -36,7 +38,16 @@ export const scene = {
     'It works on my pond.',
   ],
   description:
-    'A tiny 3D model of Samantha’s desk at night: a curved monitor showing code, a laptop, a glowing jellyfish lamp, a rubber duck, and Samantha typing with her dog Andy beside her chair.',
+    'A tiny 3D model of Samantha’s desk at night: a curved monitor showing code, a laptop, a steaming cup of coffee, a glowing jellyfish lamp and a rubber duck. Samantha is typing in her chair with her dog Andy sitting beside her.',
+  /* Speech bubbles shown when a character is clicked. */
+  samGreeting: 'Hi there!',
+  andyBark: 'Woof!',
+  /* Labels for the keyboard-accessible buttons that trigger scene moments. */
+  controls: {
+    sam: 'Wave at Samantha',
+    andy: 'Say hi to Andy',
+    duck: 'Squeak the rubber duck',
+  },
 }
 
 export const about = {

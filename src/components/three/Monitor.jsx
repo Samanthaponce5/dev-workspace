@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { DESK } from './dimensions'
 import { lightLevels, palette } from './materials'
@@ -12,21 +12,14 @@ const SCREEN = {
   standHeight: 0.18,
 }
 
-const NAME_DELAY_MS = 2200
-
 /**
- * Curved ultrawide monitor on the riser shelf. The screen is a slice of a
- * cylinder viewed from the inside so it curves toward the viewer.
+ * Curved ultrawide monitor on the riser shelf, showing a quiet code
+ * editor. The screen is a slice of a cylinder viewed from the inside so
+ * it curves toward the viewer.
  */
-export function Monitor({ lines, shadows }) {
-  const [showName, setShowName] = useState(false)
-  useEffect(() => {
-    const id = window.setTimeout(() => setShowName(true), NAME_DELAY_MS)
-    return () => window.clearTimeout(id)
-  }, [])
-
+export function Monitor({ shadows }) {
   // Viewed from inside the cylinder the UVs run right-to-left, so mirror.
-  const screenTexture = useCodeScreenTexture({ showName, lines, mirrorX: true })
+  const screenTexture = useCodeScreenTexture({ mirrorX: true })
 
   const { width, height, radius, bezel, standHeight } = SCREEN
   const arc = width / radius
@@ -38,32 +31,16 @@ export function Monitor({ lines, shadows }) {
   // The cylinder axis sits in front of the screen, toward the viewer.
   const axisZ = screenZ + radius
 
-  const geometries = useMemo(
-    () => ({
+  const geometries = useMemo(() => {
+    const bezelStart = thetaStart - bezel / radius
+    const bezelArc = arc + (2 * bezel) / radius
+    const bezelHeight = height + bezel * 2
+    return {
       screen: new THREE.CylinderGeometry(radius, radius, height, 48, 1, true, thetaStart, arc),
-      bezel: new THREE.CylinderGeometry(
-        radius + 0.004,
-        radius + 0.004,
-        height + bezel * 2,
-        48,
-        1,
-        true,
-        thetaStart - bezel / radius,
-        arc + (2 * bezel) / radius,
-      ),
-      back: new THREE.CylinderGeometry(
-        radius + 0.06,
-        radius + 0.06,
-        height + bezel * 2,
-        48,
-        1,
-        true,
-        thetaStart - bezel / radius,
-        arc + (2 * bezel) / radius,
-      ),
-    }),
-    [radius, height, thetaStart, arc, bezel],
-  )
+      bezel: new THREE.CylinderGeometry(radius + 0.004, radius + 0.004, bezelHeight, 48, 1, true, bezelStart, bezelArc),
+      back: new THREE.CylinderGeometry(radius + 0.06, radius + 0.06, bezelHeight, 48, 1, true, bezelStart, bezelArc),
+    }
+  }, [radius, height, thetaStart, arc, bezel])
   useEffect(() => () => Object.values(geometries).forEach((geometry) => geometry.dispose()), [geometries])
 
   return (
@@ -74,9 +51,9 @@ export function Monitor({ lines, shadows }) {
             map={screenTexture}
             emissiveMap={screenTexture}
             emissive="#ffffff"
-            emissiveIntensity={1.15}
+            emissiveIntensity={0.95}
             color="#000000"
-            roughness={0.35}
+            roughness={0.9}
             side={THREE.BackSide}
             toneMapped={false}
           />
@@ -100,7 +77,7 @@ export function Monitor({ lines, shadows }) {
       </mesh>
 
       {/* Screen light spilling onto the desk and the person at it */}
-      <pointLight position={[0, screenCenterY, screenZ + 0.6]} intensity={lightLevels.monitor} color="#9fb4ff" distance={3.2} decay={2} />
+      <pointLight position={[0, screenCenterY, screenZ + 0.6]} intensity={lightLevels.monitor} color="#9fb4ff" distance={3.4} decay={2} />
     </group>
   )
 }

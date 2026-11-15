@@ -8,3 +8,7 @@
 .narrow {
   max-width: calc(var(--width-prose) + var(--space-gutter) * 2);
 }
+
+.wide {
+  max-width: calc(var(--width-wide) + var(--space-gutter) * 2);
+}

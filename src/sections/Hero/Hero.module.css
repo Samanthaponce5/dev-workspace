@@ -1,74 +1,98 @@
+/*
+ * Layers, back to front:
+ *   .backdrop  midnight gradient and the purple/blue light pools
+ *   scene      full-bleed 3D canvas (see HeroScene)
+ *   ::after    fade into the page colour along the bottom edge
+ *   .layout    text, above the canvas
+ */
 .hero {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  align-items: center;
-  min-height: 100svh;
-  padding-top: calc(var(--nav-height) + var(--space-4));
-  padding-bottom: calc(var(--space-7) + var(--safe-bottom));
+  min-height: max(100svh, 40rem);
+  overflow: clip;
 }
 
-/*
- * Mobile first: the scene sits on top so it is the first thing seen,
- * with the text centred beneath it.
- */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  /* Phone: indigo midnight that warms to violet around the desk. */
+  background:
+    radial-gradient(90% 38% at 50% 74%, rgb(124 84 255 / 42%), transparent 70%),
+    radial-gradient(70% 30% at 85% 60%, rgb(72 96 255 / 30%), transparent 70%),
+    linear-gradient(180deg, #0d0d27 0%, #121238 38%, #1a1752 78%, #15133f 100%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 12%;
+  background: linear-gradient(180deg, transparent, var(--color-bg));
+  pointer-events: none;
+}
+
+/* Text sits above the canvas; only the text itself captures the pointer. */
 .layout {
   display: grid;
-  grid-template-areas:
-    'stage'
-    'intro';
-  gap: var(--space-5);
-}
-
-.stage {
-  grid-area: stage;
+  grid-template-rows: auto minmax(19rem, 1fr);
+  padding-top: calc(var(--nav-height) + env(safe-area-inset-top, 0px) + var(--space-5));
+  pointer-events: none;
 }
 
 .intro {
-  grid-area: intro;
   display: grid;
-  justify-items: center;
-  text-align: center;
-  gap: var(--space-4);
+  justify-items: start;
+  justify-self: start;
+  /* A little extra indent on phones, matching the generous mockup margin. */
+  padding-left: clamp(0rem, 4vw, 1rem);
+  pointer-events: auto;
 }
 
 .name {
-  margin-block: var(--space-1);
+  color: var(--color-white);
   font-size: var(--text-display);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-heavy);
   line-height: 0.98;
-  letter-spacing: var(--tracking-display);
-  text-wrap: balance;
-  /* Soft light falling across the letters, plus a faint violet haze. */
-  background: linear-gradient(100deg, #f4f5ff 0%, #dfe3ff 46%, #b8bfff 78%, #c7b4ff 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 28px rgb(143 157 255 / 22%));
+  letter-spacing: -0.045em;
 }
 
 .nameLine {
   display: block;
 }
 
-.lede {
-  max-width: 30rem;
-  font-size: var(--text-base);
-  line-height: 1.5;
-  color: var(--color-text-muted);
-  text-wrap: pretty;
+.role {
+  max-width: 14em;
+  margin-top: var(--space-5);
+  color: var(--color-white);
+  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.625rem);
+  font-weight: var(--weight-medium);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* Left out on phones so the button and desk get the first screen. */
+.tagline {
+  display: none;
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-3);
-  width: 100%;
-  margin-top: var(--space-2);
+  margin-top: var(--space-5);
 }
 
-/* On phones both buttons share the row and stretch to equal widths. */
-.action {
-  flex: 1 1 9rem;
+.arrow {
+  display: none;
+}
+
+/* The slot the diorama is fitted to: full width, down to the hero's edge. */
+.stage {
+  margin-inline: calc(-1 * max(var(--space-gutter), var(--safe-left)))
+    calc(-1 * max(var(--space-gutter), var(--safe-right)));
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-4);
 }
 
 /* Staggered entrance, timed from --enter-step on each block. */
@@ -89,54 +113,81 @@
   }
 }
 
-@media (min-width: 30rem) {
-  .lede {
-    font-size: var(--text-lg);
-  }
-
-  .action {
-    flex: 0 1 auto;
-    min-width: 9.5rem;
-  }
-}
-
-/* Tablet: give the stage more room before the columns split. */
+/* Tablet: same stack, with the tagline and a taller stage. */
 @media (min-width: 48rem) {
-  .layout {
-    gap: var(--space-7);
+  .tagline {
+    display: block;
+    margin-top: var(--space-4);
+    color: rgb(255 255 255 / 86%);
+    font-size: var(--text-lg);
+    line-height: 1.4;
+  }
+
+  .role {
+    max-width: none;
+    font-weight: var(--weight-bold);
+  }
+
+  .actions {
+    margin-top: var(--space-6);
+  }
+
+  .arrow {
+    display: block;
   }
 }
 
 /*
- * Desktop: text on the left, the diorama on a wider stage to the right.
- * The desk is a landscape object with an ultrawide monitor, so it earns
- * the larger share of the width.
+ * Desktop: text on the left around the vertical centre, the desk filling
+ * most of the right. The left stays near black so the white text reads;
+ * the purple and blue light spills out from behind the desk.
  */
 @media (min-width: 64rem) {
   .hero {
-    padding-top: var(--nav-height);
-    padding-bottom: var(--space-7);
+    min-height: max(100svh, 38rem);
+  }
+
+  .backdrop {
+    background:
+      radial-gradient(34% 52% at 50% 64%, rgb(128 70 255 / 46%), transparent 72%),
+      radial-gradient(36% 46% at 92% 10%, rgb(96 84 255 / 44%), transparent 72%),
+      radial-gradient(40% 50% at 100% 96%, rgb(60 70 255 / 40%), transparent 72%),
+      linear-gradient(90deg, #06060d 0%, #090916 34%, #121034 72%, #15123c 100%);
   }
 
   .layout {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-areas: 'intro stage';
+    grid-template-rows: none;
     align-items: center;
-    gap: var(--space-8);
+    padding-top: var(--nav-height);
+    padding-bottom: var(--space-6);
   }
 
   .intro {
-    justify-items: start;
-    text-align: left;
-    gap: var(--space-5);
+    padding-left: 0;
+  }
+
+  .name {
+    font-size: clamp(4rem, 6.2vw, 5.75rem);
+  }
+
+  .role {
+    margin-top: var(--space-6);
+    font-size: clamp(1.375rem, 1.75vw, 1.625rem);
+  }
+
+  .tagline {
+    margin-top: var(--space-5);
+    font-size: clamp(1.125rem, 1.5vw, 1.375rem);
   }
 
   .actions {
-    justify-content: flex-start;
-    width: auto;
+    margin-top: var(--space-7);
   }
 
-  .lede {
-    max-width: 30rem;
+  /* Out of flow: the slot spans the right side, almost edge to edge. */
+  .stage {
+    position: absolute;
+    inset: calc(var(--nav-height) * 0.6) 1.5% 2% 37%;
+    margin: 0;
   }
 }

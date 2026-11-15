@@ -21,6 +21,10 @@
   --color-glow-blue: #4f6bff;
   --color-glow-violet: #8a5bff;
   --color-warm: #ffb870;
+  --color-lavender: #cbbcff;
+  --color-lavender-strong: #ddd2ff;
+  --color-lime: #c8f55a;
+  --color-white: #ffffff;
   --color-on-accent: #0a0c18;
 
   /* Type */
@@ -34,7 +38,7 @@
   --text-xl: clamp(1.375rem, 1.2rem + 0.8vw, 1.875rem);
   --text-2xl: clamp(1.875rem, 1.45rem + 2vw, 3rem);
   --text-3xl: clamp(2.5rem, 1.6rem + 4.2vw, 4.75rem);
-  --text-display: clamp(2.75rem, 1.5rem + 6.5vw, 5.75rem);
+  --text-display: clamp(3.125rem, 1.6rem + 8vw, 5.75rem);
 
   --leading-tight: 1.02;
   --leading-snug: 1.25;
@@ -44,6 +48,7 @@
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
+  --weight-heavy: 760;
 
   --tracking-tight: -0.03em;
   --tracking-display: -0.04em;
@@ -69,6 +74,7 @@
 
   /* Layout */
   --width-content: 72rem;
+  --width-wide: 80rem;
   --width-prose: 40rem;
   --nav-height: 4rem;
 

@@ -1,0 +1,92 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: var(--layer-nav);
+  padding-top: env(safe-area-inset-top, 0px);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+/* Once the page scrolls, the bar gains a blurred backing so text stays readable. */
+.solid {
+  background: rgb(9 9 24 / 72%);
+  border-bottom-color: var(--color-border);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-height);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
+  font-size: 1.0625rem;
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--color-lavender);
+  }
+}
+
+.link[aria-current='true'] {
+  color: var(--color-lavender);
+}
+
+.desktopOnly {
+  display: none;
+}
+
+.menuToggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-right: calc(var(--space-2) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-white);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 48rem) {
+  .links {
+    gap: var(--space-5);
+  }
+
+  .desktopOnly {
+    display: list-item;
+  }
+
+  .menuToggle {
+    display: none;
+  }
+}
