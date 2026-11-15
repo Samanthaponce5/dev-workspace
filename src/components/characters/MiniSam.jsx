@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { samPalette as colors } from '../three/materials'
 import { SamHead } from './SamHead'
+import { SamJeans } from './SamJeans'
 import { FACE } from './samShape'
 
 const { lerp } = THREE.MathUtils
@@ -18,6 +19,7 @@ const ARM = {
   waveRaise: -2.45, // out to the side and up
   waveElbow: -0.3,
 }
+const TORSO_LEAN = 0.14 // radians her upper body tips toward the desk
 const BLINK_EVERY = 3.6
 const BLINK_LENGTH = 0.13
 
@@ -42,33 +44,10 @@ function Arm({ side, armRef, forearmRef, shadows }) {
   )
 }
 
-function Leg({ side, shadows }) {
-  const x = side * 0.065
-  return (
-    <>
-      {/* Thigh, along the seat */}
-      <mesh position={[x, 0.06, 0.13]} rotation={[Math.PI / 2, 0, 0]} castShadow={shadows}>
-        <capsuleGeometry args={[0.055, 0.13, 4, 10]} />
-        <meshStandardMaterial color={colors.jeans} roughness={0.85} />
-      </mesh>
-      {/* Shin */}
-      <mesh position={[x, -0.035, 0.25]} castShadow={shadows}>
-        <capsuleGeometry args={[0.05, 0.07, 4, 10]} />
-        <meshStandardMaterial color={colors.jeans} roughness={0.85} />
-      </mesh>
-      {/* Sneaker */}
-      <mesh position={[x, -0.125, 0.275]} scale={[1.05, 0.72, 1.45]}>
-        <sphereGeometry args={[0.058, 12, 10]} />
-        <meshStandardMaterial color={colors.shoes} roughness={0.6} />
-      </mesh>
-    </>
-  )
-}
-
 /**
  * Mini-Samantha: a seated chibi built from spheres and capsules. Big head,
  * small body, navy top tucked into high-waisted jeans, white sneakers.
- * Her head, face and hair live in SamHead.jsx.
+ * Her head, face and hair live in SamHead.jsx; her jeans in SamJeans.jsx.
  *
  * She animates herself (breathing, blinking, typing, waving) and blends
  * between poses using the weights in `poseRef.current`:
@@ -127,24 +106,14 @@ export function MiniSam({ poseRef, animate = true, shadows }) {
 
   return (
     <group ref={rootRef} scale={SCALE}>
-      {/* High-waisted jeans: hips plus a waistband that the top tucks into */}
-      <mesh position={[0, 0.075, 0]} scale={[1, 0.8, 0.85]} castShadow={shadows}>
-        <sphereGeometry args={[0.13, 16, 12]} />
-        <meshStandardMaterial color={colors.jeans} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 0.15, 0.008]}>
-        <cylinderGeometry args={[0.106, 0.116, 0.11, 20]} />
-        <meshStandardMaterial color={colors.jeans} roughness={0.85} />
-      </mesh>
-      <Leg side={-1} shadows={shadows} />
-      <Leg side={1} shadows={shadows} />
+      <SamJeans torsoLean={TORSO_LEAN} shadows={shadows} />
 
       {/* Upper body leans in a little */}
-      <group ref={torsoRef} position={[0, 0.1, 0]} rotation={[0.14, 0, 0]}>
+      <group ref={torsoRef} position={[0, 0.1, 0]} rotation={[TORSO_LEAN, 0, 0]}>
         <group position={[0, -0.1, 0]}>
-          {/* Fitted navy long-sleeve top */}
-          <mesh position={[0, 0.27, 0]} castShadow={shadows}>
-            <capsuleGeometry args={[0.092, 0.09, 6, 14]} />
+          {/* Fitted navy long-sleeve top. It runs straight down past the waistband, so the tuck is a clean line. */}
+          <mesh position={[0, 0.25, 0]} castShadow={shadows}>
+            <capsuleGeometry args={[0.092, 0.13, 8, 28]} />
             <meshStandardMaterial color={colors.top} roughness={0.8} />
           </mesh>
           <mesh position={[0, 0.425, 0]}>

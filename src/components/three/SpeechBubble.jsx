@@ -21,8 +21,13 @@ const projected = new THREE.Vector3()
  * To fade out instead of vanishing, either pass `durationMs` (how long
  * the bubble will be shown, for bubbles on a timer) or set `leaving` just
  * before removing it (for bubbles driven by an animation timeline).
+ *
+ * The fade is scheduled when the bubble's element is created. If the
+ * same bubble can be shown again while it is still up, pass a
+ * `restartKey` that changes on every showing: the element is then
+ * recreated, so it pops in again and its fade starts from zero.
  */
-export function SpeechBubble({ position, durationMs, leaving = false, children }) {
+export function SpeechBubble({ position, durationMs, leaving = false, restartKey, children }) {
   const bubbleRef = useRef(null)
 
   const calculatePosition = useCallback((object, camera, size) => {
@@ -46,6 +51,7 @@ export function SpeechBubble({ position, durationMs, leaving = false, children }
     <Html position={position} calculatePosition={calculatePosition} zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
       <div className={styles.anchor} style={{ '--tail': `${TAIL}px` }}>
         <div
+          key={restartKey}
           ref={bubbleRef}
           className={styles.bubble}
           role="status"

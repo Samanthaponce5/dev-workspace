@@ -81,147 +81,154 @@ function drawCodeLines(context) {
   context.globalAlpha = 1
 }
 
-/* Right half of the screen: a live preview of this very site, above a test run. */
-const PANE = { x: 880, width: 628 }
-const PREVIEW = { y: 22, height: 300 }
-const TERMINAL = { y: 338, height: 156 }
+/* Right half of the screen: a browser DevTools panel on its Network tab. */
+const PANE = { x: 874, y: 14, width: 646, height: 484 }
+const ROWS = { tabs: 52, overview: 46, filters: 50, header: 32, request: 64, highlighted: 92, footer: 34 }
+const COLUMNS = { name: 22, status: 360, waterfall: 520 }
 
 const SANS = "'Geist Variable', system-ui, sans-serif"
 const MONO = "'Geist Mono Variable', ui-monospace, monospace"
+const BLUE = '#8ab4f8'
+const GREEN = '#81c995'
+const MUTED = '#9aa0a6'
 
-function drawPreview(context, content) {
-  const { x, width } = PANE
-  const { y, height } = PREVIEW
-  const barHeight = 30
+/* Where each request's bar sits in the waterfall: [start, length] as fractions. */
+const WATERFALL = [
+  [0.04, 0.3],
+  [0.22, 0.62],
+  [0.6, 0.28],
+]
 
-  // Browser window
-  fillRoundedRect(context, x, y, width, height, 12, '#0b1721')
+function drawDevTools(context, content) {
+  const { x, y, width, height } = PANE
+  const right = x + width
+
+  fillRoundedRect(context, x, y, width, height, 12, '#202124')
   context.save()
   context.beginPath()
   context.roundRect(x, y, width, height, 12)
   context.clip()
-
-  // Teal glow behind the little desk, like the real hero
-  const glow = context.createRadialGradient(x + width * 0.72, y + height * 0.62, 10, x + width * 0.72, y + height * 0.62, width * 0.5)
-  glow.addColorStop(0, 'rgba(20, 96, 106, 0.95)')
-  glow.addColorStop(1, 'rgba(20, 96, 106, 0)')
-  context.fillStyle = glow
-  context.fillRect(x, y, width, height)
-
-  // Address bar
-  context.fillStyle = '#132733'
-  context.fillRect(x, y, width, barHeight)
-  ;['#ff6b6b', '#ffd23f', '#63b06f'].forEach((color, index) => {
-    context.beginPath()
-    context.arc(x + 20 + index * 18, y + barHeight / 2, 5, 0, Math.PI * 2)
-    context.fillStyle = color
-    context.fill()
-  })
-  fillRoundedRect(context, x + 86, y + 7, 300, 16, 8, '#0b1721')
-
-  // Mini page: monogram, name, role, button
-  const left = x + 30
-  context.textBaseline = 'alphabetic'
   context.textAlign = 'left'
-  context.fillStyle = '#eef7f6'
-  context.font = `700 17px ${SANS}`
-  context.fillText(content.monogram, left, y + 62)
-  context.beginPath()
-  context.arc(left + 28, y + 58, 3.5, 0, Math.PI * 2)
-  context.fillStyle = '#c8f55a'
-  context.fill()
+  context.textBaseline = 'alphabetic'
 
-  context.fillStyle = '#eef7f6'
-  context.font = `760 46px ${SANS}`
-  content.nameLines.forEach((line, index) => context.fillText(line, left, y + 132 + index * 44))
-  fillRoundedRect(context, left, y + 196, 190, 9, 4.5, 'rgba(238, 247, 246, 0.8)')
-  fillRoundedRect(context, left, y + 228, 112, 32, 16, '#aeded1')
-  fillRoundedRect(context, left + 22, y + 240, 52, 8, 4, '#0b1721')
+  // Tab bar, with the open tab large enough to act as the panel's heading
+  context.fillStyle = '#292a2d'
+  context.fillRect(x, y, width, ROWS.tabs)
+  let cursor = x + 20
+  content.tabs.forEach((tab) => {
+    const active = tab === content.activeTab
+    context.font = active ? `700 31px ${SANS}` : `500 21px ${SANS}`
+    context.fillStyle = active ? '#ffffff' : MUTED
+    context.fillText(tab, cursor, y + 35)
+    const tabWidth = context.measureText(tab).width
+    if (active) {
+      context.fillStyle = BLUE
+      context.fillRect(cursor, y + ROWS.tabs - 5, tabWidth, 5)
+    }
+    cursor += tabWidth + 26
+  })
 
-  // Mini desk on its platform
-  const cx = x + width * 0.74
-  const cy = y + height * 0.66
-  const slab = (dx, dy, halfW, halfH, fill) => {
-    context.beginPath()
-    context.moveTo(cx + dx - halfW, cy + dy)
-    context.lineTo(cx + dx, cy + dy - halfH)
-    context.lineTo(cx + dx + halfW, cy + dy)
-    context.lineTo(cx + dx, cy + dy + halfH)
-    context.closePath()
-    context.fillStyle = fill
-    context.fill()
-  }
-  slab(0, 44, 140, 46, '#0f3540')
-  slab(0, 36, 140, 46, '#2d6069')
-  slab(4, 2, 92, 30, '#1c1c1f')
-  fillRoundedRect(context, cx - 52, cy - 74, 112, 44, 5, '#15161b')
-  fillRoundedRect(context, cx - 47, cy - 69, 102, 34, 3, '#0b0e17')
+  // Timeline overview: tick marks and a few coloured bars
+  let top = y + ROWS.tabs
+  context.fillStyle = '#1a1b1e'
+  context.fillRect(x, top, width, ROWS.overview)
+  context.fillStyle = '#303134'
+  for (let tick = x + 60; tick < right; tick += 84) context.fillRect(tick, top, 2, ROWS.overview)
   ;[
-    [0, 40, '#c792ea'],
-    [1, 62, '#82aaff'],
-    [2, 34, '#c3e88d'],
-  ].forEach(([row, barWidth, color]) => fillRoundedRect(context, cx - 40, cy - 63 + row * 9, barWidth, 4, 2, color))
-  fillRoundedRect(context, cx - 62, cy - 26, 132, 4, 2, '#71c9c8')
+    [0.05, 0.2, '#f6ae2d', 10],
+    [0.18, 0.34, BLUE, 20],
+    [0.3, 0.42, GREEN, 30],
+    [0.66, 0.2, BLUE, 16],
+  ].forEach(([start, length, color, offset]) => fillRoundedRect(context, x + start * width, top + offset, length * width, 6, 3, color))
+
+  // Filter chips, with the active one filled in
+  top += ROWS.overview
+  cursor = x + 18
+  content.filters.forEach((filter) => {
+    const active = filter === content.activeFilter
+    context.font = active ? `700 23px ${SANS}` : `500 21px ${SANS}`
+    const chipWidth = context.measureText(filter).width + 26
+    if (active) fillRoundedRect(context, cursor, top + 9, chipWidth, 33, 16.5, 'rgba(138, 180, 248, 0.28)')
+    context.fillStyle = active ? '#d2e3fc' : MUTED
+    context.fillText(filter, cursor + 13, top + 33)
+    cursor += chipWidth + 6
+  })
+
+  // Column headings
+  top += ROWS.filters
+  context.fillStyle = '#292a2d'
+  context.fillRect(x, top, width, ROWS.header)
+  context.font = `500 17px ${SANS}`
+  context.fillStyle = MUTED
+  context.fillText('Name', x + COLUMNS.name, top + 22)
+  context.fillText('Status', x + COLUMNS.status, top + 22)
+  context.fillText('Waterfall', x + COLUMNS.waterfall, top + 22)
+
+  // Requests
+  top += ROWS.header
+  const waterfallWidth = width - COLUMNS.waterfall - 18
+  content.requests.forEach((request, index) => {
+    const rowHeight = request.highlight ? ROWS.highlighted : ROWS.request
+    const middle = top + rowHeight / 2
+
+    if (request.highlight) {
+      context.fillStyle = 'rgba(138, 180, 248, 0.17)'
+      context.fillRect(x, top, width, rowHeight)
+      context.fillStyle = BLUE
+      context.fillRect(x, top, 6, rowHeight)
+    }
+
+    context.font = request.highlight ? `700 22px ${MONO}` : `500 19px ${MONO}`
+    context.fillStyle = request.highlight ? BLUE : '#7d848c'
+    context.fillText(request.method, x + COLUMNS.name, middle + 8)
+    const methodWidth = context.measureText(request.method).width
+
+    context.font = request.highlight ? `700 33px ${MONO}` : `500 23px ${MONO}`
+    context.fillStyle = request.highlight ? '#ffffff' : '#bdc1c6'
+    context.fillText(request.path, x + COLUMNS.name + methodWidth + 12, middle + (request.highlight ? 11 : 8))
+
+    if (request.highlight) {
+      context.beginPath()
+      context.arc(x + COLUMNS.status + 8, middle, 8, 0, Math.PI * 2)
+      context.fillStyle = GREEN
+      context.fill()
+      context.font = `700 29px ${MONO}`
+      context.fillText(request.status, x + COLUMNS.status + 24, middle + 10)
+    } else {
+      context.font = `500 22px ${MONO}`
+      context.fillStyle = MUTED
+      context.fillText(request.status, x + COLUMNS.status, middle + 8)
+    }
+
+    const [start, length] = WATERFALL[index % WATERFALL.length]
+    const barHeight = request.highlight ? 16 : 10
+    const barX = x + COLUMNS.waterfall + start * waterfallWidth
+    fillRoundedRect(context, barX - 12, middle - 1, 12, 2, 1, '#5f6368')
+    fillRoundedRect(context, barX, middle - barHeight / 2, length * waterfallWidth, barHeight, barHeight / 2, request.highlight ? GREEN : BLUE)
+
+    context.fillStyle = '#303134'
+    context.fillRect(x, top + rowHeight - 1, width, 1)
+    top += rowHeight
+  })
+
+  // Status bar
+  context.fillStyle = '#292a2d'
+  context.fillRect(x, y + height - ROWS.footer, width, ROWS.footer)
+  context.font = `500 17px ${SANS}`
+  context.fillStyle = MUTED
+  context.fillText(content.summary, x + COLUMNS.name, y + height - 11)
 
   context.restore()
-  context.strokeStyle = 'rgba(174, 222, 209, 0.28)'
+  context.strokeStyle = 'rgba(174, 222, 209, 0.25)'
   context.lineWidth = 2
   context.beginPath()
   context.roundRect(x, y, width, height, 12)
   context.stroke()
-}
-
-function drawTinyDuck(context, x, y) {
-  context.fillStyle = '#ffd23f'
-  context.beginPath()
-  context.ellipse(x, y, 13, 9, 0, 0, Math.PI * 2)
-  context.fill()
-  context.beginPath()
-  context.arc(x + 9, y - 10, 7.5, 0, Math.PI * 2)
-  context.fill()
-  context.fillStyle = '#ff8a3d'
-  context.beginPath()
-  context.ellipse(x + 18, y - 9, 5, 2.6, 0, 0, Math.PI * 2)
-  context.fill()
-  context.fillStyle = '#1a1a1a'
-  context.beginPath()
-  context.arc(x + 11, y - 12, 1.4, 0, Math.PI * 2)
-  context.fill()
-}
-
-function drawTerminal(context, content) {
-  const { x, width } = PANE
-  const { y, height } = TERMINAL
-
-  fillRoundedRect(context, x, y, width, height, 12, '#081018')
-  context.strokeStyle = 'rgba(174, 222, 209, 0.2)'
-  context.lineWidth = 2
-  context.beginPath()
-  context.roundRect(x, y, width, height, 12)
-  context.stroke()
-
-  context.textBaseline = 'alphabetic'
-  context.textAlign = 'left'
-  context.font = `500 21px ${MONO}`
-  const left = x + 24
-  const lineHeight = 31
-
-  context.fillStyle = '#7b9398'
-  context.fillText(content.command, left, y + 38)
-
-  content.tests.forEach((label, index) => {
-    const baseline = y + 38 + (index + 1) * lineHeight
-    context.fillStyle = '#7ee0a1'
-    context.fillText('✓', left, baseline)
-    context.fillStyle = '#d7e6e6'
-    context.fillText(label, left + 30, baseline)
-    if (index === content.tests.length - 1) drawTinyDuck(context, left + 30 + context.measureText(label).width + 30, baseline - 5)
-  })
 }
 
 /**
- * The monitor's picture: a code editor on the left; on the right, a tiny
- * browser preview of this site above a terminal with a passing test run.
+ * The monitor's picture: a code editor on the left; on the right, a
+ * browser DevTools panel on its Network tab with one request picked out.
  * `content` supplies the words (see `scene.monitor` in content.js).
  */
 export function useCodeScreenTexture({ content, mirrorX = false }) {
@@ -232,8 +239,7 @@ export function useCodeScreenTexture({ content, mirrorX = false }) {
       target.paint((context) => {
         drawEditorChrome(context)
         drawCodeLines(context)
-        drawPreview(context, content)
-        drawTerminal(context, content)
+        drawDevTools(context, content)
       })
 
     draw()

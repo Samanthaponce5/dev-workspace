@@ -34,7 +34,7 @@ export function DeskWorld({ scene, animate, parallax, shadows, cameraAzimuth, in
         <Desk shadows={shadows} />
         <LedStrip />
         <Monitor content={scene.monitor} shadows={shadows} />
-        <Laptop position={[-0.1, 0, 0.34]} shadows={shadows} />
+        <Laptop position={[-0.1, 0, 0.34]} content={scene.laptop} shadows={shadows} />
 
         {/* Shelf, either side of the monitor */}
         <Clock position={[-1.42, SHELF_Y, SHELF_Z + 0.04]} temperature={scene.clockTemperature} shadows={shadows} />

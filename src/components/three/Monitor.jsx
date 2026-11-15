@@ -13,8 +13,8 @@ const SCREEN = {
 }
 
 /**
- * Curved ultrawide monitor on the riser shelf: code on the left, a live
- * preview of this site and a test run on the right. The screen is a slice of a cylinder viewed from the inside so
+ * Curved ultrawide monitor on the riser shelf: code on the left, a
+ * DevTools Network panel on the right. The screen is a slice of a cylinder viewed from the inside so
  * it curves toward the viewer.
  */
 export function Monitor({ content, shadows }) {

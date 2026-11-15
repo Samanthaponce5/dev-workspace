@@ -30,12 +30,25 @@ export const hero = {
 
 /* Text and settings used inside the 3D desk scene. */
 export const scene = {
-  /* What the curved monitor shows beside the code: a mini preview of this site and a test run. */
+  /* What the curved monitor shows beside the code: a DevTools Network panel. */
   monitor: {
-    monogram: 'SP',
-    nameLines: site.name.split(' '),
-    command: '$ npm test',
-    tests: ['renders the hero', 'keyboard accessible', 'quack\u2011test passed'],
+    tabs: ['Elements', 'Console', 'Network'],
+    activeTab: 'Network',
+    filters: ['All', 'Fetch/XHR', 'JS', 'CSS', 'Img'],
+    activeFilter: 'Fetch/XHR',
+    /* The highlighted request is drawn larger, with a green status. */
+    requests: [
+      { method: 'GET', path: '/api/me', status: '200' },
+      { method: 'GET', path: '/api/episodes', status: '200 OK', highlight: true },
+      { method: 'GET', path: '/api/search', status: '304' },
+    ],
+    summary: '3 requests',
+  },
+  /* What the laptop shows: a simplified dark-mode Q&A page. */
+  laptop: {
+    question: 'Why is my Three.js canvas blurry on mobile?',
+    accepted: 'Accepted answer',
+    snippet: 'setPixelRatio(devicePixelRatio)',
   },
   /* Shown on the desk clock next to the visitor's real local time. */
   clockTemperature: '73°F',

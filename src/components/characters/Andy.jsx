@@ -49,10 +49,11 @@ function Eye({ direction }) {
 }
 
 /**
- * Andy's head: one broad, shallow shaped mesh. The fluffy cheeks and the
- * short muzzle are swells in that single surface, and the tan crown, the
- * darker fur round the eyes and muzzle and the white chin are painted
- * onto it, so every contour and marking flows together. The shape and
+ * Andy's head: one wide, round shaped mesh. Full shaggy cheeks, whisker
+ * pads, a short flat muzzle and a beard are overlapping soft tufts in
+ * that single surface. The tan-brown crown, charcoal-brown fur round the
+ * eyes and muzzle and the white beard are painted onto it, so every
+ * contour and marking flows together. The shape and
  * colours are defined in andyShape.js.
  */
 function AndyHead({ tongueRef, leftEarRef, rightEarRef, shadows }) {
@@ -88,11 +89,11 @@ function AndyHead({ tongueRef, leftEarRef, rightEarRef, shadows }) {
       </mesh>
 
       {/* Dark floppy ears, hanging close against the sides of the head */}
-      <group ref={leftEarRef} position={[0.128, 0.07, -0.005]} rotation={[0, 0, EAR_REST]}>
-        <Fur color={colors.ear} position={[0.034, -0.105, 0]} scale={[0.052, 0.128, 0.078]} castShadow={shadows} />
+      <group ref={leftEarRef} position={[0.138, 0.07, -0.01]} rotation={[0, 0, EAR_REST]}>
+        <Fur color={colors.ear} position={[0.034, -0.11, 0]} scale={[0.05, 0.132, 0.08]} castShadow={shadows} />
       </group>
-      <group ref={rightEarRef} position={[-0.128, 0.07, -0.005]} rotation={[0, 0, -EAR_REST]}>
-        <Fur color={colors.ear} position={[-0.034, -0.105, 0]} scale={[0.052, 0.128, 0.078]} castShadow={shadows} />
+      <group ref={rightEarRef} position={[-0.138, 0.07, -0.01]} rotation={[0, 0, -EAR_REST]}>
+        <Fur color={colors.ear} position={[-0.034, -0.11, 0]} scale={[0.05, 0.132, 0.08]} castShadow={shadows} />
       </group>
     </>
   )
@@ -200,7 +201,7 @@ export function Andy({ position, facingAngle = 0, animate = true, shadows }) {
       </group>
 
       {bubble && (
-        <SpeechBubble position={[0, 0.84, 0]} durationMs={bubble.durationMs}>
+        <SpeechBubble position={[0, 0.84, 0]} durationMs={bubble.durationMs} restartKey={bubble.id}>
           {bubble.text}
         </SpeechBubble>
       )}

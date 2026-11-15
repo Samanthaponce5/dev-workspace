@@ -10,6 +10,7 @@ import { SpeechBubble } from '../SpeechBubble'
 const BUBBLE_MS = 2600
 const INTRO_BUBBLE_MS = 3000
 const HOP_SECONDS = 0.7
+const TAP_RADIUS = 0.2 // in scene units; roughly a fingertip on a phone
 
 /**
  * Rubber duck debugging easter egg.
@@ -17,7 +18,8 @@ const HOP_SECONDS = 0.7
  * Once per page load, when Samantha has finished her greeting and turned
  * back to her desk, it gives a silent little hop and says `introQuote`
  * for a few seconds. Clicking it at any time squeaks, hops, and shows one
- * of `quotes` in turn.
+ * of `quotes` in turn; every click shows the bubble afresh and restarts
+ * its timer, even if a bubble is already up.
  */
 export function RubberDuck({ position, quotes, introQuote, animate = true }) {
   const bodyRef = useRef(null)
@@ -77,6 +79,11 @@ export function RubberDuck({ position, quotes, introQuote, animate = true }) {
           squeak()
         }}
       >
+        {/* Invisible, generous tap target: the duck itself is only a few pixels wide on a phone. */}
+        <mesh position={[0, 0.08, 0]}>
+          <sphereGeometry args={[TAP_RADIUS, 12, 8]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
         {/* Body */}
         <mesh position={[0, 0.05, 0]} scale={[1.1, 0.85, 1.35]}>
           <sphereGeometry args={[0.06, 16, 12]} />
@@ -107,7 +114,7 @@ export function RubberDuck({ position, quotes, introQuote, animate = true }) {
       </group>
 
       {bubble && (
-        <SpeechBubble position={[0, 0.32, 0]} durationMs={bubble.durationMs}>
+        <SpeechBubble position={[0, 0.32, 0]} durationMs={bubble.durationMs} restartKey={bubble.id}>
           {bubble.text}
         </SpeechBubble>
       )}
