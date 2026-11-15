@@ -1,6 +1,7 @@
-import { Chair } from './Chair'
+import { Andy } from '../characters/Andy'
+import { SeatedSam } from '../characters/SeatedSam'
 import { Desk } from './Desk'
-import { CHAIR_POSITION, DESK, SHELF_Y, SHELF_Z, WORLD_OFFSET_Y } from './dimensions'
+import { ANDY_POSITION, CHAIR_POSITION, DESK, SHELF_Y, SHELF_Z, WORLD_OFFSET_Y } from './dimensions'
 import { Laptop } from './Laptop'
 import { LedStrip } from './LedStrip'
 import { Lighting } from './Lighting'
@@ -23,7 +24,7 @@ const DESK_Y = DESK.height
  * `facingAngle` is the camera's angle around the desk, so characters know
  * which way to turn to look at the visitor.
  */
-export function DeskWorld({ scene, animate, parallax, shadows }) {
+export function DeskWorld({ scene, animate, parallax, shadows, facingAngle }) {
   return (
     <SceneRig animate={animate} parallax={parallax}>
       <group position={[0, WORLD_OFFSET_Y, 0]}>
@@ -44,7 +45,8 @@ export function DeskWorld({ scene, animate, parallax, shadows }) {
         <CoffeeMug position={[0.62, DESK_Y, 0.36]} animate={animate} shadows={shadows} />
         <PencilCup position={[1.25, DESK_Y, -0.05]} shadows={shadows} />
 
-        <Chair position={CHAIR_POSITION} rotation={[0, Math.PI, 0]} shadows={shadows} />
+        <SeatedSam position={CHAIR_POSITION} facingAngle={facingAngle} animate={animate} shadows={shadows} />
+        <Andy position={ANDY_POSITION} facingAngle={facingAngle} animate={animate} shadows={shadows} />
       </group>
     </SceneRig>
   )
