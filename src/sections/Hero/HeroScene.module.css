@@ -4,12 +4,12 @@
   z-index: -2;
 }
 
-/* Invisible until the scene has drawn completely, then fades in whole. */
+/* Invisible until the scene has drawn completely, then fades in over the poster. */
 .canvas {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 900ms var(--ease-out);
+  transition: opacity 600ms var(--ease-out);
 }
 
 .canvas[data-ready] {

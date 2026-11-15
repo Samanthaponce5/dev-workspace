@@ -1,0 +1,18 @@
+{
+  "desktop": {
+    "src": "/scene-desktop.webp",
+    "width": 794,
+    "height": 587.33,
+    "pixelsPerUnit": 138.473,
+    "anchorX": 0.4932,
+    "anchorY": 0.4498
+  },
+  "mobile": {
+    "src": "/scene-mobile.webp",
+    "width": 499,
+    "height": 355,
+    "pixelsPerUnit": 87.197,
+    "anchorX": 0.508,
+    "anchorY": 0.4673
+  }
+}

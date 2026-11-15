@@ -5,7 +5,9 @@ const round = (value) => Math.round(value * 1000) / 1000
 /**
  * Measures where `targetRef` sits inside `containerRef`, as fractions of
  * the container's size: { x, y, width, height }, each between 0 and 1.
- * Updates whenever either element resizes. Returns null until measured.
+ * Also reports the container's own size in pixels (containerWidth and
+ * containerHeight). Updates whenever either element resizes. Returns
+ * null until measured.
  */
 export function useRelativeFrame(containerRef, targetRef) {
   const [frame, setFrame] = useState(null)
@@ -25,13 +27,17 @@ export function useRelativeFrame(containerRef, targetRef) {
         y: round((inner.top - outer.top) / outer.height),
         width: round(inner.width / outer.width),
         height: round(inner.height / outer.height),
+        containerWidth: Math.round(outer.width),
+        containerHeight: Math.round(outer.height),
       }
       setFrame((previous) =>
         previous &&
         previous.x === next.x &&
         previous.y === next.y &&
         previous.width === next.width &&
-        previous.height === next.height
+        previous.height === next.height &&
+        previous.containerWidth === next.containerWidth &&
+        previous.containerHeight === next.containerHeight
           ? previous
           : next,
       )

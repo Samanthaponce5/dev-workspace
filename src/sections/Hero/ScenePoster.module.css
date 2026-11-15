@@ -1,0 +1,17 @@
+/* Positioned and sized by inline styles; see ScenePoster.jsx. */
+.poster {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+/*
+ * Once the live scene is ready it fades in on top (see HeroScene.module.css).
+ * The poster waits for that fade to finish before leaving, so there is
+ * never a moment with neither fully showing.
+ */
+.poster[data-hidden] {
+  opacity: 0;
+  transition: opacity 240ms linear 620ms;
+}

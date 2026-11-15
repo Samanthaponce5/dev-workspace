@@ -11,10 +11,11 @@ import { ReadySignal } from './ReadySignal'
  * pixel ratio is capped to keep the fill cost down on dense screens.
  *
  * `onReady` fires once the whole scene has been drawn; the parent keeps
- * the canvas hidden until then. `introStarted` tells the characters the
- * scene is now visible, so they can begin their greeting.
+ * the canvas hidden until then. `sceneStarted` says the canvas is now
+ * being shown, and `introStarted` that the visitor can actually see it,
+ * so the characters can begin their greeting.
  */
-export function DeskScene({ scene, frame, active, animate, isMobile, introStarted, onReady }) {
+export function DeskScene({ scene, frame, active, animate, isMobile, sceneStarted, introStarted, onReady }) {
   const view = isMobile ? VIEWS.mobile : VIEWS.desktop
   const shadows = !isMobile
 
@@ -42,6 +43,7 @@ export function DeskScene({ scene, frame, active, animate, isMobile, introStarte
         parallax={!isMobile}
         shadows={shadows}
         cameraAzimuth={view.azimuth}
+        sceneStarted={sceneStarted}
         introStarted={introStarted}
       />
       <ReadySignal onReady={onReady} />

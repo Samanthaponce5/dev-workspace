@@ -22,12 +22,13 @@ const DESK_Y = DESK.height
  * centred on the riser with the clock and lamp either side of it, laptop
  * in front, coffee within reach, Samantha in her chair and Andy beside it.
  * `cameraAzimuth` is the camera's angle around the desk, so characters
- * know which way to turn to look at the visitor. `introStarted` becomes
- * true once the scene is on screen, which starts the greeting.
+ * know which way to turn to look at the visitor. `sceneStarted` becomes
+ * true when the scene is first shown, and `introStarted` once nothing is
+ * covering it, which starts the greeting.
  */
-export function DeskWorld({ scene, animate, parallax, shadows, cameraAzimuth, introStarted }) {
+export function DeskWorld({ scene, animate, parallax, shadows, cameraAzimuth, sceneStarted, introStarted }) {
   return (
-    <SceneRig animate={animate} parallax={parallax}>
+    <SceneRig animate={animate} parallax={parallax} started={sceneStarted}>
       <group position={[0, WORLD_OFFSET_Y, 0]}>
         <Lighting shadows={shadows} />
         <Platform shadows={shadows} />

@@ -12,10 +12,15 @@ const PARALLAX_PITCH = 0.07
  * Wraps the diorama in a group that floats, slowly turns, and tilts a
  * little toward the pointer. The pointer is tracked on the whole window
  * so the tilt responds while the cursor is over the hero text too.
+ *
+ * Nothing moves until `started` is true, and the float and turn are timed
+ * from that moment. So the scene's first visible frame is always its
+ * rest position, which is what the static poster image shows.
  */
-export function SceneRig({ animate = true, parallax = true, children }) {
+export function SceneRig({ animate = true, parallax = true, started = true, children }) {
   const groupRef = useRef(null)
   const pointer = useRef({ x: 0, y: 0 })
+  const startedAt = useRef(null)
 
   useEffect(() => {
     if (!parallax) return undefined
@@ -31,7 +36,9 @@ export function SceneRig({ animate = true, parallax = true, children }) {
     const group = groupRef.current
     if (!group) return
 
-    const t = clock.elapsedTime
+    if (!started) return
+    startedAt.current ??= clock.elapsedTime
+    const t = clock.elapsedTime - startedAt.current
     const turn = animate ? Math.sin(t * TURN_SPEED) * TURN_AMPLITUDE : 0
     const bob = animate ? Math.sin(t * 0.8) * BOB_AMPLITUDE : 0
 

@@ -14,7 +14,7 @@ const easeInOutQuad = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
  * waves, and swivels back.
  */
 export const INTRO = {
-  delay: 0.9, // wait for the scene's fade-in to finish before the wave
+  delay: 0.6, // a beat after the live scene is in view, before the wave
   raise: 0.4, // time to lift her arm
   waveEnd: 2.6, // wave finished; speech bubbles go away
   returnEnd: 3.8, // back at the keyboard

@@ -1,7 +1,7 @@
-import * as THREE from 'three'
 import { FIT_POINTS } from '../dimensions'
 
-const deg = THREE.MathUtils.degToRad
+/* Kept free of three.js so the page can use these before the 3D bundle has loaded. */
+const deg = (degrees) => (degrees * Math.PI) / 180
 
 /*
  * Camera setups for the two hero layouts.

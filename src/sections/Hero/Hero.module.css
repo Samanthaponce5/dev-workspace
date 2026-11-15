@@ -94,24 +94,6 @@
   margin-bottom: var(--space-2);
 }
 
-/* Staggered entrance, timed from --enter-step on each block. */
-.enter {
-  animation: fadeUp var(--duration-slow) var(--ease-out) both;
-  animation-delay: calc(120ms + var(--enter-step, 0) * 110ms);
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Tablet: same stack, with the tagline and a taller stage. */
 @media (min-width: 48rem) {
   .tagline {
