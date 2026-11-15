@@ -11,17 +11,14 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-height) + var(--space-4));
   -webkit-text-size-adjust: 100%;
+  background-color: var(--color-bg);
 }
 
 body {
+  position: relative;
   margin: 0;
   min-height: 100svh;
   background-color: var(--color-bg);
-  /* Two soft pools of LED light so the page never reads as flat black. */
-  background-image:
-    radial-gradient(60rem 40rem at 85% -10%, rgb(79 107 255 / 16%), transparent 60%),
-    radial-gradient(50rem 36rem at -10% 30%, rgb(138 91 255 / 10%), transparent 60%);
-  background-repeat: no-repeat;
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -31,7 +28,36 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/*
+ * Ambient light. Two soft pools of LED colour so the page never reads as
+ * flat black, plus a faint grain so large dark areas have some texture.
+ * Both are fixed and non-interactive.
+ */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  z-index: -2;
+  background-image:
+    radial-gradient(55rem 38rem at 78% -8%, rgb(79 107 255 / 17%), transparent 62%),
+    radial-gradient(44rem 34rem at -8% 42%, rgb(138 91 255 / 11%), transparent 62%);
+  background-repeat: no-repeat;
+}
+
+body::after {
+  z-index: -1;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
 }
 
 h1,
@@ -100,6 +126,7 @@ canvas {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }

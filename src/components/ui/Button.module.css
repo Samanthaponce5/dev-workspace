@@ -1,56 +1,86 @@
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 3rem;
+  min-height: 3rem; /* 48px: comfortable tap target */
   padding: var(--space-3) var(--space-5);
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   font-size: var(--text-base);
   font-weight: var(--weight-medium);
+  letter-spacing: -0.005em;
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
   transition:
     transform var(--duration-fast) var(--ease-out),
     background-color var(--duration-base) var(--ease-out),
     border-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out),
     box-shadow var(--duration-base) var(--ease-out);
 }
 
 .button:focus-visible {
   border-radius: var(--radius-pill);
+  box-shadow: var(--focus-ring);
 }
 
 .button:active {
-  transform: translateY(1px) scale(0.98);
+  transform: translateY(1px) scale(0.985);
 }
 
+/* Filled: a soft blue-violet gradient with a glow that lifts on hover. */
 .primary {
-  background: var(--color-accent);
+  background: linear-gradient(135deg, #aab4ff 0%, #9aa4ff 55%, #b9a3ff 100%);
   color: var(--color-on-accent);
-  box-shadow: var(--glow-accent);
+  box-shadow:
+    0 0 0 1px rgb(170 180 255 / 35%),
+    0 10px 30px -12px rgb(111 99 255 / 60%);
 }
 
-.primary:hover {
-  background: var(--color-accent-strong);
-  box-shadow:
-    0 0 0 1px rgb(170 180 255 / 45%),
-    0 16px 48px -10px rgb(111 99 255 / 85%);
+.primary::after {
+  /* Thin highlight along the top edge, like light catching a pill. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgb(255 255 255 / 35%), transparent 45%);
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .primary:hover {
+    box-shadow:
+      0 0 0 1px rgb(190 198 255 / 55%),
+      0 18px 44px -12px rgb(111 99 255 / 85%);
+  }
+
+  .primary:hover::after {
+    opacity: 1;
+  }
 }
 
 .primary:focus-visible {
   box-shadow: var(--focus-ring);
 }
 
+/* Outlined: quiet until hovered. */
 .ghost {
-  background: transparent;
+  background: rgb(255 255 255 / 2%);
   border-color: var(--color-border-strong);
   color: var(--color-text);
 }
 
-.ghost:hover {
-  background: var(--color-surface);
-  border-color: var(--color-accent);
+@media (hover: hover) {
+  .ghost:hover {
+    background: var(--color-surface);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
 }

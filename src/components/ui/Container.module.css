@@ -2,7 +2,7 @@
   width: 100%;
   max-width: calc(var(--width-content) + var(--space-gutter) * 2);
   margin-inline: auto;
-  padding-inline: var(--space-gutter);
+  padding-inline: max(var(--space-gutter), var(--safe-left)) max(var(--space-gutter), var(--safe-right));
 }
 
 .narrow {

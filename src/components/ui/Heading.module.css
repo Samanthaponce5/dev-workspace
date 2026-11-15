@@ -1,5 +1,5 @@
 .heading {
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   text-wrap: balance;
@@ -7,15 +7,20 @@
 
 .display {
   font-size: var(--text-display);
-  line-height: 0.95;
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
 }
 
 .xl {
   font-size: var(--text-3xl);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-display);
 }
 
 .lg {
   font-size: var(--text-2xl);
+  font-weight: var(--weight-medium);
 }
 
 .md {

@@ -2,22 +2,55 @@
   display: grid;
   align-items: center;
   min-height: 100svh;
-  padding-block: calc(var(--nav-height) + var(--space-7)) var(--space-8);
+  padding-top: calc(var(--nav-height) + var(--space-4));
+  padding-bottom: calc(var(--space-7) + var(--safe-bottom));
 }
 
+/*
+ * Mobile first: the scene sits on top so it is the first thing seen,
+ * with the text centred beneath it.
+ */
 .layout {
   display: grid;
-  gap: var(--space-7);
-}
-
-.intro {
-  display: grid;
-  justify-items: start;
+  grid-template-areas:
+    'stage'
+    'intro';
   gap: var(--space-5);
 }
 
+.stage {
+  grid-area: stage;
+}
+
+.intro {
+  grid-area: intro;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: var(--space-4);
+}
+
+.name {
+  margin-block: var(--space-1);
+  font-size: var(--text-display);
+  font-weight: var(--weight-medium);
+  line-height: 0.98;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+  /* Soft light falling across the letters, plus a faint violet haze. */
+  background: linear-gradient(100deg, #f4f5ff 0%, #dfe3ff 46%, #b8bfff 78%, #c7b4ff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 28px rgb(143 157 255 / 22%));
+}
+
+.nameLine {
+  display: block;
+}
+
 .lede {
-  max-width: 34rem;
+  max-width: 30rem;
   font-size: var(--text-lg);
   line-height: 1.5;
   color: var(--color-text-muted);
@@ -27,6 +60,79 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-3);
-  margin-top: var(--space-3);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+/* On phones both buttons share the row and stretch to equal widths. */
+.action {
+  flex: 1 1 9rem;
+}
+
+/* Staggered entrance, timed from --enter-step on each block. */
+.enter {
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+  animation-delay: calc(120ms + var(--enter-step, 0) * 110ms);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 30rem) {
+  .action {
+    flex: 0 1 auto;
+    min-width: 9.5rem;
+  }
+}
+
+/* Tablet: give the stage more room before the columns split. */
+@media (min-width: 48rem) {
+  .layout {
+    gap: var(--space-7);
+  }
+}
+
+/*
+ * Desktop: text on the left, the diorama on a wider stage to the right.
+ * The desk is a landscape object with an ultrawide monitor, so it earns
+ * the larger share of the width.
+ */
+@media (min-width: 64rem) {
+  .hero {
+    padding-top: var(--nav-height);
+    padding-bottom: var(--space-7);
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: 'intro stage';
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .intro {
+    justify-items: start;
+    text-align: left;
+    gap: var(--space-5);
+  }
+
+  .actions {
+    justify-content: flex-start;
+    width: auto;
+  }
+
+  .lede {
+    max-width: 30rem;
+  }
 }

@@ -1,0 +1,32 @@
+.stage {
+  position: relative;
+  width: 100%;
+  /* Phone: a wide, short stage so the text still fits on the first screen. */
+  aspect-ratio: 4 / 3;
+  max-height: min(38svh, 21rem);
+  display: grid;
+  place-items: center;
+}
+
+/* Floor light: the LED strip's colour pooling under the desk. */
+.glow {
+  width: 78%;
+  aspect-ratio: 2.4 / 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(99 118 255 / 42%),
+    rgb(138 91 255 / 22%) 45%,
+    transparent 100%
+  );
+  filter: blur(28px);
+  transform: translateY(12%);
+}
+
+@media (min-width: 64rem) {
+  .stage {
+    aspect-ratio: auto;
+    max-height: none;
+    height: min(70svh, 40rem);
+  }
+}

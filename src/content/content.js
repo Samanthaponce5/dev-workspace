@@ -17,10 +17,10 @@ export const nav = [
 ]
 
 export const hero = {
-  eyebrow: 'Front-end developer, growing into full-stack',
+  eyebrow: 'Front-End Developer · Growing Into Full-Stack',
   title: site.name,
   intro:
-    'I build fast, accessible interfaces at Podchaser, and I care about the details that make them feel good to use.',
+    'I’m a Front-End Developer at Podchaser, building fast, accessible interfaces and growing into Full-Stack work. I care about the small details that make software feel good to use.',
   primaryAction: { label: 'See my work', href: '#work' },
   secondaryAction: { label: 'Say hi', href: '#contact' },
 }
