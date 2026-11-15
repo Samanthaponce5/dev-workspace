@@ -1,0 +1,29 @@
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.art {
+  width: min(100%, 36rem);
+  height: auto;
+  filter: drop-shadow(0 20px 40px rgb(79 107 255 / 25%));
+}
+
+/* While the 3D bundle downloads the illustration breathes gently. */
+.fallback[data-loading] .art {
+  animation: breathe 2.4s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.55;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0.85;
+    transform: translateY(-6px);
+  }
+}

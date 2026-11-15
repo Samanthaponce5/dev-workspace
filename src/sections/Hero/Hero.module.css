@@ -51,7 +51,7 @@
 
 .lede {
   max-width: 30rem;
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   line-height: 1.5;
   color: var(--color-text-muted);
   text-wrap: pretty;
@@ -90,6 +90,10 @@
 }
 
 @media (min-width: 30rem) {
+  .lede {
+    font-size: var(--text-lg);
+  }
+
   .action {
     flex: 0 1 auto;
     min-width: 9.5rem;
