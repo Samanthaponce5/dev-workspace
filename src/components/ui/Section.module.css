@@ -1,0 +1,11 @@
+.section {
+  position: relative;
+  padding-block: var(--space-section);
+}
+
+.header {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 52rem;
+  margin-bottom: clamp(var(--space-6), 6vw, var(--space-8));
+}

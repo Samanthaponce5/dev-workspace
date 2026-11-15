@@ -1,0 +1,20 @@
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+  color: var(--color-accent-strong);
+}
+
+/* A short LED-strip dash before the label. */
+.eyebrow::before {
+  content: '';
+  flex-shrink: 0;
+  width: var(--space-5);
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-glow-blue), var(--color-violet));
+  box-shadow: 0 0 12px var(--color-glow-violet);
+}
