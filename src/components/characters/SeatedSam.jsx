@@ -1,91 +1,69 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
 import { scene as sceneContent } from '../../content/content'
 import { useHoverCursor } from '../../hooks/useHoverCursor'
 import { useSceneEvent } from '../../hooks/useSceneEvent'
-import { useTimedValue } from '../../hooks/useTimedValue'
 import { Chair } from '../three/Chair'
 import { SpeechBubble } from '../three/SpeechBubble'
+import { facingAngle, INTRO, setWorkingPose, writeHoverPose, writeIntroPose } from './greeting'
 import { MiniSam } from './MiniSam'
 
-const { smoothstep } = THREE.MathUtils
-
-/* Greeting timeline, in seconds from the click. */
-const SPIN_END = 1.25 // chair has spun round to face the visitor
-const WAVE_END = 3.1 // done waving
-const RETURN_END = 4.0 // back at the keyboard
-
-const easeOutCubic = (x) => 1 - (1 - x) ** 3
-const easeInOutQuad = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
+/* The bubble's tail points here: above her head, clear of the waving hand. */
+const BUBBLE_ANCHOR = [0, 2.04, 0]
 
 /**
- * Mini-Samantha in her chair. She types until hovered or clicked, then
- * spins the chair a full turn, stops facing the visitor, waves, and
- * swivels back to work.
+ * Mini-Samantha in her chair.
  *
- * `facingAngle` is the camera's angle around the desk, used to work out
- * how far the chair must turn to face the visitor.
+ * She begins facing the visitor. Once `introStarted` is true (the scene
+ * has faded in) she waves with a "Hi there!" bubble, then turns to the
+ * desk and types. After that, hovering or clicking makes her spin the
+ * chair round and wave again. A greeting in progress is never interrupted
+ * or restarted, so hover can't cut the intro short.
+ *
+ * `cameraAzimuth` is the camera's angle around the desk, used to work
+ * out how far the chair turns to face the visitor.
  */
-export function SeatedSam({ position, facingAngle, animate = true, shadows }) {
+export function SeatedSam({ position, cameraAzimuth, introStarted, animate = true, shadows }) {
   const swivelRef = useRef(null)
-  const poseRef = useRef({ typing: 1, wave: 0, bounce: 0 })
-  const greetStart = useRef(-1)
+  const face = facingAngle(cameraAzimuth)
+  const poseRef = useRef({ angle: face, typing: 0, wave: 0, bounce: 0, bubble: false })
+  // kind: 'intro' | 'hover' | null (working). start: ms timestamp, or null while the intro waits.
+  const greeting = useRef({ kind: 'intro', start: null })
+  const [bubbleVisible, setBubbleVisible] = useState(false)
   const bubbleShown = useRef(false)
-  const [bubble, setBubble] = useTimedValue((WAVE_END - SPIN_END) * 1000)
   const hover = useHoverCursor()
 
+  useEffect(() => {
+    const current = greeting.current
+    if (introStarted && current.kind === 'intro' && current.start === null) {
+      current.start = performance.now() + INTRO.delay * 1000
+    }
+  }, [introStarted])
+
   const greet = useCallback(() => {
-    if (greetStart.current >= 0) return // already mid-greeting
-    greetStart.current = performance.now()
-    bubbleShown.current = false
+    if (greeting.current.kind) return
+    greeting.current = { kind: 'hover', start: performance.now() }
   }, [])
   useSceneEvent('sam:greet', greet)
 
   useFrame(() => {
     const swivel = swivelRef.current
-    const pose = poseRef.current
     if (!swivel) return
+    const pose = poseRef.current
+    const { kind, start } = greeting.current
 
-    if (greetStart.current < 0) {
-      swivel.rotation.y = 0
-      pose.typing = 1
-      pose.wave = 0
-      pose.bounce = 0
-      return
+    if (kind) {
+      const t = start === null ? -1 : (performance.now() - start) / 1000
+      const write = kind === 'intro' ? writeIntroPose : writeHoverPose
+      if (write(pose, t, face, animate)) greeting.current = { kind: null, start: null }
     }
+    if (!greeting.current.kind) setWorkingPose(pose)
 
-    const t = (performance.now() - greetStart.current) / 1000
-    // The chair starts facing the desk. Half a turn plus the camera's angle
-    // faces the visitor; one extra full turn makes it a proper spin.
-    const faceVisitor = Math.PI + facingAngle + (animate ? Math.PI * 2 : 0)
-    const backToDesk = animate ? Math.PI * 4 : Math.PI * 2
-
-    if (t < SPIN_END) {
-      const progress = animate ? easeOutCubic(t / SPIN_END) : 1
-      swivel.rotation.y = progress * faceVisitor
-      pose.typing = 1 - smoothstep(t, 0, 0.25)
-      pose.wave = smoothstep(t, SPIN_END - 0.45, SPIN_END)
-      pose.bounce = 0
-    } else if (t < WAVE_END) {
-      swivel.rotation.y = faceVisitor
-      pose.typing = 0
-      pose.wave = 1
-      // One small happy hop in the seat as the wave starts.
-      const hop = (t - SPIN_END) / 0.45
-      pose.bounce = animate && hop < 1 ? Math.sin(hop * Math.PI) * 0.035 : 0
-      if (!bubbleShown.current) {
-        bubbleShown.current = true
-        setBubble({ text: sceneContent.samGreeting })
-      }
-    } else if (t < RETURN_END) {
-      const progress = easeInOutQuad((t - WAVE_END) / (RETURN_END - WAVE_END))
-      swivel.rotation.y = animate ? faceVisitor + progress * (backToDesk - faceVisitor) : 0
-      pose.wave = 1 - smoothstep(progress, 0, 0.4)
-      pose.typing = smoothstep(progress, 0.6, 1)
-      pose.bounce = 0
-    } else {
-      greetStart.current = -1
+    swivel.rotation.y = pose.angle
+    // Only touch React state on the frames where the bubble appears or goes.
+    if (pose.bubble !== bubbleShown.current) {
+      bubbleShown.current = pose.bubble
+      setBubbleVisible(pose.bubble)
     }
   })
 
@@ -108,7 +86,7 @@ export function SeatedSam({ position, facingAngle, animate = true, shadows }) {
         </Chair>
       </group>
 
-      {bubble && <SpeechBubble position={[0, 1.98, 0]}>{bubble.text}</SpeechBubble>}
+      {bubbleVisible && <SpeechBubble position={BUBBLE_ANCHOR}>{sceneContent.samGreeting}</SpeechBubble>}
     </group>
   )
 }

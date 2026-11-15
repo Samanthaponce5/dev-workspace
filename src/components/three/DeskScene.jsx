@@ -2,14 +2,19 @@ import { Canvas } from '@react-three/fiber'
 import { CameraRig } from './camera/CameraRig'
 import { VIEWS } from './camera/views'
 import { DeskWorld } from './DeskWorld'
+import { ReadySignal } from './ReadySignal'
 
 /**
  * The WebGL canvas for the hero. It fills its parent (the whole hero) and
  * the camera fits the diorama to `frame`, the part of the canvas the
  * layout reserves for it. Rendering only runs while `active`, and the
  * pixel ratio is capped to keep the fill cost down on dense screens.
+ *
+ * `onReady` fires once the whole scene has been drawn; the parent keeps
+ * the canvas hidden until then. `introStarted` tells the characters the
+ * scene is now visible, so they can begin their greeting.
  */
-export function DeskScene({ scene, frame, active, animate, isMobile }) {
+export function DeskScene({ scene, frame, active, animate, isMobile, introStarted, onReady }) {
   const view = isMobile ? VIEWS.mobile : VIEWS.desktop
   const shadows = !isMobile
 
@@ -30,8 +35,16 @@ export function DeskScene({ scene, frame, active, animate, isMobile }) {
       onCreated={describeCanvas}
       style={{ background: 'transparent' }}
     >
-      <CameraRig view={view} frame={frame ?? view.defaultFrame} />
-      <DeskWorld scene={scene} animate={animate} parallax={!isMobile} shadows={shadows} facingAngle={view.azimuth} />
+      <CameraRig view={view} frame={frame} />
+      <DeskWorld
+        scene={scene}
+        animate={animate}
+        parallax={!isMobile}
+        shadows={shadows}
+        cameraAzimuth={view.azimuth}
+        introStarted={introStarted}
+      />
+      <ReadySignal onReady={onReady} />
     </Canvas>
   )
 }

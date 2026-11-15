@@ -3,23 +3,17 @@ import styles from './HeroFallback.module.css'
 const toPercent = (value) => `${value * 100}%`
 
 /**
- * Static illustration of the desk, shown when WebGL is unavailable, the
- * device is low on power, or while the 3D bundle is still loading. It is
- * placed in the same slot the 3D diorama would occupy.
+ * Static illustration of the desk, shown instead of the 3D scene when
+ * WebGL is unavailable or the device is low on power. It is placed in
+ * the same slot the 3D diorama would occupy.
  */
-export function HeroFallback({ frame, label, loading = false }) {
+export function HeroFallback({ frame, label }) {
   const style = frame
     ? { left: toPercent(frame.x), top: toPercent(frame.y), width: toPercent(frame.width), height: toPercent(frame.height) }
     : undefined
 
   return (
-    <div
-      className={styles.fallback}
-      style={style}
-      data-loading={loading || undefined}
-      role={label ? 'img' : undefined}
-      aria-label={label}
-    >
+    <div className={styles.fallback} style={style} role="img" aria-label={label}>
       <svg viewBox="0 0 480 300" className={styles.art} aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id="fb-led" x1="0" x2="1">
@@ -76,7 +70,6 @@ export function HeroFallback({ frame, label, loading = false }) {
         <circle cx="303" cy="136" r="3.5" fill="#ffd3ee" />
         <path d="M334 150 h12 l1 6 h-14 z" fill="#ffd23f" />
       </svg>
-      {loading && <span className="visually-hidden">Loading the 3D desk scene</span>}
     </div>
   )
 }

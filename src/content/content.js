@@ -32,6 +32,10 @@ export const hero = {
 export const scene = {
   /* Shown on the desk clock next to the visitor's real local time. */
   clockTemperature: '73°F',
+  /* Said once on load, while Samantha waves. */
+  /* \u2011 is a non-breaking hyphen, so "quack-test" never splits across lines. */
+  duckIntro: 'She codes. I quack\u2011test.',
+  /* Said in turn each time the duck is clicked. */
   duckQuotes: [
     'Have you tried explaining it to me?',
     'Quack. Did you check the console?',

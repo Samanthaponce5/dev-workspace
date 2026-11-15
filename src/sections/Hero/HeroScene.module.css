@@ -4,23 +4,19 @@
   z-index: -2;
 }
 
+/* Invisible until the scene has drawn completely, then fades in whole. */
 .canvas {
   position: absolute;
   inset: 0;
-  animation: reveal var(--duration-slow) var(--ease-out) both;
+  opacity: 0;
+  transition: opacity 900ms var(--ease-out);
+}
+
+.canvas[data-ready] {
+  opacity: 1;
 }
 
 /* Let vertical swipes scroll the page even when they start on the scene. */
 .canvas canvas {
   touch-action: pan-y;
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }

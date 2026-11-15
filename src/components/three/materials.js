@@ -34,23 +34,24 @@ export const palette = {
 /* Mini-Samantha. */
 export const samPalette = {
   skin: '#e8b490',
-  hairDark: '#3a2417',
-  hairMid: '#6b4226',
-  hairLight: '#c08d5a',
+  hair: '#3b2416',
   top: '#1e2658',
   jeans: '#4470b8',
   shoes: '#f1f1f5',
-  eye: '#2e1a10',
+  eye: '#3a2012',
+  lash: '#24150c',
   blush: '#f29a9a',
   mouth: '#a8504a',
 }
 
 /* Andy the Shih Tzu. */
 export const andyPalette = {
-  coat: '#8b6844',
-  gold: '#c9a56e',
-  grey: '#a3957f',
-  ear: '#4b3323',
+  body: '#9b6a40',
+  tan: '#c79a62',
+  crown: '#d2a66d',
+  mask: '#7f6249',
+  muzzle: '#5f4735',
+  ear: '#4a3122',
   white: '#f4efe8',
   nose: '#121212',
   eye: '#1c120c',

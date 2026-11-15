@@ -1,9 +1,16 @@
+/* Lifts the bubble so its bottom centre sits just above the anchor point. */
+.anchor {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - var(--tail, 10px)));
+}
+
 .bubble {
   position: relative;
   width: max-content;
-  max-width: 12rem;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
+  /* Narrow enough on phones that two bubbles can sit side by side. */
+  max-width: min(13rem, 42vw);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
   background: #f7f7fb;
   color: #141829;
   font-family: var(--font-sans);
@@ -12,14 +19,16 @@
   line-height: 1.35;
   text-align: center;
   box-shadow: 0 10px 30px -10px rgb(0 0 0 / 60%);
+  transform-origin: 50% 100%;
   animation: pop var(--duration-base) var(--ease-out) both;
 }
 
+/* Tail. --tail-shift is set from SpeechBubble.jsx when the bubble is nudged. */
 .bubble::after {
   content: '';
   position: absolute;
-  bottom: -6px;
-  left: 50%;
+  bottom: -5px;
+  left: calc(50% + var(--tail-shift, 0px));
   width: 12px;
   height: 12px;
   background: inherit;

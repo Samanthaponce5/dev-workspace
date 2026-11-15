@@ -37,7 +37,7 @@ function extent(points, axis) {
 export function fitCameraToFrame(camera, size, view, frame) {
   if (!size.width || !size.height) return
 
-  const { azimuth, elevation, fov, margin } = view
+  const { azimuth, elevation, fov, marginX, marginY } = view
   // Unit vector from the scene toward the camera.
   direction.set(Math.sin(azimuth) * Math.cos(elevation), Math.sin(elevation), Math.cos(azimuth) * Math.cos(elevation))
   right.crossVectors(WORLD_UP, direction).normalize()
@@ -49,7 +49,7 @@ export function fitCameraToFrame(camera, size, view, frame) {
 
   const boxWidth = frame.width * size.width
   const boxHeight = frame.height * size.height
-  const pixelsPerUnit = Math.min(boxWidth / (horizontal.span * margin), boxHeight / (vertical.span * margin))
+  const pixelsPerUnit = Math.min(boxWidth / (horizontal.span * marginX), boxHeight / (vertical.span * marginY))
   const distance = size.height / (pixelsPerUnit * 2 * Math.tan(THREE.MathUtils.degToRad(fov) / 2))
 
   target

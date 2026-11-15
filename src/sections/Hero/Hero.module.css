@@ -91,8 +91,8 @@
 .stage {
   margin-inline: calc(-1 * max(var(--space-gutter), var(--safe-left)))
     calc(-1 * max(var(--space-gutter), var(--safe-right)));
-  margin-top: var(--space-6);
-  margin-bottom: var(--space-4);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
 /* Staggered entrance, timed from --enter-step on each block. */
@@ -184,10 +184,14 @@
     margin-top: var(--space-7);
   }
 
-  /* Out of flow: the slot spans the right side, almost edge to edge. */
+  /*
+   * Out of flow: the slot spans the right side, almost edge to edge.
+   * On very wide screens the max() terms take over and hold the slot near
+   * the centred text, so the desk doesn't drift off to the far right.
+   */
   .stage {
     position: absolute;
-    inset: calc(var(--nav-height) * 0.6) 1.5% 2% 37%;
+    inset: calc(var(--nav-height) * 0.6) max(1.5%, calc(50% - 48rem)) 2% max(37%, calc(50% - 12rem));
     margin: 0;
   }
 }

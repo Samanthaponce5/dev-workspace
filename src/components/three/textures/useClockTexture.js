@@ -46,7 +46,15 @@ export function useClockTexture(temperature) {
     }
 
     tick()
-    return () => window.clearTimeout(timeoutId)
+    // Redraw once web fonts are in, so the digits don't stay in a fallback face.
+    let cancelled = false
+    document.fonts?.ready.then(() => {
+      if (!cancelled) target.paint((context) => drawClock(context, formatTime(new Date()), temperature))
+    })
+    return () => {
+      cancelled = true
+      window.clearTimeout(timeoutId)
+    }
   }, [target, temperature])
 
   useEffect(() => () => target.dispose(), [target])

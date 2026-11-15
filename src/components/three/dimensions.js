@@ -23,14 +23,14 @@ export const CHAIR_SEAT_HEIGHT = 0.5
 /** Top of the seat cushion, where a seated character's hips rest. */
 export const CHAIR_SEAT_TOP = CHAIR_SEAT_HEIGHT + 0.05
 
-export const CHAIR_POSITION = [-0.15, 0, 0.92]
-export const ANDY_POSITION = [0.62, 0, 1.22]
+export const CHAIR_POSITION = [-0.15, 0, 0.96]
+export const ANDY_POSITION = [0.68, 0, 1.3]
 
 /** The whole room is lowered so the desk sits near the world origin. */
 export const WORLD_OFFSET_Y = -0.75
 
 const MONITOR_TOP = 2.3
-const SAM_TOP = 1.72
+const SAM_TOP = 1.9
 const halfDeskW = DESK.width / 2
 const halfDeskD = DESK.depth / 2
 const halfPlatW = PLATFORM.width / 2

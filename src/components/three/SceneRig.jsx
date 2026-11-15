@@ -7,7 +7,6 @@ const TURN_SPEED = 0.25
 const BOB_AMPLITUDE = 0.025
 const PARALLAX_YAW = 0.16
 const PARALLAX_PITCH = 0.07
-const INTRO_SECONDS = 1.2
 
 /**
  * Wraps the diorama in a group that floats, slowly turns, and tilts a
@@ -17,7 +16,6 @@ const INTRO_SECONDS = 1.2
 export function SceneRig({ animate = true, parallax = true, children }) {
   const groupRef = useRef(null)
   const pointer = useRef({ x: 0, y: 0 })
-  const startTime = useRef(null)
 
   useEffect(() => {
     if (!parallax) return undefined
@@ -33,14 +31,7 @@ export function SceneRig({ animate = true, parallax = true, children }) {
     const group = groupRef.current
     if (!group) return
 
-    startTime.current ??= clock.elapsedTime
-    const t = clock.elapsedTime - startTime.current
-
-    // Ease the diorama in: rising slightly and settling to full size.
-    const intro = animate ? THREE.MathUtils.smoothstep(t / INTRO_SECONDS, 0, 1) : 1
-    const scale = 0.92 + 0.08 * intro
-    group.scale.setScalar(scale)
-
+    const t = clock.elapsedTime
     const turn = animate ? Math.sin(t * TURN_SPEED) * TURN_AMPLITUDE : 0
     const bob = animate ? Math.sin(t * 0.8) * BOB_AMPLITUDE : 0
 
@@ -50,7 +41,7 @@ export function SceneRig({ animate = true, parallax = true, children }) {
 
     group.rotation.y = THREE.MathUtils.lerp(group.rotation.y, targetYaw, smoothing)
     group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, targetPitch, smoothing)
-    group.position.y = bob - (1 - intro) * 0.2
+    group.position.y = bob
   })
 
   return <group ref={groupRef}>{children}</group>
