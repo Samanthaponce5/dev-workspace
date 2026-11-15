@@ -75,6 +75,6 @@ export const lightLevels = {
   led: 2.4,
   ledReach: 2.1,
   monitor: 2.6,
-  candle: 1.4,
+  candle: 1.8,
   lamp: 1.4,
 }

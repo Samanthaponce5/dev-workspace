@@ -27,20 +27,21 @@ const KNEE_AT = 0.52 // how far along the leg the knee is, from 0 to 1
 const legRadius = (t) => (t < KNEE_AT ? lerp(0.06, 0.054, t / KNEE_AT) : lerp(0.054, 0.041, (t - KNEE_AT) / (1 - KNEE_AT)))
 
 /*
- * High waistband, as a side profile of [radius, height] spun round the
- * body. It hugs the torso and its top edge rolls inward, so there is no
+ * Waistband, as a side profile of [radius, height] spun round the body.
+ * The last height is where the jeans stop; raise or lower the profile to
+ * change how high they sit. It hugs the torso and its top edge rolls inward, so there is no
  * hard rim where the top tucks in.
  */
 const WAIST_PROFILE = [
-  [0.118, 0.085],
-  [0.115, 0.12],
-  [0.108, 0.155],
-  [0.101, 0.185],
-  [0.1, 0.2],
-  [0.0995, 0.212],
-  [0.096, 0.2195],
-  [0.086, 0.2225],
-  [0.07, 0.2225],
+  [0.118, 0.08],
+  [0.115, 0.108],
+  [0.109, 0.136],
+  [0.103, 0.158],
+  [0.1005, 0.172],
+  [0.0995, 0.183],
+  [0.096, 0.1905],
+  [0.086, 0.1935],
+  [0.07, 0.1935],
 ]
 
 function createJeans() {

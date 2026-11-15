@@ -112,8 +112,8 @@ export function MiniSam({ poseRef, animate = true, shadows }) {
       <group ref={torsoRef} position={[0, 0.1, 0]} rotation={[TORSO_LEAN, 0, 0]}>
         <group position={[0, -0.1, 0]}>
           {/* Fitted navy long-sleeve top. It runs straight down past the waistband, so the tuck is a clean line. */}
-          <mesh position={[0, 0.25, 0]} castShadow={shadows}>
-            <capsuleGeometry args={[0.092, 0.13, 8, 28]} />
+          <mesh position={[0, 0.24, 0]} castShadow={shadows}>
+            <capsuleGeometry args={[0.092, 0.15, 8, 28]} />
             <meshStandardMaterial color={colors.top} roughness={0.8} />
           </mesh>
           <mesh position={[0, 0.425, 0]}>
