@@ -1,0 +1,105 @@
+.roles {
+  display: grid;
+}
+
+.role {
+  display: grid;
+  gap: var(--space-2) var(--space-6);
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.role:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+}
+
+/* The current role is picked out with a mint badge and brighter text. */
+.badge {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.title {
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
+}
+
+.current .title {
+  color: var(--color-accent);
+}
+
+.summary {
+  max-width: var(--width-prose);
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+/*
+ * Andy's track: a strip under the list that he crosses once. The strip
+ * hides anything outside it, so he enters and leaves at its edges.
+ */
+.track {
+  position: relative;
+  height: 4.75rem;
+  margin-top: var(--space-6);
+  overflow: hidden;
+}
+
+.trotter {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 5.25rem;
+  translate: -110% 0;
+}
+
+.track[data-visible] .trotter {
+  animation: cross 6.5s linear 0.3s both;
+}
+
+@keyframes cross {
+  from {
+    left: 0;
+    translate: -110% 0;
+  }
+
+  to {
+    left: 100%;
+    translate: 10% 0;
+  }
+}
+
+/* Without motion he simply stands at the start of the strip. */
+@media (prefers-reduced-motion: reduce) {
+  .trotter,
+  .track[data-visible] .trotter {
+    animation: none;
+    translate: 0 0;
+  }
+}
+
+@media (min-width: 48rem) {
+  .role {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    align-items: baseline;
+  }
+}

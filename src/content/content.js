@@ -116,6 +116,7 @@ export const skills = {
 export const experience = {
   eyebrow: 'Experience',
   title: 'Where I’ve been building.',
+  currentLabel: 'Currently',
   /* PLACEHOLDER: fill in dates, titles and summaries. */
   roles: [
     {
@@ -160,4 +161,5 @@ export const contact = {
 
 export const footer = {
   note: 'Designed and built by Samantha Ponce. Andy supervised.',
+  backToTop: 'Back to top',
 }

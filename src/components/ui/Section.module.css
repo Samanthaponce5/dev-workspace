@@ -3,9 +3,17 @@
   padding-block: var(--space-section);
 }
 
+/* Heading on the left, optional aside on the right. */
+.top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: clamp(var(--space-6), 6vw, var(--space-8));
+}
+
 .header {
   display: grid;
   gap: var(--space-4);
-  max-width: 52rem;
-  margin-bottom: clamp(var(--space-6), 6vw, var(--space-8));
+  max-width: 46rem;
 }

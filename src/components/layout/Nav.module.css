@@ -36,6 +36,7 @@
 }
 
 .link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
@@ -54,8 +55,26 @@
   }
 }
 
+/* Active-section indicator: a short underline that grows from the centre. */
+.link::after {
+  content: '';
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: 0.35rem;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
 .link[aria-current='true'] {
   color: var(--color-accent);
+}
+
+.link[aria-current='true']::after {
+  transform: scaleX(1);
 }
 
 .desktopOnly {

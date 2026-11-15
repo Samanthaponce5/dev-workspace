@@ -1,0 +1,69 @@
+.layout {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.details {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.intro {
+  max-width: var(--width-prose);
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Long email addresses must be able to wrap inside the button on small phones. */
+.actions > * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.pair {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-3);
+  justify-self: center;
+  padding: var(--space-5) var(--space-6) var(--space-4);
+}
+
+.pair::before {
+  content: '';
+  position: absolute;
+  inset: auto 4% 0;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(20 96 106 / 75%), transparent);
+}
+
+.sam,
+.andy {
+  position: relative;
+}
+
+.sam {
+  width: clamp(5.5rem, 20vw, 7.5rem);
+}
+
+.andy {
+  width: clamp(4.25rem, 15vw, 5.75rem);
+}
+
+@media (min-width: 56rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--space-8);
+  }
+}

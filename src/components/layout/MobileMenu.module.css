@@ -30,6 +30,10 @@
   text-decoration: none;
 }
 
+.link[aria-current='true'] {
+  color: var(--color-accent);
+}
+
 .link:hover,
 .link:focus-visible {
   background: rgb(174 222 209 / 12%);

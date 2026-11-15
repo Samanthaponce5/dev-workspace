@@ -1,0 +1,55 @@
+.layout {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.prose {
+  display: grid;
+  gap: var(--space-5);
+  max-width: var(--width-prose);
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+/* The two of them stand on a soft pool of teal light. */
+.pair {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-3);
+  justify-self: center;
+  padding: var(--space-5) var(--space-6) var(--space-4);
+}
+
+.pair::before {
+  content: '';
+  position: absolute;
+  inset: auto 4% 0;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(20 96 106 / 75%), transparent);
+}
+
+.sam,
+.andy {
+  position: relative;
+}
+
+.sam {
+  width: clamp(6rem, 22vw, 8.5rem);
+}
+
+.andy {
+  width: clamp(4.5rem, 16vw, 6.25rem);
+}
+
+@media (min-width: 56rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-8);
+  }
+}

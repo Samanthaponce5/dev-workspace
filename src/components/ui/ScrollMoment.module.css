@@ -1,0 +1,22 @@
+.moment {
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.moment[data-visible] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* With reduced motion it is simply there, with no slide. */
+@media (prefers-reduced-motion: reduce) {
+  .moment {
+    opacity: 1;
+    transform: none;
+  }
+}

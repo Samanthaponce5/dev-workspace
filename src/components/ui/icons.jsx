@@ -23,6 +23,14 @@ export function ArrowRightIcon(props) {
   )
 }
 
+export function ArrowUpRightIcon(props) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M6 14L14 6M7 6h7v7" />
+    </svg>
+  )
+}
+
 export function MenuIcon(props) {
   return (
     <svg {...baseProps} {...props}>

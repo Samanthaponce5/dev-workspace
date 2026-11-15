@@ -6,7 +6,7 @@ import styles from './MobileMenu.module.css'
  * Closes on Escape, on a click outside, and when a link is followed.
  * Focus moves to the first link on open; the caller restores it on close.
  */
-export function MobileMenu({ id, items, onClose, ignoreRef }) {
+export function MobileMenu({ id, items, activeId, onClose, ignoreRef }) {
   const panelRef = useRef(null)
 
   useEffect(() => {
@@ -34,7 +34,12 @@ export function MobileMenu({ id, items, onClose, ignoreRef }) {
       <ul className={styles.list}>
         {items.map((item) => (
           <li key={item.id}>
-            <a className={styles.link} href={`#${item.id}`} onClick={() => onClose({ restoreFocus: false })}>
+            <a
+              className={styles.link}
+              href={`#${item.id}`}
+              aria-current={activeId === item.id ? 'true' : undefined}
+              onClick={() => onClose({ restoreFocus: false })}
+            >
               {item.label}
             </a>
           </li>

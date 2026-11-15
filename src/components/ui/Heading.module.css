@@ -13,9 +13,10 @@
 }
 
 .xl {
-  font-size: var(--text-3xl);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--tracking-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: 1.08;
+  letter-spacing: var(--tracking-tight);
 }
 
 .lg {
