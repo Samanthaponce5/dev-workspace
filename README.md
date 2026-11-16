@@ -36,8 +36,8 @@ Vite prints a local URL, usually <http://localhost:5173>.
 
 All text on the site lives in [`src/content/content.js`](src/content/content.js),
 including what the characters say and the text on the monitor and laptop.
-Anything marked `PLACEHOLDER` there is stand-in copy waiting to be replaced:
-the About intro, the contact email, and the LinkedIn and GitHub links.
+Anything marked `PLACEHOLDER` there is stand-in copy waiting to be replaced
+(currently the skill descriptions in the Work section).
 
 The two résumé links point at `/resume.pdf`. Add the file as
 `public/resume.pdf`, or change the path in `content.js`.
@@ -56,7 +56,7 @@ src/
     ui/           Reusable building blocks (Button, Section, Heading, Tag, Card…)
     layout/       Nav, mobile menu, logo and footer
     three/        The 3D desk scene: camera, lighting, furniture, props, textures
-    characters/   Mini Samantha and Andy, in 3D and as lightweight SVGs
+    characters/   Mini Samantha and Andy, modelled in code
   sections/       Hero, Work, About, Experience, Contact
   intro/          The reveal that hands the intro over to the page
   hooks/          useReducedMotion, useIsMobile, useInView…

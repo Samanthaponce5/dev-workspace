@@ -27,13 +27,6 @@
   margin-top: var(--space-2);
 }
 
-/* She stands at the end of the heading row, pointing down at the cards. */
-.pointer {
-  flex: none;
-  width: clamp(4.75rem, 15vw, 7.5rem);
-  margin-bottom: calc(var(--space-4) * -1);
-}
-
 @media (min-width: 48rem) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

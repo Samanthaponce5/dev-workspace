@@ -1,35 +1,5 @@
-.section {
-  position: relative;
-  padding-block: var(--space-section);
-}
-
-/*
- * Phones: heading, then the links, then the pair waving goodbye.
- * Wide screens: heading on the left with the pair under it, links on the
- * right, centred against the two.
- */
-.layout {
-  display: grid;
-  gap: var(--space-7);
-}
-
-.header {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.intro {
-  max-width: 24rem;
-  margin-top: var(--space-2);
-  font-size: var(--text-xl);
-  line-height: 1.4;
-  color: var(--color-text-muted);
-  text-wrap: pretty;
-}
-
 /* The links never lift on hover as a block; each row responds on its own. */
-.layout .card,
-.layout .card:hover {
+.card.card {
   padding-block: var(--space-4) var(--space-5);
   transform: none;
 }
@@ -39,10 +9,11 @@
 }
 
 .link {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  min-height: 4rem;
+  min-height: 4.25rem;
   padding-block: var(--space-3);
   border-bottom: 1px solid var(--color-border-strong);
   color: var(--color-text);
@@ -50,6 +21,20 @@
   font-weight: var(--weight-semibold);
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-out);
+}
+
+/* A strip of light that runs along the rule under the row being pointed at. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-aqua), var(--color-accent));
+  box-shadow: 0 0 12px var(--color-aqua);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-base) var(--ease-out);
 }
 
 .linkIcon {
@@ -80,75 +65,24 @@
   transition: color var(--duration-fast) var(--ease-out);
 }
 
+.link:focus-visible::after {
+  transform: scaleX(1);
+}
+
 @media (hover: hover) {
   .link:hover {
     color: var(--color-accent);
   }
 
+  .link:hover::after {
+    transform: scaleX(1);
+  }
+
   .link:hover .linkArrow {
-    translate: 2px -2px;
+    translate: 3px -3px;
   }
 
   .resume:hover {
     color: var(--color-accent-strong);
-  }
-}
-
-.pair {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--space-3);
-  justify-self: center;
-  padding: var(--space-4) var(--space-6) var(--space-4);
-}
-
-.pair::before {
-  content: '';
-  position: absolute;
-  inset: auto 4% 0;
-  height: 2.75rem;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(20 96 106 / 75%), transparent);
-}
-
-.sam,
-.andy {
-  position: relative;
-}
-
-.sam {
-  width: clamp(5rem, 18vw, 6.5rem);
-}
-
-.andy {
-  width: clamp(4rem, 14vw, 5rem);
-}
-
-@media (min-width: 56rem) {
-  .layout {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    grid-template-areas:
-      'header card'
-      'pair   card';
-    align-items: center;
-    gap: var(--space-6) clamp(var(--space-7), 7vw, var(--space-9));
-  }
-
-  .header {
-    grid-area: header;
-    align-self: end;
-  }
-
-  .card {
-    grid-area: card;
-  }
-
-  .pair {
-    grid-area: pair;
-    align-self: start;
-    justify-self: start;
-    padding-inline-start: 0;
   }
 }

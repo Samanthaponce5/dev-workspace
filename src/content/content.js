@@ -77,10 +77,17 @@ export const scene = {
 export const about = {
   eyebrow: 'About',
   title: 'Hi, I’m Samantha.',
-  /* PLACEHOLDER: replace with your own intro. */
-  paragraphs: [
-    'I’m a front-end developer who likes turning complicated product ideas into interfaces that feel simple. Most days that means React, careful component design, and a lot of attention to how things load, move and read.',
-    'Lately I’ve been working further down the stack too, building the APIs and back-end pieces my interfaces depend on. When I’m not at my desk, I’m usually out with Andy, my Shih Tzu and unofficial rubber duck.',
+  intro:
+    'I’ve spent five years building production interfaces. Lately I’ve been taking on more of the APIs and backend logic those interfaces depend on.',
+  actions: {
+    work: { label: 'See my work', href: '#work' },
+    contact: { label: 'Get in touch', href: '#contact' },
+  },
+  /* `icon` names one in components/ui/icons.jsx. */
+  points: [
+    { id: 'bring', icon: 'code', label: 'What I bring:', text: 'React and complex UI.' },
+    { id: 'toward', icon: 'layers', label: 'What I’m building toward:', text: 'end-to-end feature ownership.' },
+    { id: 'ai', icon: 'sparkles', label: 'How I use AI:', text: 'explore faster, review and test the result.' },
   ],
 }
 
@@ -161,11 +168,10 @@ export const contact = {
   title: 'What are you building?',
   intro: 'I’d love to hear about your team and what you’re working on.',
   linksLabel: 'Ways to reach me',
-  /* PLACEHOLDER links: replace with your real email and profiles. */
   links: [
-    { id: 'email', icon: 'mail', label: 'Email', href: 'mailto:hello@example.com' },
-    { id: 'linkedin', icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/your-profile', external: true },
-    { id: 'github', icon: 'github', label: 'GitHub', href: 'https://github.com/your-username', external: true },
+    { id: 'email', icon: 'mail', label: 'Email', href: 'mailto:samanthaponce.dev@gmail.com' },
+    { id: 'linkedin', icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/samantha-ponce-0bb6ba1a9/', external: true },
+    { id: 'github', icon: 'github', label: 'GitHub', href: 'https://github.com/Samanthaponce5', external: true },
   ],
   resumeLabel: 'Résumé',
 }

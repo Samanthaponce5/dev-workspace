@@ -1,25 +1,40 @@
-import { AndySvg } from '../../components/characters/svg/AndySvg'
-import { SamSvg } from '../../components/characters/svg/SamSvg'
-import { ScrollMoment, Section } from '../../components/ui'
+import { Button, IconTile, Section } from '../../components/ui'
+import { ArrowRightIcon, ArrowUpRightIcon } from '../../components/ui/icons'
 import { about } from '../../content/content'
 import styles from './About.module.css'
 
-/** A short introduction. Beside it, she waves and Andy tilts his head. */
+/** A short introduction beside three one-line answers a hiring manager looks for. */
 export function About() {
-  return (
-    <Section id="about" eyebrow={about.eyebrow} title={about.title}>
-      <div className={styles.layout}>
-        <div className={styles.prose}>
-          {about.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
+  const { work, contact } = about.actions
 
-        <ScrollMoment className={styles.pair}>
-          <SamSvg pose="wave" className={styles.sam} />
-          <AndySvg pose="tilt" className={styles.andy} />
-        </ScrollMoment>
-      </div>
+  return (
+    <Section
+      id="about"
+      split
+      eyebrow={about.eyebrow}
+      title={about.title}
+      intro={about.intro}
+      actions={
+        <>
+          <Button href={work.href} iconEnd={<ArrowRightIcon />}>
+            {work.label}
+          </Button>
+          <Button href={contact.href} variant="ghost" iconEnd={<ArrowUpRightIcon />}>
+            {contact.label}
+          </Button>
+        </>
+      }
+    >
+      <ul className={styles.points}>
+        {about.points.map((point, index) => (
+          <li key={point.id} className={styles.point} style={{ '--i': index + 1 }} data-rise>
+            <IconTile name={point.icon} tone="soft" />
+            <p className={styles.text}>
+              <strong className={styles.label}>{point.label}</strong> {point.text}
+            </p>
+          </li>
+        ))}
+      </ul>
     </Section>
   )
 }

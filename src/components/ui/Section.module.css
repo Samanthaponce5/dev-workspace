@@ -1,21 +1,23 @@
+/*
+ * Nav links land with the eyebrow a short way under the header, rather
+ * than at the very top of the section's padding.
+ */
 .section {
   position: relative;
   padding-block: var(--space-section);
+  scroll-margin-top: calc(var(--space-6) - var(--space-section));
 }
 
-/* Heading on the left, optional aside on the right. */
-.top {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-5);
-  margin-bottom: clamp(var(--space-6), 6vw, var(--space-8));
+.layout {
+  display: grid;
+  gap: clamp(var(--space-6), 5vw, var(--space-7));
 }
 
 .header {
   display: grid;
+  justify-items: start;
   gap: var(--space-4);
-  max-width: 46rem;
+  max-width: 48rem;
 }
 
 .intro {
@@ -23,4 +25,29 @@
   line-height: 1.55;
   color: var(--color-text-muted);
   text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+/* Split: heading and content side by side, centred against each other. */
+.split .title {
+  text-wrap: pretty;
+}
+
+.split .intro {
+  max-width: 30rem;
+  color: var(--color-text);
+}
+
+@media (min-width: 60rem) {
+  .split .layout {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(var(--space-7), 6vw, var(--space-9));
+  }
 }

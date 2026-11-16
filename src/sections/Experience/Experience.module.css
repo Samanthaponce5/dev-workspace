@@ -22,17 +22,6 @@
   gap: var(--space-4);
 }
 
-.stageIcon {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
 .summary {
   color: var(--color-text);
   text-wrap: pretty;
@@ -48,6 +37,62 @@
   font-weight: var(--weight-semibold);
 }
 
+/*
+ * A strip of light along the top of each stage. When the section scrolls
+ * into view they switch on one after another, left to right, and each
+ * arrow lights as the signal passes it.
+ */
+.stage::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: var(--radius-lg);
+  right: var(--radius-lg);
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-aqua), var(--color-accent));
+  box-shadow: 0 0 14px var(--color-aqua);
+  transform-origin: left;
+}
+
+:global([data-reveal='pending']) .stage::after {
+  transform: scaleX(0);
+}
+
+:global([data-reveal='in']) .stage::after {
+  animation: light-strip 0.7s var(--ease-out) both;
+  animation-delay: calc(var(--i) * 380ms);
+}
+
+:global([data-reveal='in']) .next {
+  animation: light-arrow 0.6s var(--ease-out) both;
+  animation-delay: calc(var(--i) * 380ms + 420ms);
+}
+
+@keyframes light-strip {
+  from {
+    transform: scaleX(0);
+    opacity: 0.4;
+  }
+
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes light-arrow {
+  from {
+    color: var(--color-text-subtle);
+    opacity: 0.3;
+  }
+
+  to {
+    color: var(--color-aqua);
+    opacity: 1;
+  }
+}
+
 /* The arrow sits in the gap after each stage but the last. */
 .next {
   position: absolute;
@@ -55,7 +100,7 @@
   left: 50%;
   translate: -50% calc((var(--stage-gap) - 100%) / 2);
   rotate: 90deg;
-  color: var(--color-text-muted);
+  color: var(--color-aqua);
 }
 
 .stage:last-child .next {
@@ -82,6 +127,46 @@
   line-height: var(--leading-snug);
 }
 
+/* The logo's lime dot, pulsing: this is what she is doing now. */
+.live {
+  position: relative;
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-inline-end: var(--space-3);
+  border-radius: 50%;
+  background: var(--color-lime);
+  vertical-align: 0.12em;
+}
+
+.live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--color-lime);
+  animation: ping 2.2s var(--ease-out) infinite;
+}
+
+@keyframes ping {
+  0% {
+    opacity: 0.7;
+    scale: 1;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    scale: 3.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live::after {
+    display: none;
+  }
+}
+
 .roleLabel {
   color: var(--color-accent);
 }
@@ -89,50 +174,6 @@
 /* Moves to its own line as a whole when it doesn't fit beside the label. */
 .roleValue {
   display: inline-block;
-}
-
-/*
- * Andy's track: a strip under the section that he crosses once. The strip
- * hides anything outside it, so he enters and leaves at its edges.
- */
-.track {
-  position: relative;
-  height: 4.75rem;
-  margin-top: var(--space-6);
-  overflow: hidden;
-}
-
-.trotter {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 5.25rem;
-  translate: -110% 0;
-}
-
-.track[data-visible] .trotter {
-  animation: cross 6.5s linear 0.3s both;
-}
-
-@keyframes cross {
-  from {
-    left: 0;
-    translate: -110% 0;
-  }
-
-  to {
-    left: 100%;
-    translate: 10% 0;
-  }
-}
-
-/* Without motion he simply stands at the start of the strip. */
-@media (prefers-reduced-motion: reduce) {
-  .trotter,
-  .track[data-visible] .trotter {
-    animation: none;
-    translate: 0 0;
-  }
 }
 
 @media (min-width: 64rem) {
