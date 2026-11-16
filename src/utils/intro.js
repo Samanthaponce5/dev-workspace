@@ -4,7 +4,8 @@
  * it can paint before any JavaScript has loaded; src/intro/reveal.js
  * plays the reveal; this module only records when it has finished.
  */
-let done = document.getElementById('intro') === null
+// While prerendering at build time there is no document; the built page always starts with the intro up.
+let done = typeof document !== 'undefined' && document.getElementById('intro') === null
 const listeners = new Set()
 
 /** True once the intro has finished (or was never there). */

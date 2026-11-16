@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { scene } from '../../content/content'
-import { canRender3D } from '../../hooks/useCanRender3D'
+import { canRender3D, useCanRender3D } from '../../hooks/useCanRender3D'
 import { useInView } from '../../hooks/useInView'
 import { useIntroDone } from '../../hooks/useIntroDone'
 import { useIsMobile } from '../../hooks/useIsMobile'
@@ -103,6 +103,7 @@ function useFontsSettled(ms) {
  * hidden.
  */
 export function HeroScene({ containerRef, stageRef }) {
+  const can3D = useCanRender3D()
   const reducedMotion = useReducedMotion()
   const isMobile = useIsMobile()
   const pageVisible = usePageVisible()
@@ -131,18 +132,18 @@ export function HeroScene({ containerRef, stageRef }) {
   return (
     <div ref={sceneRef} className={styles.scene}>
       {/* On a normal load the live scene is ready first and the still image is never downloaded. */}
-      {(!canRender3D || (posterMayBeNeeded && !(live && !late))) && (
+      {(!can3D || (posterMayBeNeeded && !(live && !late))) && (
         <ScenePoster
           frame={frame}
           isMobile={isMobile}
           hidden={live}
           late={late}
-          label={canRender3D ? undefined : scene.description}
+          label={can3D ? undefined : scene.description}
           onSettled={settlePoster}
         />
       )}
 
-      {canRender3D && (
+      {can3D && (
         <>
           <div className={styles.canvas} data-ready={live || undefined} data-late={late || undefined}>
             {/* Wait for the stage to be measured so the camera is right on its first frame. */}

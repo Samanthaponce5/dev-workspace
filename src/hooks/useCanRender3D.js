@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from 'react'
+
 function hasWebGL() {
   try {
     const canvas = document.createElement('canvas')
@@ -19,10 +21,16 @@ function isLowPowerDevice() {
  * Whether to show the 3D scene or the still image. Decided once, when the
  * page loads, so the 3D bundle can start downloading before anything has
  * rendered. The checks are cheap and don't keep a WebGL context alive.
+ * Always false while the page is being prerendered at build time.
  */
-export const canRender3D = hasWebGL() && !isLowPowerDevice()
+export const canRender3D = typeof document !== 'undefined' && hasWebGL() && !isLowPowerDevice()
 
-/** The same answer as a hook, for components. */
+const subscribe = () => () => {}
+const getSnapshot = () => canRender3D
+// The prerendered HTML is written for the common case, a browser that can show the scene.
+const getServerSnapshot = () => true
+
+/** The same answer for components. Matches the prerendered HTML first, then corrects itself before paint. */
 export function useCanRender3D() {
-  return canRender3D
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }

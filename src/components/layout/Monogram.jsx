@@ -7,14 +7,15 @@ const initials = site.name
   .join('')
 
 /**
- * "SP" home link with a small lime accent dot.
+ * "SP" home link with a small lime accent dot. Its accessible name starts
+ * with the visible letters, so voice-control users can say what they see.
  *
  * The data attributes let the intro measure the logo: its moving copy
  * lands on exactly these letters and this dot (see src/intro/reveal.js).
  */
 export function Monogram() {
   return (
-    <a className={styles.monogram} href="#top" aria-label={`${site.name}, back to top`} data-site-logo>
+    <a className={styles.monogram} href="#top" aria-label={`${initials}: ${site.name}, back to top`} data-site-logo>
       <span aria-hidden="true" data-site-logo-letters>
         {initials}
       </span>

@@ -5,15 +5,16 @@ import { getSceneDuckRect } from '../../utils/sceneBridge'
 const FRAMES_AFTER_COMPILE = 2
 
 /**
- * Calls `onReady` once the scene can be shown complete.
+ * Tells the canvas when the scene can be drawn, and then when it can be
+ * shown complete.
  *
- * Browsers compile shaders in the background, and three.js skips any
- * object whose shader isn't finished, so a scene revealed too early
- * appears piece by piece. This waits for every material to compile, then
- * for a couple of full frames to be drawn, before signalling. Mount it
- * after the scene's contents so they exist when compilation starts.
+ * `onCompiled` fires once every material's shader has finished compiling.
+ * The GPU does that work in the background, so the page stays responsive
+ * as long as nothing is drawn in the meantime; the canvas holds its frame
+ * loop until this fires. `onReady` fires a couple of full frames later.
+ * Mount it after the scene's contents so they exist when compiling starts.
  */
-export function ReadySignal({ onReady }) {
+export function ReadySignal({ onCompiled, onReady }) {
   const gl = useThree((state) => state.gl)
   const scene = useThree((state) => state.scene)
   const camera = useThree((state) => state.camera)
@@ -32,13 +33,14 @@ export function ReadySignal({ onReady }) {
       if (cancelled) return
       compiled.current = true
       performance.mark('scene:compiled')
+      onCompiled()
     }
-    // If compiling up front fails, fall back to showing the scene anyway.
+    // If compiling up front fails, fall back to drawing the scene anyway.
     gl.compileAsync(scene, camera).then(markCompiled, markCompiled)
     return () => {
       cancelled = true
     }
-  }, [gl, scene, camera])
+  }, [gl, scene, camera, onCompiled])
 
   useFrame(() => {
     if (!firstFrameMarked.current) {
