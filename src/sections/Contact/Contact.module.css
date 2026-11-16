@@ -1,31 +1,97 @@
+.section {
+  position: relative;
+  padding-block: var(--space-section);
+}
+
+/*
+ * Phones: heading, then the links, then the pair waving goodbye.
+ * Wide screens: heading on the left with the pair under it, links on the
+ * right, centred against the two.
+ */
 .layout {
   display: grid;
   gap: var(--space-7);
 }
 
-.details {
+.header {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--space-4);
 }
 
 .intro {
-  max-width: var(--width-prose);
-  font-size: var(--text-lg);
-  line-height: 1.6;
+  max-width: 24rem;
+  margin-top: var(--space-2);
+  font-size: var(--text-xl);
+  line-height: 1.4;
   color: var(--color-text-muted);
   text-wrap: pretty;
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
+/* The links never lift on hover as a block; each row responds on its own. */
+.layout .card,
+.layout .card:hover {
+  padding-block: var(--space-4) var(--space-5);
+  transform: none;
 }
 
-/* Long email addresses must be able to wrap inside the button on small phones. */
-.actions > * {
-  max-width: 100%;
-  overflow-wrap: anywhere;
+.links {
+  display: grid;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 4rem;
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.linkIcon {
+  flex-shrink: 0;
+}
+
+.linkLabel {
+  flex: 1;
+}
+
+.linkArrow {
+  flex-shrink: 0;
+  transition: translate var(--duration-fast) var(--ease-out);
+}
+
+.resume {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-block: var(--space-2);
+  color: var(--color-accent);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.4em;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--color-accent);
+  }
+
+  .link:hover .linkArrow {
+    translate: 2px -2px;
+  }
+
+  .resume:hover {
+    color: var(--color-accent-strong);
+  }
 }
 
 .pair {
@@ -35,7 +101,7 @@
   justify-content: center;
   gap: var(--space-3);
   justify-self: center;
-  padding: var(--space-5) var(--space-6) var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-4);
 }
 
 .pair::before {
@@ -53,17 +119,36 @@
 }
 
 .sam {
-  width: clamp(5.5rem, 20vw, 7.5rem);
+  width: clamp(5rem, 18vw, 6.5rem);
 }
 
 .andy {
-  width: clamp(4.25rem, 15vw, 5.75rem);
+  width: clamp(4rem, 14vw, 5rem);
 }
 
 @media (min-width: 56rem) {
   .layout {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: var(--space-8);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'header card'
+      'pair   card';
+    align-items: center;
+    gap: var(--space-6) clamp(var(--space-7), 7vw, var(--space-9));
+  }
+
+  .header {
+    grid-area: header;
+    align-self: end;
+  }
+
+  .card {
+    grid-area: card;
+  }
+
+  .pair {
+    grid-area: pair;
+    align-self: start;
+    justify-self: start;
+    padding-inline-start: 0;
   }
 }

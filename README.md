@@ -37,8 +37,10 @@ Vite prints a local URL, usually <http://localhost:5173>.
 All text on the site lives in [`src/content/content.js`](src/content/content.js),
 including what the characters say and the text on the monitor and laptop.
 Anything marked `PLACEHOLDER` there is stand-in copy waiting to be replaced:
-the About intro, the experience entries, the contact email and the LinkedIn
-and GitHub links.
+the About intro, the contact email, and the LinkedIn and GitHub links.
+
+The two résumé links point at `/resume.pdf`. Add the file as
+`public/resume.pdf`, or change the path in `content.js`.
 
 Colours, spacing, type sizes and animation timings are design tokens in
 [`src/styles/tokens.css`](src/styles/tokens.css).

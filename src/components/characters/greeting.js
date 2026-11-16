@@ -16,8 +16,8 @@ const easeInOutQuad = (x) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2)
 export const INTRO = {
   delay: 0, // she waves the moment the intro has cleared; no fixed wait
   raise: 0.4, // time to lift her arm
-  waveEnd: 2.6, // wave finished; speech bubbles go away
-  returnEnd: 3.8, // back at the keyboard
+  waveEnd: 1.9, // wave finished; her speech bubble goes away
+  returnEnd: 2.8, // back at the keyboard, which is the duck's cue to speak
 }
 export const HOVER = {
   spinEnd: 1.25,

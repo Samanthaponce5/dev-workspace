@@ -6,10 +6,11 @@ import styles from './Section.module.css'
 
 /**
  * A page section with a labelled heading. The `id` doubles as the
- * anchor that the nav links scroll to. `aside` is optional content shown
- * beside the heading, such as a small illustration.
+ * anchor that the nav links scroll to. `intro` is an optional sentence
+ * or two under the title. `aside` is optional content shown beside the
+ * heading, such as a small illustration.
  */
-export function Section({ id, eyebrow, title, aside, className, children }) {
+export function Section({ id, eyebrow, title, intro, aside, className, children }) {
   const headingId = `${id}-heading`
 
   return (
@@ -21,6 +22,7 @@ export function Section({ id, eyebrow, title, aside, className, children }) {
             <Heading level={2} id={headingId}>
               {title}
             </Heading>
+            {intro && <p className={styles.intro}>{intro}</p>}
           </header>
           {aside}
         </div>

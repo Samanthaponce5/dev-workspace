@@ -12,6 +12,13 @@
   letter-spacing: var(--tracking-display);
 }
 
+.xxl {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  line-height: 1.04;
+  letter-spacing: var(--tracking-tight);
+}
+
 .xl {
   font-size: var(--text-2xl);
   font-weight: var(--weight-semibold);

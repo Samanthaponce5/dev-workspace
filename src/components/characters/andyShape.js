@@ -12,81 +12,85 @@ const { smoothstep } = THREE.MathUtils
  * toward his face.
  */
 
-/** Wide and round, and not very deep front to back. */
-export const ANDY_HEAD = { width: 0.162, height: 0.134, depth: 0.118 }
+/** Big and round: a puppy's head, nearly as deep as it is tall. */
+export const ANDY_HEAD = { width: 0.174, height: 0.148, depth: 0.142 }
 
 const unit = (x, y, z) => new THREE.Vector3(x, y, z).normalize()
 
 export const ANDY_FACE = {
-  eyeLeft: unit(0.45, 0.16, 0.88),
-  eyeRight: unit(-0.45, 0.16, 0.88),
-  bridge: unit(0, 0.1, 0.99), // between the eyes
-  muzzle: unit(0, -0.3, 0.95),
-  nose: unit(0, -0.1, 0.99),
-  tongue: unit(0, -0.5, 0.87),
-  beard: unit(0, -0.72, 0.7),
+  eyeLeft: unit(0.43, 0.1, 0.9),
+  eyeRight: unit(-0.43, 0.1, 0.9),
+  bridge: unit(0, 0.02, 1), // between the eyes
+  muzzle: unit(0, -0.34, 0.94),
+  nose: unit(0, -0.17, 0.985),
+  mouth: unit(0, -0.4, 0.92),
 }
 
 /*
- * Soft tufts: each one swells the head a little around a spot, and they
- * overlap, so the cheeks, whisker pads, muzzle and beard read as one
- * shaggy shape rather than separate parts. [direction, height, spread]
+ * Soft swellings: each one pushes the head out a little around a spot,
+ * and they overlap, so the cheeks, the short muzzle and the two halves
+ * of the forehead read as one plump shape rather than separate parts.
+ * [direction, height, spread]
  */
-const TUFTS = [
-  [unit(0.8, -0.4, 0.42), 0.26, 0.58], // full cheeks
-  [unit(-0.8, -0.4, 0.42), 0.26, 0.58],
-  [unit(0, -0.3, 0.95), 0.15, 0.46], // short, flat muzzle
-  [unit(0.36, -0.38, 0.85), 0.07, 0.24], // whisker pads either side of the nose
-  [unit(-0.36, -0.38, 0.85), 0.07, 0.24],
-  [unit(0, -0.72, 0.7), 0.15, 0.3], // beard under the chin
-  [unit(0.55, 0.62, 0.55), 0.05, 0.36], // a little lift over each brow
-  [unit(-0.55, 0.62, 0.55), 0.05, 0.36],
-  [unit(0, 0.95, 0.3), 0.06, 0.4], // top knot
+const SWELLS = [
+  [unit(0.82, -0.36, 0.44), 0.12, 0.6], // round cheeks
+  [unit(-0.82, -0.36, 0.44), 0.12, 0.6],
+  [ANDY_FACE.muzzle, 0.17, 0.36], // short, rounded muzzle
+  [unit(0.5, 0.72, 0.48), 0.1, 0.46], // the forehead is two soft domes...
+  [unit(-0.5, 0.72, 0.48), 0.1, 0.46],
+  [unit(0, 0.86, 0.5), -0.035, 0.16], // ...with a shallow crease between them
 ]
 
 const MARKINGS = {
-  eyeSpread: 0.44, // size of the dark fur around each eye
-  muzzleSpread: 0.56, // size of the dark patch over the muzzle
-  edge: 0.26, // lower = larger markings
-  softness: 0.28, // how gradually they blend into the tan
+  eyeSpread: 0.47, // size of the grey-brown fur around each eye
+  sweepSpread: 0.36, // how far it sweeps out toward the ears
+  muzzleSpread: 0.44, // size of the patch over the muzzle
+  edge: 0.36, // lower = larger markings
+  softness: 0.13, // how gradually they blend into the tan
 }
+
+const sweepLeft = unit(0.82, 0.02, 0.57)
+const sweepRight = unit(-0.82, 0.02, 0.57)
 
 const tan = new THREE.Color(andyPalette.tan)
 const crown = new THREE.Color(andyPalette.crown)
 const mask = new THREE.Color(andyPalette.mask)
 const muzzle = new THREE.Color(andyPalette.muzzle)
-const whiskers = new THREE.Color(andyPalette.whiskers)
-const white = new THREE.Color(andyPalette.white)
 
 /** Where the fur is in the given direction. `lift` raises the point off the surface. */
 export function placeAndyHead(direction, target, lift = 0) {
   let swell = 1 + lift
-  for (const [centre, height, spread] of TUFTS) swell += height * bump(direction, centre, spread)
+  for (const [centre, height, spread] of SWELLS) swell += height * bump(direction, centre, spread)
   return target.set(direction.x * ANDY_HEAD.width, direction.y * ANDY_HEAD.height, direction.z * ANDY_HEAD.depth).multiplyScalar(swell)
 }
 
 /**
- * Fur colour, following the photos: a lighter tan-brown crown; darker
- * charcoal-brown fur around the eyes, sweeping out toward the ears, and
- * over the muzzle; paler whisker pads beside the nose; a white beard.
- * The colours are painted onto the one mesh, so they follow its surface.
+ * Fur colour: caramel, a little lighter over the crown, with a
+ * grey-brown mask. The mask is a patch round each eye, joined across the
+ * bridge of the nose and sweeping out toward the ears, running down into
+ * a darker patch over the muzzle. The colours are painted onto the one
+ * mesh, so they follow its surface.
  */
 export function paintAndyHead(direction, target) {
-  const { eyeLeft, eyeRight, bridge, muzzle: muzzleCentre, beard } = ANDY_FACE
-  target.copy(tan).lerp(crown, smoothstep(direction.y, 0.25, 0.85))
+  const { eyeLeft, eyeRight, bridge, muzzle: muzzleCentre } = ANDY_FACE
+  target.copy(tan).lerp(crown, smoothstep(direction.y, 0.3, 0.9))
 
-  // A band across both eyes, joined over the bridge of the nose...
-  const band = Math.max(bump(direction, eyeLeft, MARKINGS.eyeSpread), bump(direction, eyeRight, MARKINGS.eyeSpread), bump(direction, bridge, MARKINGS.eyeSpread * 0.8))
-  // ...running down into a wider patch over the muzzle.
+  const eyes = Math.max(bump(direction, eyeLeft, MARKINGS.eyeSpread), bump(direction, eyeRight, MARKINGS.eyeSpread))
+  const sweep = Math.max(bump(direction, sweepLeft, MARKINGS.sweepSpread), bump(direction, sweepRight, MARKINGS.sweepSpread))
   const patch = bump(direction, muzzleCentre, MARKINGS.muzzleSpread)
-  const facing = smoothstep(direction.z, 0, 0.42) // keep the markings on the front
-  target.lerp(mask, smoothstep(Math.max(band, patch), MARKINGS.edge, MARKINGS.edge + MARKINGS.softness) * facing)
-  target.lerp(muzzle, bump(direction, muzzleCentre, 0.26) * 0.7)
+  const coverage = Math.max(eyes, sweep, bump(direction, bridge, MARKINGS.eyeSpread * 0.8), patch)
+  const facing = smoothstep(direction.z, 0.1, 0.45) // keep the markings on the front
+  target.lerp(mask, smoothstep(coverage, MARKINGS.edge, MARKINGS.edge + MARKINGS.softness) * facing)
+  target.lerp(muzzle, smoothstep(patch, 0.42, 0.62))
+}
 
-  // Paler whisker pads and a white beard, as in the photos.
-  const pads = Math.max(bump(direction, TUFTS[3][0], 0.2), bump(direction, TUFTS[4][0], 0.2))
-  target.lerp(whiskers, pads * 0.55)
-  target.lerp(white, smoothstep(bump(direction, beard, 0.38), 0.3, 0.7))
+/* Ears: long drops, narrow where they join the head and fuller toward the tip. */
+const ANDY_EAR = { width: 0.062, length: 0.148, depth: 0.08, flare: 0.3 }
+
+/** Where an ear's surface is in the given direction, measured from the ear's middle. */
+export function placeAndyEar(direction, target) {
+  const fullness = 1 - ANDY_EAR.flare * direction.y
+  return target.set(direction.x * ANDY_EAR.width * fullness, direction.y * ANDY_EAR.length, direction.z * ANDY_EAR.depth * fullness)
 }
 
 /** Position on the head for a feature in the given direction, as [x, y, z]. */

@@ -1,60 +1,98 @@
-.roles {
+/*
+ * Three stages in order. Stacked on phones and tablets with an arrow
+ * pointing down between them; side by side on wide screens with the
+ * arrows pointing across.
+ */
+.stages {
+  --stage-gap: var(--space-7);
+
   display: grid;
+  gap: var(--stage-gap);
 }
 
-.role {
+.stage {
   display: grid;
-  gap: var(--space-2) var(--space-6);
-  padding-block: var(--space-6);
-  border-top: 1px solid var(--color-border);
+  align-content: start;
+  gap: var(--space-4);
 }
 
-.role:last-child {
-  border-bottom: 1px solid var(--color-border);
-}
-
-.period {
+.stageHeader {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--color-text-subtle);
+  gap: var(--space-4);
 }
 
-/* The current role is picked out with a mint badge and brighter text. */
-.badge {
-  padding: 2px var(--space-3);
-  border-radius: var(--radius-pill);
+.stageIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-md);
   background: var(--color-accent);
   color: var(--color-on-accent);
-  font-family: var(--font-sans);
-  font-weight: var(--weight-semibold);
-}
-
-.body {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.title {
-  color: var(--color-text);
-  font-weight: var(--weight-medium);
-}
-
-.current .title {
-  color: var(--color-accent);
 }
 
 .summary {
-  max-width: var(--width-prose);
+  color: var(--color-text);
+  text-wrap: pretty;
+}
+
+.examples {
   color: var(--color-text-muted);
   text-wrap: pretty;
 }
 
+.examples strong {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+/* The arrow sits in the gap after each stage but the last. */
+.next {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% calc((var(--stage-gap) - 100%) / 2);
+  rotate: 90deg;
+  color: var(--color-text-muted);
+}
+
+.stage:last-child .next {
+  display: none;
+}
+
+/* Current role, with the résumé link. */
+.current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-5);
+  margin-top: var(--space-6);
+  padding: var(--space-5) clamp(var(--space-5), 4vw, var(--space-6));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-bg-raised));
+}
+
+.role {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.roleLabel {
+  color: var(--color-accent);
+}
+
+/* Moves to its own line as a whole when it doesn't fit beside the label. */
+.roleValue {
+  display: inline-block;
+}
+
 /*
- * Andy's track: a strip under the list that he crosses once. The strip
+ * Andy's track: a strip under the section that he crosses once. The strip
  * hides anything outside it, so he enters and leaves at its edges.
  */
 .track {
@@ -97,9 +135,17 @@
   }
 }
 
-@media (min-width: 48rem) {
-  .role {
-    grid-template-columns: 12rem minmax(0, 1fr);
-    align-items: baseline;
+@media (min-width: 64rem) {
+  .stages {
+    --stage-gap: var(--space-8);
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .next {
+    top: 50%;
+    left: 100%;
+    translate: calc((var(--stage-gap) - 100%) / 2) -50%;
+    rotate: none;
   }
 }

@@ -113,50 +113,61 @@ export const skills = {
   ],
 }
 
+/*
+ * PLACEHOLDER: put your résumé at public/resume.pdf (or change this path).
+ * Until that file exists, the two résumé links lead nowhere.
+ */
+export const resume = {
+  href: '/resume.pdf',
+  newTabNote: '(opens in a new tab)',
+}
+
 export const experience = {
   eyebrow: 'Experience',
-  title: 'Where I’ve been building.',
-  currentLabel: 'Currently',
-  /* PLACEHOLDER: fill in dates, titles and summaries. */
-  roles: [
+  title: 'How my scope has grown',
+  intro:
+    'My work at Podchaser has expanded from building React interfaces to collaborating across the stack and contributing backend changes.',
+  examplesLabel: 'Examples:',
+  /* In order: each stage builds on the one before it. `icon` names one in components/ui/icons.jsx. */
+  stages: [
     {
-      id: 'podchaser',
-      company: 'Podchaser',
-      title: 'Front-End Developer',
-      period: 'Present',
-      current: true,
-      summary:
-        'Placeholder summary. Describe what you own at Podchaser, the kind of problems you solve, and what you’re proud of.',
+      id: 'react',
+      icon: 'atom',
+      title: 'React interfaces',
+      summary: 'Build and maintain user-facing experiences in React.',
+      examples: 'search and filter controls, content discovery UI, and reusable components.',
     },
     {
-      id: 'previous-1',
-      company: 'Previous company',
-      title: 'Role title',
-      period: 'Year – Year',
-      current: false,
-      summary: 'Placeholder summary. One or two sentences about what you built and learned here.',
+      id: 'cross-stack',
+      icon: 'layers',
+      title: 'Cross-stack collaboration',
+      summary: 'Work across the frontend and backend to connect features end to end.',
+      examples: 'integrate APIs with the UI, align changes across the stack, and troubleshoot feature issues.',
     },
     {
-      id: 'previous-2',
-      company: 'Earlier company',
-      title: 'Role title',
-      period: 'Year – Year',
-      current: false,
-      summary: 'Placeholder summary. One or two sentences about what you built and learned here.',
+      id: 'backend',
+      icon: 'code',
+      title: 'Backend contributions',
+      summary: 'Make backend changes to support product features and improvements.',
+      examples: 'contribute Laravel changes (e.g., endpoints and data updates) to support frontend experiences.',
     },
   ],
+  currentRole: { label: 'Current role:', value: `${site.company} · ${site.role}` },
+  resumeLabel: 'View Résumé',
 }
 
 export const contact = {
   eyebrow: 'Contact',
-  title: 'Let’s build something.',
-  intro: 'The fastest way to reach me is email. Andy screens all my messages, but he’s friendly.',
+  title: 'What are you building?',
+  intro: 'I’d love to hear about your team and what you’re working on.',
+  linksLabel: 'Ways to reach me',
   /* PLACEHOLDER links: replace with your real email and profiles. */
-  email: 'hello@example.com',
   links: [
-    { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/your-profile' },
-    { id: 'github', label: 'GitHub', href: 'https://github.com/your-username' },
+    { id: 'email', icon: 'mail', label: 'Email', href: 'mailto:hello@example.com' },
+    { id: 'linkedin', icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/your-profile', external: true },
+    { id: 'github', icon: 'github', label: 'GitHub', href: 'https://github.com/your-username', external: true },
   ],
+  resumeLabel: 'Résumé',
 }
 
 export const footer = {
