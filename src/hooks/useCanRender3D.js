@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 function hasWebGL() {
   try {
     const canvas = document.createElement('canvas')
@@ -18,9 +16,13 @@ function isLowPowerDevice() {
 }
 
 /**
- * Decides once whether to show the 3D scene or the static illustration.
- * The checks are cheap and don't create a WebGL context that is kept.
+ * Whether to show the 3D scene or the still image. Decided once, when the
+ * page loads, so the 3D bundle can start downloading before anything has
+ * rendered. The checks are cheap and don't keep a WebGL context alive.
  */
+export const canRender3D = hasWebGL() && !isLowPowerDevice()
+
+/** The same answer as a hook, for components. */
 export function useCanRender3D() {
-  return useMemo(() => hasWebGL() && !isLowPowerDevice(), [])
+  return canRender3D
 }

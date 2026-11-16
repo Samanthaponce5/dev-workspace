@@ -6,12 +6,16 @@
   user-select: none;
 }
 
-/*
- * Once the live scene is ready it fades in on top (see HeroScene.module.css).
- * The poster waits for that fade to finish before leaving, so there is
- * never a moment with neither fully showing.
- */
+/* Normally the live scene is ready first and the still image is never seen. */
 .poster[data-hidden] {
   opacity: 0;
+}
+
+/*
+ * If the live scene arrives late it fades in on top (see
+ * HeroScene.module.css). The still image waits for that fade to finish
+ * before leaving, so there is never a moment with neither fully showing.
+ */
+.poster[data-hidden][data-late] {
   transition: opacity 240ms linear 620ms;
 }

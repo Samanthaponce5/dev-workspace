@@ -1,8 +1,11 @@
-import { useCallback, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useCallback, useEffect, useRef } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
+import * as THREE from 'three'
 import { useHoverCursor } from '../../../hooks/useHoverCursor'
 import { useSceneEvent } from '../../../hooks/useSceneEvent'
 import { useTimedValue } from '../../../hooks/useTimedValue'
+import { isIntroDone, onIntroDone } from '../../../utils/intro'
+import { registerSceneDuck } from '../../../utils/sceneBridge'
 import { playSqueak } from '../../../utils/squeak'
 import { palette } from '../materials'
 import { SpeechBubble } from '../SpeechBubble'
@@ -11,6 +14,35 @@ const BUBBLE_MS = 2600
 const INTRO_BUBBLE_MS = 3000
 const HOP_SECONDS = 0.7
 const TAP_RADIUS = 0.2 // in scene units; roughly a fingertip on a phone
+const corner = new THREE.Vector3()
+
+/*
+ * The duck's outline on screen, in viewport pixels: every vertex of its
+ * visible parts is projected through the camera and the extremes kept.
+ */
+function screenRect(body, camera, canvas) {
+  const bounds = canvas.getBoundingClientRect()
+  let left = Infinity
+  let top = Infinity
+  let right = -Infinity
+  let bottom = -Infinity
+
+  body.updateWorldMatrix(true, true)
+  body.traverse((part) => {
+    if (!part.isMesh || part.userData.tapTarget) return
+    const positions = part.geometry.attributes.position
+    for (let index = 0; index < positions.count; index += 1) {
+      corner.fromBufferAttribute(positions, index).applyMatrix4(part.matrixWorld).project(camera)
+      const x = bounds.left + (corner.x * 0.5 + 0.5) * bounds.width
+      const y = bounds.top + (-corner.y * 0.5 + 0.5) * bounds.height
+      left = Math.min(left, x)
+      right = Math.max(right, x)
+      top = Math.min(top, y)
+      bottom = Math.max(bottom, y)
+    }
+  })
+  return Number.isFinite(left) ? { left, top, width: right - left, height: bottom - top } : null
+}
 
 /**
  * Rubber duck debugging easter egg.
@@ -22,8 +54,29 @@ const TAP_RADIUS = 0.2 // in scene units; roughly a fingertip on a phone
  * its timer, even if a bubble is already up.
  */
 export function RubberDuck({ position, quotes, introQuote, animate = true }) {
+  const groupRef = useRef(null)
   const bodyRef = useRef(null)
   const hopStart = useRef(-1)
+  const camera = useThree((state) => state.camera)
+  const gl = useThree((state) => state.gl)
+  const invalidate = useThree((state) => state.invalidate)
+
+  // During the intro the duck is hidden: the intro's own duck hops across
+  // the page and lands here, and the two are swapped at that instant.
+  useEffect(() => {
+    const group = groupRef.current
+    const show = () => {
+      group.visible = true
+      invalidate()
+    }
+    group.visible = isIntroDone()
+    const unregister = registerSceneDuck({ getRect: () => screenRect(bodyRef.current, camera, gl.domElement), show })
+    const unsubscribe = onIntroDone(show)
+    return () => {
+      unregister()
+      unsubscribe()
+    }
+  }, [camera, gl, invalidate])
   const nextQuote = useRef(0)
   const introPlayed = useRef(false)
   const [bubble, setBubble] = useTimedValue(BUBBLE_MS)
@@ -70,7 +123,7 @@ export function RubberDuck({ position, quotes, introQuote, animate = true }) {
   })
 
   return (
-    <group position={position}>
+    <group ref={groupRef} position={position} name="rubber-duck">
       <group
         ref={bodyRef}
         {...hover}
@@ -80,7 +133,7 @@ export function RubberDuck({ position, quotes, introQuote, animate = true }) {
         }}
       >
         {/* Invisible, generous tap target: the duck itself is only a few pixels wide on a phone. */}
-        <mesh position={[0, 0.08, 0]}>
+        <mesh position={[0, 0.08, 0]} userData={{ tapTarget: true }}>
           <sphereGeometry args={[TAP_RADIUS, 12, 8]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>

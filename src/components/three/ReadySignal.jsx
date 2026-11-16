@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
+import { getSceneDuckRect } from '../../utils/sceneBridge'
 
 const FRAMES_AFTER_COMPILE = 2
 
@@ -19,11 +20,18 @@ export function ReadySignal({ onReady }) {
   const compiled = useRef(false)
   const framesDrawn = useRef(0)
   const signalled = useRef(false)
+  const firstFrameMarked = useRef(false)
 
   useEffect(() => {
+    // In development only: lets scripts/capture-posters.mjs reach into the scene.
+    if (import.meta.env.DEV) window.__scene = { scene, getDuckRect: getSceneDuckRect }
+
     let cancelled = false
+    performance.mark('scene:compile-start')
     const markCompiled = () => {
-      if (!cancelled) compiled.current = true
+      if (cancelled) return
+      compiled.current = true
+      performance.mark('scene:compiled')
     }
     // If compiling up front fails, fall back to showing the scene anyway.
     gl.compileAsync(scene, camera).then(markCompiled, markCompiled)
@@ -33,10 +41,15 @@ export function ReadySignal({ onReady }) {
   }, [gl, scene, camera])
 
   useFrame(() => {
+    if (!firstFrameMarked.current) {
+      firstFrameMarked.current = true
+      performance.mark('scene:first-frame-loop')
+    }
     if (!compiled.current || signalled.current) return
     framesDrawn.current += 1
     if (framesDrawn.current >= FRAMES_AFTER_COMPILE) {
       signalled.current = true
+      performance.mark('scene:ready')
       onReady()
     }
   })

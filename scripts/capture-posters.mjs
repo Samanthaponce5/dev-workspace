@@ -1,13 +1,19 @@
 /*
- * Captures the still images ("posters") of the desk scene that the hero
- * shows while the 3D scene loads, and when WebGL isn't available.
+ * Captures the images that are generated from the live site:
+ *
+ *   - the still images ("posters") of the desk scene, which the hero
+ *     shows when the 3D scene is slow to load or WebGL isn't available;
+ *   - the intro's two embedded pictures (the SP letters and the tiny
+ *     duck) and the proportions of the navbar logo, written into
+ *     index.html so the intro matches what it lands on.
  *
  *   1. Start the dev server:  npm run dev
  *   2. In another terminal:   npm run posters
  *      (or: node scripts/capture-posters.mjs http://localhost:5173)
  *
- * Run it again whenever the scene changes (furniture, characters, colours,
- * lighting or camera), so the posters keep matching the live scene.
+ * Run it again whenever the scene, the duck or the navbar logo changes
+ * (furniture, characters, colours, lighting, camera, logo font or size),
+ * so the stills keep matching the live page.
  *
  * It opens the site in headless Chrome at a desktop and a phone size,
  * waits for the scene's first complete frame, stops the animation clock so
@@ -21,7 +27,7 @@
  * the default macOS location.
  */
 import { spawn } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -84,6 +90,8 @@ const MEASURE = `(async () => {
 
 /* Runs in the page. Leaves only the scene's canvas showing, on a transparent page. */
 const ISOLATE_CANVAS = `(() => {
+  // The duck is hidden while the intro is pending; the stills need it on its shelf.
+  window.__scene.scene.getObjectByName('rubber-duck').visible = true
   document.documentElement.style.background = 'transparent'
   document.body.style.background = 'transparent'
   document.body.style.visibility = 'hidden'
@@ -91,7 +99,7 @@ const ISOLATE_CANVAS = `(() => {
 })()`
 
 /* Runs in the page. Trims the screenshot to the scene and re-encodes it as WebP. */
-const trimAndEncode = (png) => `(async () => {
+const trimAndEncode = (png, quality) => `(async () => {
   const image = new Image()
   image.src = 'data:image/png;base64,${png}'
   await image.decode()
@@ -115,11 +123,11 @@ const trimAndEncode = (png) => `(async () => {
   box.height = Math.min(image.height, bottom + 3) - box.y
   const trimmed = Object.assign(document.createElement('canvas'), { width: box.width, height: box.height })
   trimmed.getContext('2d').drawImage(canvas, -box.x, -box.y)
-  return { box, webp: trimmed.toDataURL('image/webp', ${WEBP_QUALITY}).split(',')[1] }
+  return { box, webp: trimmed.toDataURL('image/webp', ${quality}).split(',')[1] }
 })()`
 
-const metadata = {}
-for (const variant of VARIANTS) {
+/* Opens the site at a given size and waits for the scene's first complete frame, with the clock stopped. */
+async function openSite({ width, height, scale, mobile, stageCss }) {
   const { targetId } = await send('Target.createTarget', { url: 'about:blank' })
   const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true })
   const page = (method, params) => send(method, params, sessionId)
@@ -131,11 +139,11 @@ for (const variant of VARIANTS) {
 
   await page('Page.enable')
   await page('Runtime.enable')
-  await page('Emulation.setDeviceMetricsOverride', { width: variant.width, height: variant.height, deviceScaleFactor: variant.scale, mobile: variant.mobile })
+  await page('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: scale, mobile })
   await page('Page.addScriptToEvaluateOnNewDocument', { source: FREEZABLE_CLOCK })
-  if (variant.stageCss) {
+  if (stageCss) {
     await page('Page.addScriptToEvaluateOnNewDocument', {
-      source: `document.addEventListener('DOMContentLoaded', () => document.head.append(Object.assign(document.createElement('style'), { textContent: '[data-hero-stage] { ${variant.stageCss} }' })))`,
+      source: `document.addEventListener('DOMContentLoaded', () => document.head.append(Object.assign(document.createElement('style'), { textContent: '[data-hero-stage] { ${stageCss} }' })))`,
     })
   }
   await page('Page.navigate', { url })
@@ -143,14 +151,24 @@ for (const variant of VARIANTS) {
   // Wait for the live scene's first complete frame, then stop the clock at once.
   const ready = await evaluate(`(async () => { const start = Date.now(); while (!document.querySelector('[data-ready]')) { if (Date.now() - start > 60000) return false; await new Promise(r => setTimeout(r, 30)) } window.__freezeClock(); return true })()`)
   if (!ready) throw new Error(`The scene never became ready at ${url}. Is the dev server running?`)
-  await sleep(1600) // let the canvas finish fading in and draw its resting pose
+  if (!(await evaluate('Boolean(window.__scene)'))) throw new Error('This needs the dev server (npm run dev), not a production build.')
+  await sleep(1600) // let it draw its resting pose
 
-  const measured = await evaluate(MEASURE)
-  await evaluate(ISOLATE_CANVAS)
-  await page('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } })
-  await sleep(400)
-  const { data: png } = await page('Page.captureScreenshot', { format: 'png' })
-  const { box, webp } = await evaluate(trimAndEncode(png))
+  const screenshot = async (clip) => {
+    await page('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } })
+    await sleep(400)
+    return (await page('Page.captureScreenshot', { format: 'png', ...(clip ? { clip } : {}) })).data
+  }
+  return { evaluate, screenshot, close: () => send('Target.closeTarget', { targetId }) }
+}
+
+// 1. The posters.
+const metadata = {}
+for (const variant of VARIANTS) {
+  const site = await openSite(variant)
+  const measured = await site.evaluate(MEASURE)
+  await site.evaluate(ISOLATE_CANVAS)
+  const { box, webp } = await site.evaluate(trimAndEncode(await site.screenshot(), WEBP_QUALITY))
 
   const file = `scene-${variant.name}.webp`
   writeFileSync(`${root}public/${file}`, Buffer.from(webp, 'base64'))
@@ -167,10 +185,85 @@ for (const variant of VARIANTS) {
     anchorY: Math.round(((measured.centreY - box.y / variant.scale) / height) * 10000) / 10000,
   }
   console.log(`${file}: ${box.width}x${box.height}px, ${(Buffer.from(webp, 'base64').length / 1024).toFixed(0)} kB`)
-  await send('Target.closeTarget', { targetId })
+  await site.close()
 }
-
 writeFileSync(`${root}src/sections/Hero/scenePoster.json`, `${JSON.stringify(metadata, null, 2)}\n`)
 console.log('Wrote src/sections/Hero/scenePoster.json')
+
+// 2. The intro's pictures and proportions, embedded in index.html.
+const INTRO_SCALE = 5 // the duck is tiny on screen, so capture it enlarged
+
+/* Runs in the page. Draws the navbar logo's letters to a picture and measures how the dot sits beside them. */
+const MEASURE_LOGO = `(async () => {
+  const span = document.querySelector('[data-site-logo-letters]')
+  const dot = document.querySelector('[data-site-logo-dot]').getBoundingClientRect()
+  const style = getComputedStyle(span)
+  const fontSize = parseFloat(style.fontSize)
+  const spacing = (parseFloat(style.letterSpacing) || 0) / fontSize
+  const font = (size) => style.fontStyle + ' ' + style.fontWeight + ' ' + size + 'px ' + style.fontFamily
+  await document.fonts.load(font(fontSize), span.textContent)
+
+  // Where the letters' ink is on the page (see inkRect in src/intro/reveal.js).
+  let context = document.createElement('canvas').getContext('2d')
+  context.font = font(fontSize)
+  context.letterSpacing = style.letterSpacing
+  let m = context.measureText(span.textContent)
+  const box = span.getBoundingClientRect()
+  const baseline = box.top + (box.height - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent
+  const ink = { left: box.left - m.actualBoundingBoxLeft, top: baseline - m.actualBoundingBoxAscent, width: m.actualBoundingBoxLeft + m.actualBoundingBoxRight, height: m.actualBoundingBoxAscent + m.actualBoundingBoxDescent }
+
+  // The same letters, drawn large and trimmed to their ink.
+  const SIZE = 128
+  const canvas = document.createElement('canvas')
+  context = canvas.getContext('2d')
+  context.font = font(SIZE)
+  context.letterSpacing = spacing * SIZE + 'px'
+  m = context.measureText(span.textContent)
+  canvas.width = Math.ceil(m.actualBoundingBoxLeft + m.actualBoundingBoxRight)
+  canvas.height = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
+  context = canvas.getContext('2d')
+  context.font = font(SIZE)
+  context.letterSpacing = spacing * SIZE + 'px'
+  context.fillStyle = style.color
+  context.fillText(span.textContent, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent)
+
+  return {
+    letters: { src: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height },
+    // All relative to the height of the letters.
+    dotRatio: dot.width / ink.height,
+    gapRatio: (dot.left - (ink.left + ink.width)) / ink.height,
+    dropRatio: (ink.top + ink.height - dot.bottom) / ink.height,
+  }
+})()`
+
+/* Runs in the page. Hides everything in the scene except the duck, and reports where it is. */
+const ISOLATE_DUCK = `(() => {
+  const { scene, getDuckRect } = window.__scene
+  const duck = scene.getObjectByName('rubber-duck')
+  duck.visible = true
+  scene.traverse((object) => { if (object.isMesh || object.isSprite) object.visible = false })
+  duck.traverse((object) => { if (object.isMesh && !object.userData.tapTarget) object.visible = true })
+  return getDuckRect()
+})()`
+
+const round = (value) => Math.round(value * 10000) / 10000
+{
+  const site = await openSite({ width: 1440, height: 900, scale: INTRO_SCALE, mobile: false })
+  const logo = await site.evaluate(MEASURE_LOGO)
+  const rect = await site.evaluate(ISOLATE_DUCK)
+  await site.evaluate(ISOLATE_CANVAS)
+  const clip = { x: rect.left - 6, y: rect.top - 6, width: rect.width + 12, height: rect.height + 12, scale: 1 }
+  const { box, webp } = await site.evaluate(trimAndEncode(await site.screenshot(clip), 0.92))
+  await site.close()
+
+  const htmlPath = `${root}index.html`
+  const html = readFileSync(htmlPath, 'utf8')
+    .replace(/(<img class="intro-letters" data-intro-letters )src="[^"]*" width="\d+" height="\d+"/, `$1src="${logo.letters.src}" width="${logo.letters.width}" height="${logo.letters.height}"`)
+    .replace(/(<img class="intro-duck" data-intro-duck )src="[^"]*" width="\d+" height="\d+"/, `$1src="data:image/webp;base64,${webp}" width="${box.width}" height="${box.height}"`)
+    .replace(/\/\* intro-geometry \*\/.*?\/\* \/intro-geometry \*\//, `/* intro-geometry */ --dot-ratio: ${round(logo.dotRatio)}; --gap-ratio: ${round(logo.gapRatio)}; --drop-ratio: ${round(logo.dropRatio)}; /* /intro-geometry */`)
+  writeFileSync(htmlPath, html)
+  console.log(`index.html: letters ${logo.letters.width}x${logo.letters.height}px, duck ${box.width}x${box.height}px (${(Buffer.from(webp, 'base64').length / 1024).toFixed(1)} kB), dot ${round(logo.dotRatio)} / gap ${round(logo.gapRatio)} / drop ${round(logo.dropRatio)}`)
+}
+
 socket.close()
 chrome.kill()

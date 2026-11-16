@@ -4,6 +4,8 @@ import { VIEWS } from './camera/views'
 import { DeskWorld } from './DeskWorld'
 import { ReadySignal } from './ReadySignal'
 
+performance.mark('scene:bundle-evaluated')
+
 /**
  * The WebGL canvas for the hero. It fills its parent (the whole hero) and
  * the camera fits the diorama to `frame`, the part of the canvas the
@@ -22,6 +24,7 @@ export function DeskScene({ scene, frame, active, animate, isMobile, sceneStarte
   // Label the <canvas> itself, so speech bubbles rendered beside it in the
   // DOM are still announced by screen readers.
   const describeCanvas = ({ gl }) => {
+    performance.mark('scene:canvas-created')
     gl.domElement.setAttribute('role', 'img')
     gl.domElement.setAttribute('aria-label', scene.description)
   }

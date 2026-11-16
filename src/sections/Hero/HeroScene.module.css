@@ -4,16 +4,24 @@
   z-index: -2;
 }
 
-/* Invisible until the scene has drawn completely, then fades in over the poster. */
+/*
+ * Invisible until the scene has drawn a complete frame. Normally that
+ * happens behind the intro overlay, so it simply appears; the overlay's
+ * reveal is the transition.
+ */
 .canvas {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 600ms var(--ease-out);
 }
 
 .canvas[data-ready] {
   opacity: 1;
+}
+
+/* If the live scene arrives after the page was revealed, it fades in over the still image. */
+.canvas[data-late] {
+  transition: opacity 600ms var(--ease-out);
 }
 
 /* Let vertical swipes scroll the page even when they start on the scene. */

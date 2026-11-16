@@ -1,7 +1,7 @@
 .monogram {
   display: inline-flex;
   align-items: baseline;
-  gap: 3px;
+  gap: 0.09em;
   min-height: 2.75rem;
   padding-block: var(--space-2);
   color: var(--color-text);
@@ -13,8 +13,8 @@
 }
 
 .dot {
-  width: 0.4em;
-  height: 0.4em;
+  width: 0.32em;
+  height: 0.32em;
   border-radius: 50%;
   background: var(--color-lime);
   box-shadow: 0 0 12px rgb(200 245 90 / 60%);

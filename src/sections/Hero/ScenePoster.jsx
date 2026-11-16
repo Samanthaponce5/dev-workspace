@@ -5,9 +5,9 @@ import styles from './ScenePoster.module.css'
 
 /**
  * A still image of the finished desk scene, drawn exactly where the live
- * scene appears. It is shown while the 3D bundle loads (the live scene
- * then fades in over it) and instead of the scene when WebGL is missing
- * or the device is low-power.
+ * scene appears. It is what visitors see if the live scene is slow to
+ * load (the live scene then fades in over it, `late`), and instead of
+ * the scene when WebGL is missing or the device is low-power.
  *
  * The image was captured from the real scene by `npm run posters`, which
  * also recorded how large the scene was drawn (pixelsPerUnit) and where
@@ -17,7 +17,7 @@ import styles from './ScenePoster.module.css'
  *
  * `onSettled` fires when the image has loaded, or failed to.
  */
-export function ScenePoster({ frame, isMobile, hidden = false, label, onSettled }) {
+export function ScenePoster({ frame, isMobile, hidden = false, late = false, label, onSettled }) {
   if (!frame) return null
 
   const poster = isMobile ? posters.mobile : posters.desktop
@@ -41,6 +41,7 @@ export function ScenePoster({ frame, isMobile, hidden = false, label, onSettled 
       height={poster.height}
       style={{ left, top, width, height }}
       data-hidden={hidden || undefined}
+      data-late={late || undefined}
       draggable={false}
       fetchPriority="high"
       onLoad={onSettled}
