@@ -19,9 +19,10 @@ const unit = (x, y, z) => new THREE.Vector3(x, y, z).normalize()
 const color = (name) => new THREE.Color(andyPalette[name])
 
 const tan = color('tan')
-const crown = color('crown')
+const beige = color('beige')
 const taupe = color('taupe')
-const muzzleBrown = color('muzzle')
+const greige = color('greige')
+const brown = color('brown')
 const bodyTan = color('body')
 const cream = color('cream')
 const creamShade = color('creamShade')
@@ -29,48 +30,31 @@ const creamShade = color('creamShade')
 /* ---------------------------------------------------------------- Head */
 
 /** Broad and softly rounded: wider than it is tall. */
-export const ANDY_HEAD = { width: 0.176, height: 0.146, depth: 0.142 }
+export const ANDY_HEAD = { width: 0.174, height: 0.146, depth: 0.14 }
 
 export const ANDY_FACE = {
-  eyeLeft: unit(0.41, 0.13, 0.9),
-  eyeRight: unit(-0.41, 0.13, 0.9),
-  bridge: unit(0, 0.04, 1), // between the eyes
-  muzzle: unit(0, -0.32, 0.95),
-  nose: unit(0, -0.14, 0.99),
-  mouth: unit(0, -0.4, 0.92),
+  eyeLeft: unit(0.42, 0.17, 0.89),
+  eyeRight: unit(-0.42, 0.17, 0.89),
 }
 
 /*
  * Soft swellings (or, with a negative height, hollows): each one moves
  * the surface a little around a spot. They overlap, so the forehead,
- * cheeks, brows and muzzle are all one sculpted shape.
+ * brows and cheeks are all one sculpted shape. The muzzle is not part of
+ * this mesh: it is built from its own volumes in Andy.jsx.
  * [direction, height, spread]
  */
 const SWELLS = [
-  [unit(0.8, -0.38, 0.46), 0.14, 0.56], // full cheeks
-  [unit(-0.8, -0.38, 0.46), 0.14, 0.56],
+  [unit(0.82, -0.36, 0.44), 0.15, 0.54], // full cheeks
+  [unit(-0.82, -0.36, 0.44), 0.15, 0.54],
   [unit(0.5, 0.74, 0.45), 0.09, 0.44], // a broad forehead in two soft halves...
   [unit(-0.5, 0.74, 0.45), 0.09, 0.44],
-  [unit(0, 1, 0.1), -0.055, 0.2], // ...with a slight dip between them at the top
-  [unit(0.4, 0.46, 0.79), 0.04, 0.17], // raised brows
-  [unit(-0.4, 0.46, 0.79), 0.04, 0.17],
-  [ANDY_FACE.eyeLeft, -0.03, 0.15], // the eyes sit slightly into the face
-  [ANDY_FACE.eyeRight, -0.03, 0.15],
-  [unit(0.22, -0.37, 0.9), 0.2, 0.27], // a short muzzle: two full sides...
-  [unit(-0.22, -0.37, 0.9), 0.2, 0.27],
-  [ANDY_FACE.muzzle, 0.08, 0.3], // ...joined across the middle
+  [unit(0, 1, 0.1), -0.05, 0.2], // ...with a slight dip at the parting
+  [unit(0.42, 0.5, 0.76), 0.05, 0.18], // brows, which frame the eyes from above
+  [unit(-0.42, 0.5, 0.76), 0.05, 0.18],
+  [ANDY_FACE.eyeLeft, -0.045, 0.16], // the eyes sit into the face
+  [ANDY_FACE.eyeRight, -0.045, 0.16],
 ]
-
-const MARKINGS = {
-  eyeSpread: 0.47, // how far the taupe reaches round each eye
-  sweepSpread: 0.4, // and out toward the ears
-  lowerSpread: 0.54, // and over the cheeks beside the muzzle
-  edge: 0.27, // lower = more taupe
-  softness: 0.2, // how gradually it fades into the tan
-}
-
-const sweepLeft = unit(0.84, 0.02, 0.54)
-const sweepRight = unit(-0.84, 0.02, 0.54)
 
 /** Where the fur is in the given direction. `lift` raises the point off the surface. */
 export function placeAndyHead(direction, target, lift = 0) {
@@ -80,21 +64,26 @@ export function placeAndyHead(direction, target, lift = 0) {
 }
 
 /**
- * Honey tan, a little lighter on top, with soft taupe-brown across the
- * lower face: round the eyes, out toward the ears and down over the
- * cheeks, deepening on the muzzle. The forehead stays tan.
+ * Muted and gradual, after the real Andy: beige on the forehead, taupe
+ * toward the sides and along the parting, a lighter grey-brown on the
+ * lower face where the muzzle sits, and deeper brown under the jaw and
+ * beside the ears. A little shade round each eye gives it depth, but the
+ * two never join: the bridge between them stays light.
  */
 export function paintAndyHead(direction, target) {
-  const { eyeLeft, eyeRight, bridge, muzzle } = ANDY_FACE
-  target.copy(tan).lerp(crown, smoothstep(direction.y, 0.35, 0.95))
+  const across = Math.abs(direction.x)
+  target.copy(beige)
+  target.lerp(taupe, smoothstep(across, 0.4, 0.95) * 0.75) // sides of the head
+  target.lerp(taupe, Math.exp(-((direction.x / 0.08) ** 2)) * smoothstep(direction.y, 0.3, 0.75) * 0.4) // the parting
 
-  const eyes = Math.max(bump(direction, eyeLeft, MARKINGS.eyeSpread), bump(direction, eyeRight, MARKINGS.eyeSpread))
-  const sweep = Math.max(bump(direction, sweepLeft, MARKINGS.sweepSpread), bump(direction, sweepRight, MARKINGS.sweepSpread))
-  const lower = bump(direction, muzzle, MARKINGS.lowerSpread)
-  const coverage = Math.max(eyes, sweep, lower, bump(direction, bridge, MARKINGS.eyeSpread * 0.8))
-  const facing = smoothstep(direction.z, 0.05, 0.45) // keep it on the front of his head
-  target.lerp(taupe, smoothstep(coverage, MARKINGS.edge, MARKINGS.edge + MARKINGS.softness) * facing)
-  target.lerp(muzzleBrown, smoothstep(bump(direction, muzzle, 0.46), 0.3, 0.7))
+  const front = smoothstep(direction.z, 0.15, 0.6)
+  target.lerp(greige, smoothstep(-direction.y, -0.12, 0.3) * front * 0.9) // lower face
+
+  const eyes = Math.max(bump(direction, ANDY_FACE.eyeLeft, 0.2), bump(direction, ANDY_FACE.eyeRight, 0.2))
+  target.lerp(taupe, eyes * 0.75)
+
+  target.lerp(brown, smoothstep(-direction.y, 0.55, 0.88) * smoothstep(direction.z, -0.3, 0.3) * 0.85) // under the jaw
+  target.lerp(brown, smoothstep(across, 0.82, 1) * 0.6) // where the ears join
 }
 
 /** Position on the head for a feature in the given direction, as [x, y, z]. */
@@ -102,10 +91,21 @@ export function onAndyHead(direction, lift = 0) {
   return placeAndyHead(direction, new THREE.Vector3(), lift).toArray()
 }
 
+/*
+ * A moustache cheek: a soft drop that starts beside the nose and gets
+ * fuller as it sweeps out. This is the left one; the right is mirrored.
+ */
+const ANDY_WHISKER = { length: 0.064, height: 0.042, depth: 0.046, flare: 0.3 }
+
+export function placeAndyWhisker(direction, target) {
+  const fullness = 1 + ANDY_WHISKER.flare * direction.x
+  return target.set(direction.x * ANDY_WHISKER.length, direction.y * ANDY_WHISKER.height * fullness, direction.z * ANDY_WHISKER.depth * fullness)
+}
+
 /* ---------------------------------------------------------------- Ears */
 
 /* Broad where they join the head, softly flattened front to back, rounded at the tip. */
-const ANDY_EAR = { width: 0.063, length: 0.134, depth: 0.05, taper: 0.06 }
+const ANDY_EAR = { width: 0.06, length: 0.122, depth: 0.052, taper: 0.1 }
 
 /** Where an ear's surface is in the given direction, measured from the ear's middle. */
 export function placeAndyEar(direction, target) {

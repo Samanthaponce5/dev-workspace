@@ -1,11 +1,23 @@
 /*
- * Nav links land with the eyebrow a short way under the header, rather
- * than at the very top of the section's padding.
+ * Every section fills the screen, so a short one never shares it with
+ * the start of the next. Its content is centred in the space under the
+ * header; a section taller than the screen simply runs on. Nav links
+ * land with the section's top at the top of the window (the negative
+ * margin cancels the page's scroll padding).
  */
 .section {
   position: relative;
-  padding-block: var(--space-section);
-  scroll-margin-top: calc(var(--space-6) - var(--space-section));
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: calc(var(--nav-height) + var(--space-6)) var(--space-7);
+  scroll-margin-top: calc((var(--nav-height) + var(--space-4)) * -1);
+}
+
+/* The grid would otherwise shrink the container to its content. */
+.section > * {
+  width: 100%;
 }
 
 .layout {

@@ -6,7 +6,7 @@ import { useHoverCursor } from '../../hooks/useHoverCursor'
 import { useSceneEvent } from '../../hooks/useSceneEvent'
 import { useTimedValue } from '../../hooks/useTimedValue'
 import { andyPalette as colors } from '../three/materials'
-import { ANDY_FACE, ANDY_LEG, onAndyHead, paintAndyBody, paintAndyHead, paintAndyLeg, placeAndyBody, placeAndyEar, placeAndyHead, placeAndyLeg } from './andyShape'
+import { ANDY_FACE, ANDY_LEG, onAndyHead, paintAndyBody, paintAndyHead, paintAndyLeg, placeAndyBody, placeAndyEar, placeAndyHead, placeAndyLeg, placeAndyWhisker } from './andyShape'
 import { createShapedSphere } from './geometry/shapedSphere'
 import { SpeechBubble } from '../three/SpeechBubble'
 
@@ -16,8 +16,9 @@ const HOP_HEIGHT = 0.16
 const BARK_MS = 1400
 const TILT_EVERY = 6 // seconds between idle head tilts
 const TILT_LENGTH = 1.8
-const EAR_REST = 0.17 // sweeping down and out from high on his head; hops flap them further
+const EAR_REST = 0.12 // hanging low and close beside his face; hops flap them outward
 const HEAD_TILT = -0.2 // chin up a little, so he looks toward the visitor
+const TONGUE_THICKNESS = 0.2
 const SOLE_HEIGHT = ANDY_LEG.sole * ANDY_LEG.height // a leg's centre sits this far above the floor
 
 /* A tuft of fur: a unit sphere stretched into shape with `scale`. */
@@ -32,35 +33,58 @@ function Fur({ color, ...meshProps }) {
 
 function Eye({ direction }) {
   return (
-    <group position={onAndyHead(direction, 0.035)}>
+    <group position={onAndyHead(direction, 0.05)}>
       <mesh>
-        <sphereGeometry args={[0.034, 20, 14]} />
+        <sphereGeometry args={[0.032, 20, 14]} />
         <meshStandardMaterial color={colors.eye} roughness={0.2} />
       </mesh>
       {/* One small catchlight */}
-      <mesh position={[-0.011, 0.014, 0.027]}>
-        <sphereGeometry args={[0.0082, 10, 8]} />
+      <mesh position={[-0.01, 0.013, 0.026]}>
+        <sphereGeometry args={[0.0075, 10, 8]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
     </group>
   )
 }
 
-/* A short centre line under the nose and a shallow closed-mouth curve. */
-const MOUTH = { radius: 0.036, thickness: 0.003, arc: 1.2, line: 0.016 }
-
-function Mouth() {
+/**
+ * Andy's muzzle, built from real volumes rather than painted on: a short
+ * bridge with the nose on top, a moustache cheek sweeping out and down
+ * from each side of it, and tucked underneath, a small open mouth with
+ * the tip of his tongue showing and a cream chin. It stands proud of the
+ * face, so it catches the light and shades what is under it.
+ */
+function Muzzle({ parts, tongueRef, shadows }) {
   return (
-    <group position={onAndyHead(ANDY_FACE.mouth, 0.016)} rotation={[0.4, 0, 0]}>
-      <mesh position={[0, MOUTH.line / 2, 0]}>
-        <capsuleGeometry args={[MOUTH.thickness, MOUTH.line, 4, 8]} />
-        <meshStandardMaterial color={colors.mouth} roughness={0.8} />
+    <group position={[0, -0.03, 0.132]}>
+      {/* Lower jaw and the inside of the mouth, set back under the moustache */}
+      <Fur color={colors.brown} position={[0, -0.05, -0.014]} scale={[0.05, 0.026, 0.034]} />
+      <Fur color={colors.mouth} position={[0, -0.038, 0.006]} scale={[0.03, 0.017, 0.022]} />
+      <mesh ref={tongueRef} position={[0, -0.05, 0.026]} rotation={[1.0, 0, 0]} scale={[0.5, TONGUE_THICKNESS, 0.62]}>
+        <sphereGeometry args={[0.04, 16, 12]} />
+        <meshStandardMaterial color={colors.tongue} roughness={0.55} />
       </mesh>
-      {/* The arc is the bottom of a circle whose lowest point is where the line ends. */}
-      <mesh position={[0, MOUTH.radius, 0]} rotation={[0, 0, -Math.PI / 2 - MOUTH.arc / 2]}>
-        <torusGeometry args={[MOUTH.radius, MOUTH.thickness, 8, 20, MOUTH.arc]} />
-        <meshStandardMaterial color={colors.mouth} roughness={0.8} />
-      </mesh>
+      <Fur color={colors.cream} position={[0, -0.088, -0.022]} scale={[0.034, 0.03, 0.03]} />
+
+      {/* Bridge and nose */}
+      <Fur color={colors.greige} position={[0, 0.002, 0.012]} scale={[0.036, 0.03, 0.034]} castShadow={shadows} />
+      <group position={[0, 0.016, 0.042]}>
+        <mesh scale={[1.4, 0.95, 0.85]}>
+          <sphereGeometry args={[0.018, 16, 12]} />
+          <meshStandardMaterial color={colors.nose} roughness={0.25} />
+        </mesh>
+        <mesh position={[-0.007, 0.008, 0.011]}>
+          <sphereGeometry args={[0.004, 8, 6]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
+        </mesh>
+      </group>
+
+      {/* Moustache cheeks. The right one is the left one mirrored. */}
+      {[1, -1].map((side) => (
+        <group key={side} scale={[side, 1, 1]}>
+          <mesh geometry={parts.whisker} material={parts.whiskerFur} position={[0.056, -0.014, 0.002]} rotation={[0, -0.35, -0.42]} castShadow={shadows} />
+        </group>
+      ))}
     </group>
   )
 }
@@ -74,8 +98,10 @@ function useAndyParts() {
       body: createShapedSphere({ place: placeAndyBody, paint: paintAndyBody, widthSegments: 48, heightSegments: 36 }),
       leg: createShapedSphere({ place: placeAndyLeg, paint: paintAndyLeg, widthSegments: 48, heightSegments: 36 }),
       ear: createShapedSphere({ place: placeAndyEar, widthSegments: 24, heightSegments: 18 }),
+      whisker: createShapedSphere({ place: placeAndyWhisker, widthSegments: 24, heightSegments: 18 }),
       painted: fur({ vertexColors: true }),
-      earFur: fur({ color: colors.ear }),
+      earFur: fur({ color: colors.brown }),
+      whiskerFur: fur({ color: colors.greige, side: THREE.DoubleSide }),
     }
   }, [])
   useEffect(() => () => Object.values(parts).forEach((part) => part.dispose()), [parts])
@@ -83,38 +109,31 @@ function useAndyParts() {
 }
 
 /**
- * Andy's head: one broad shaped mesh. The forehead with its slight dip,
- * the full cheeks, raised brows and short two-sided muzzle are all
- * sculpted into that single surface, and the taupe-brown of his lower
- * face is painted onto it (see andyShape.js). On top sit his eyes, a
- * small nose with a soft shine, an understated closed mouth, and ears
- * that hang from high on the head to about jaw level.
+ * Andy's head: one broad shaped mesh with the forehead, brows, eye
+ * hollows and full cheeks sculpted into it and his muted colouring
+ * painted on (see andyShape.js). On it sit two soft sweeps of fur either
+ * side of his parting, his eyes, the muzzle, and ears that hang low and
+ * close beside his face.
  */
-function AndyHead({ parts, leftEarRef, rightEarRef, shadows }) {
+function AndyHead({ parts, tongueRef, leftEarRef, rightEarRef, shadows }) {
   return (
     <>
       <mesh geometry={parts.head} material={parts.painted} castShadow={shadows} />
 
+      {/* Fur swept to each side of the parting, set well into the forehead */}
+      {[-1, 1].map((side) => (
+        <Fur key={side} color={colors.sweep} position={[side * 0.05, 0.104, 0.082]} rotation={[0, 0, side * -0.32]} scale={[0.07, 0.036, 0.046]} />
+      ))}
+
       <Eye direction={ANDY_FACE.eyeLeft} />
       <Eye direction={ANDY_FACE.eyeRight} />
+      <Muzzle parts={parts} tongueRef={tongueRef} shadows={shadows} />
 
-      <group position={onAndyHead(ANDY_FACE.nose, 0.03)}>
-        <mesh scale={[1.35, 0.95, 0.8]}>
-          <sphereGeometry args={[0.019, 16, 12]} />
-          <meshStandardMaterial color={colors.nose} roughness={0.25} />
-        </mesh>
-        <mesh position={[-0.007, 0.008, 0.012]}>
-          <sphereGeometry args={[0.0042, 8, 6]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.55} />
-        </mesh>
+      <group ref={leftEarRef} position={[0.118, 0.07, -0.014]} rotation={[0, 0, EAR_REST]}>
+        <mesh geometry={parts.ear} material={parts.earFur} position={[0.036, -0.1, 0]} castShadow={shadows} />
       </group>
-      <Mouth />
-
-      <group ref={leftEarRef} position={[0.104, 0.102, -0.014]} rotation={[0, 0, EAR_REST]}>
-        <mesh geometry={parts.ear} material={parts.earFur} position={[0.042, -0.12, 0]} castShadow={shadows} />
-      </group>
-      <group ref={rightEarRef} position={[-0.104, 0.102, -0.014]} rotation={[0, 0, -EAR_REST]}>
-        <mesh geometry={parts.ear} material={parts.earFur} position={[-0.042, -0.12, 0]} castShadow={shadows} />
+      <group ref={rightEarRef} position={[-0.118, 0.07, -0.014]} rotation={[0, 0, -EAR_REST]}>
+        <mesh geometry={parts.ear} material={parts.earFur} position={[-0.036, -0.1, 0]} castShadow={shadows} />
       </group>
     </>
   )
@@ -123,20 +142,23 @@ function AndyHead({ parts, leftEarRef, rightEarRef, shadows }) {
 /**
  * Andy: a chibi Shih Tzu sitting beside the chair.
  *
- * Head: broad and honey tan, wider than his body, with full cheeks, a
- * short taupe-brown muzzle, dark eyes, a closed mouth and deep-brown
- * floppy ears (see AndyHead). Body: a compact pear shape sitting low over
- * rounded hind legs, with one cream bib painted on the chest. His front
- * legs are short and close together, each ending in a flat-soled paw
- * with a cream sock and toe grooves; the hind paws peek out behind them.
+ * Head: broad and softly rounded, wider than his body, in muted beige
+ * and taupe, with a short muzzle that stands out from the face, a fluffy
+ * moustache cheek either side of his nose, his tongue peeking out and
+ * deep-brown floppy ears (see AndyHead). Body: a compact pear shape
+ * sitting low over rounded hind legs, with one cream bib painted on the
+ * chest. His front legs are short and close together, each ending in a
+ * flat-soled paw with a cream sock and toe grooves; the hind paws peek
+ * out behind them.
  *
- * Idle: wags his tail and tilts his head now and then.
+ * Idle: wags his tail, pants lightly, and tilts his head now and then.
  * Clicked: two happy hops with a faster wag, flapping ears and a "Woof!".
  */
 export function Andy({ position, facingAngle = 0, animate = true, shadows }) {
   const rootRef = useRef(null)
   const headRef = useRef(null)
   const tailRef = useRef(null)
+  const tongueRef = useRef(null)
   const leftEarRef = useRef(null)
   const rightEarRef = useRef(null)
   const hopStart = useRef(-1)
@@ -173,6 +195,9 @@ export function Andy({ position, facingAngle = 0, animate = true, shadows }) {
     const tilt = cycle < TILT_LENGTH ? Math.sin((cycle / TILT_LENGTH) * Math.PI) : 0
     headRef.current.rotation.z = excited ? 0 : tilt * 0.3 * motion
     headRef.current.rotation.x = HEAD_TILT + (excited ? -0.15 * hopPhase * motion : 0)
+
+    // Light panting
+    tongueRef.current.scale.y = TONGUE_THICKNESS * (1 + Math.sin(t * 7) * 0.2 * motion)
 
     const flap = hopPhase * 0.5 * motion
     leftEarRef.current.rotation.z = EAR_REST + flap
@@ -211,7 +236,7 @@ export function Andy({ position, facingAngle = 0, animate = true, shadows }) {
         </group>
 
         <group ref={headRef} position={[0, 0.352, 0.05]}>
-          <AndyHead parts={parts} leftEarRef={leftEarRef} rightEarRef={rightEarRef} shadows={shadows} />
+          <AndyHead parts={parts} tongueRef={tongueRef} leftEarRef={leftEarRef} rightEarRef={rightEarRef} shadows={shadows} />
         </group>
       </group>
 
