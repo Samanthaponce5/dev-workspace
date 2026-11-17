@@ -54,6 +54,19 @@
   --scene-led: #71c9c8;
   --scene-led-light: 2.4; /* how brightly the strips light what is near them */
   --scene-led-glow: 2.2; /* how brightly the strips themselves glow */
+
+  /* The jellyfish lamp on the shelf: a pink jellyfish in glowing blue water. */
+  --scene-jelly: #ffd3ee;
+  --scene-jelly-glow: 1.4; /* the bell */
+  --scene-jelly-tentacle-glow: 1;
+  --scene-jelly-edge: none; /* an outline round the bell and tentacles, or none */
+  --scene-lamp-water: #2f8fb8;
+  --scene-lamp-water-glow: 0.9;
+  --scene-lamp-water-opacity: 0.5;
+  --scene-lamp-glass: #b6dfe6;
+  --scene-lamp-glass-opacity: 0.22;
+  --scene-lamp-light: #8fdbe6;
+  --scene-lamp-light-level: 1.4;
 }
 
 /* Dark, high contrast: brighter text, solid borders and a heavier focus ring, on slightly deeper surfaces. */
@@ -117,6 +130,23 @@
   --scene-led: #7fd9dc;
   --scene-led-light: 1.5;
   --scene-led-glow: 2.2;
+
+  /*
+   * A pearl-white jellyfish with a silver-grey edge, in faintly smoky
+   * water, so it keeps its shape against the bright page. It glows only
+   * a little; most of its shading comes from the room's light.
+   */
+  --scene-jelly: #f7f4ee;
+  --scene-jelly-glow: 0.22;
+  --scene-jelly-tentacle-glow: 0.16;
+  --scene-jelly-edge: #9aa3a8;
+  --scene-lamp-water: #7d8f97;
+  --scene-lamp-water-glow: 0.18;
+  --scene-lamp-water-opacity: 0.46;
+  --scene-lamp-glass: #8f9ca2;
+  --scene-lamp-glass-opacity: 0.16;
+  --scene-lamp-light: #e6eef0;
+  --scene-lamp-light-level: 0.7;
 }
 
 /* Light, high contrast: near-black ink on plain white, with solid borders. */

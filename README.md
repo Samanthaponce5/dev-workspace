@@ -99,7 +99,7 @@ the first paint, like the display settings below.
 
 - Each theme's whole palette is in
   [`src/styles/tokens.css`](src/styles/tokens.css): the page's colours, and
-  the `--scene-*` values for the 3D platform and LED strips. The scene reads
+  the `--scene-*` values for the 3D platform, LED strips and jellyfish lamp. The scene reads
   those through
   [`src/components/three/sceneTheme.js`](src/components/three/sceneTheme.js)
   and changes its materials and lights in place, so switching never reloads

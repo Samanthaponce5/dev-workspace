@@ -3,7 +3,7 @@ import { getAppliedSettings, subscribeToSettings } from '../../utils/displaySett
 
 /*
  * The parts of the 3D scene that change with the site's theme: the
- * platform and the LED strips. Their values are the --scene-* custom
+ * platform, the LED strips and the jellyfish lamp. Their values are the --scene-* custom
  * properties in styles/tokens.css, beside the page's own colours, so one
  * file holds each theme's whole palette.
  */
@@ -16,6 +16,17 @@ function readSceneTheme() {
     led: token('--scene-led'),
     ledLight: Number(token('--scene-led-light')),
     ledGlow: Number(token('--scene-led-glow')),
+    jelly: token('--scene-jelly'),
+    jellyGlow: Number(token('--scene-jelly-glow')),
+    jellyTentacleGlow: Number(token('--scene-jelly-tentacle-glow')),
+    jellyEdge: token('--scene-jelly-edge') === 'none' ? null : token('--scene-jelly-edge'),
+    lampWater: token('--scene-lamp-water'),
+    lampWaterGlow: Number(token('--scene-lamp-water-glow')),
+    lampWaterOpacity: Number(token('--scene-lamp-water-opacity')),
+    lampGlass: token('--scene-lamp-glass'),
+    lampGlassOpacity: Number(token('--scene-lamp-glass-opacity')),
+    lampLight: token('--scene-lamp-light'),
+    lampLightLevel: Number(token('--scene-lamp-light-level')),
   }
 }
 

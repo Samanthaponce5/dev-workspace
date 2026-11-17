@@ -1,8 +1,8 @@
 /*
  * Colours shared across the 3D scene so the whole diorama can be retuned
  * in one place. Values are plain hex strings that three.js parses. The
- * platform and LED colours change with the site's theme, so they live
- * with the theme tokens instead: see sceneTheme.js.
+ * platform, LED and jellyfish lamp colours change with the site's theme,
+ * so they live with the theme tokens instead: see sceneTheme.js.
  */
 export const palette = {
   deskWood: '#1c1c1f',
@@ -19,10 +19,6 @@ export const palette = {
   candleGlass: '#c8743a',
   candleWax: '#f3dcc2',
   flame: '#ffb347',
-  lampGlass: '#b6dfe6',
-  lampWater: '#2f8fb8',
-  lampLight: '#8fdbe6',
-  jelly: '#ffd3ee',
   duck: '#ffd23f',
   duckBeak: '#ff8a3d',
   cup: '#2a2a30',
@@ -74,5 +70,4 @@ export const lightLevels = {
   ledReach: 2.1,
   monitor: 2.6,
   candle: 1.8,
-  lamp: 1.4,
 }
