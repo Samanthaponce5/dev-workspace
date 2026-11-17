@@ -63,6 +63,7 @@
   --scene-lamp-water: #2f8fb8;
   --scene-lamp-water-glow: 0.9;
   --scene-lamp-water-opacity: 0.5;
+  --scene-lamp-water-behind: 0; /* 1: the water only shows behind the jellyfish, never over it */
   --scene-lamp-glass: #b6dfe6;
   --scene-lamp-glass-opacity: 0.22;
   --scene-lamp-light: #8fdbe6;
@@ -132,20 +133,21 @@
   --scene-led-glow: 2.2;
 
   /*
-   * A pearl-white jellyfish with a silver-grey edge, in faintly smoky
-   * water, so it keeps its shape against the bright page. It glows only
-   * a little; most of its shading comes from the room's light.
+   * A pearl-white jellyfish with a silver-grey edge in teal water. The
+   * water is drawn only behind the jellyfish, so it is a clear backdrop
+   * instead of a haze over it, and the glass in front is barely there.
    */
-  --scene-jelly: #f7f4ee;
-  --scene-jelly-glow: 0.22;
-  --scene-jelly-tentacle-glow: 0.16;
+  --scene-jelly: #fbf8f3;
+  --scene-jelly-glow: 0.35;
+  --scene-jelly-tentacle-glow: 0.25;
   --scene-jelly-edge: #9aa3a8;
-  --scene-lamp-water: #7d8f97;
-  --scene-lamp-water-glow: 0.18;
-  --scene-lamp-water-opacity: 0.46;
-  --scene-lamp-glass: #8f9ca2;
-  --scene-lamp-glass-opacity: 0.16;
-  --scene-lamp-light: #e6eef0;
+  --scene-lamp-water: #2f7f88;
+  --scene-lamp-water-glow: 0.2;
+  --scene-lamp-water-opacity: 0.72;
+  --scene-lamp-water-behind: 1;
+  --scene-lamp-glass: #c4d2d6;
+  --scene-lamp-glass-opacity: 0.12;
+  --scene-lamp-light: #e6f1f2;
   --scene-lamp-light-level: 0.7;
 }
 

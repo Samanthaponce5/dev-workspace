@@ -7,7 +7,7 @@ import { useSceneTheme } from '../sceneTheme'
 const LAMP = { radius: 0.085, height: 0.34 }
 const TENTACLES = [0, 1.3, 2.5, 3.8, 5.0]
 const BELL_RADIUS = 0.03
-const EDGE = 1.18 // how much larger than the jellyfish its outline is
+const EDGE = 1.08 // how much larger than the jellyfish its outline is
 
 /*
  * The jellyfish's outline, when the theme gives it one: a slightly larger
@@ -35,7 +35,7 @@ function Edge({ color, children }) {
  *
  * Its colours follow the site's theme (see sceneTheme.js): in Dark a
  * glowing pink jellyfish in blue water; in Light a pearl-white one with
- * a silver-grey edge in faintly smoky water.
+ * a silver-grey edge in front of teal water.
  */
 export function JellyfishLamp({ position, animate = true }) {
   const jellyRef = useRef(null)
@@ -64,7 +64,7 @@ export function JellyfishLamp({ position, animate = true }) {
       </mesh>
 
       {/* Glowing water column */}
-      <mesh position={[0, LAMP.height / 2 + 0.03, 0]}>
+      <mesh position={[0, LAMP.height / 2 + 0.03, 0]} visible={!theme.lampWaterBehind}>
         <cylinderGeometry args={[LAMP.radius - 0.012, LAMP.radius - 0.012, LAMP.height - 0.02, 20]} />
         <meshStandardMaterial
           color={theme.lampWater}
@@ -75,6 +75,16 @@ export function JellyfishLamp({ position, animate = true }) {
           roughness={0.2}
           depthWrite={false}
         />
+      </mesh>
+      {/*
+        Or, where the theme asks for it, the water drawn inside out: only
+        the far wall and floor of the column show, behind the jellyfish,
+        so the water never covers it. It is a flat tint, because the
+        lamp's own light, right beside that wall, would wash it out.
+      */}
+      <mesh position={[0, LAMP.height / 2 + 0.03, 0]} visible={theme.lampWaterBehind}>
+        <cylinderGeometry args={[LAMP.radius - 0.012, LAMP.radius - 0.012, LAMP.height - 0.02, 20]} />
+        <meshBasicMaterial color={theme.lampWater} transparent opacity={theme.lampWaterOpacity} depthWrite={false} side={THREE.BackSide} />
       </mesh>
 
       {/* Jellyfish: a bell plus trailing tentacles */}

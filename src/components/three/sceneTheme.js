@@ -23,6 +23,7 @@ function readSceneTheme() {
     lampWater: token('--scene-lamp-water'),
     lampWaterGlow: Number(token('--scene-lamp-water-glow')),
     lampWaterOpacity: Number(token('--scene-lamp-water-opacity')),
+    lampWaterBehind: token('--scene-lamp-water-behind') === '1',
     lampGlass: token('--scene-lamp-glass'),
     lampGlassOpacity: Number(token('--scene-lamp-glass-opacity')),
     lampLight: token('--scene-lamp-light'),
