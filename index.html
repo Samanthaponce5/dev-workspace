@@ -20,14 +20,16 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <!--
-      Display settings the visitor saved earlier, put on <html> before
-      anything paints so the page never flashes its defaults first.
+      The theme and display settings the visitor saved earlier, put on
+      <html> before anything paints so the page never flashes its defaults
+      (the Dark theme, say) first.
       Keep the key and attribute names in step with src/utils/displaySettings.js.
     -->
     <script>
       try {
         var saved = JSON.parse(localStorage.getItem('display-settings'))
         var root = document.documentElement
+        if (saved && saved.appearance === 'light') root.dataset.theme = 'light'
         if (saved && saved.textSize === 'large') root.dataset.textSize = 'large'
         if (saved && saved.contrast === 'high') root.dataset.contrast = 'high'
         if (saved && saved.motion === 'reduced') root.dataset.motion = 'reduced'
@@ -75,6 +77,24 @@
           #0b1721;
         -webkit-mask-image: radial-gradient(circle at var(--wipe-x) var(--wipe-y), transparent calc(var(--wipe-r) - 56px), #000 var(--wipe-r));
         mask-image: radial-gradient(circle at var(--wipe-x) var(--wipe-y), transparent calc(var(--wipe-r) - 56px), #000 var(--wipe-r));
+      }
+
+      /*
+       * Light theme. These few colours repeat the Light tokens in
+       * src/styles/tokens.css, because this overlay paints before that
+       * stylesheet has loaded.
+       */
+      [data-theme='light'] .intro-bg {
+        background: linear-gradient(100deg, #f8f6f2 0%, #f2f3ee 38%, #d9e9e4 100%);
+      }
+
+      /* The letters are a picture of the Dark logo; this redraws them in the Light theme's ink. */
+      [data-theme='light'] .intro-letters {
+        filter: url(#intro-ink);
+      }
+
+      [data-theme='light'] .intro-dot {
+        background: #86b64e;
       }
 
       /* A faint band of aqua light riding the wipe's edge. */
@@ -181,6 +201,12 @@
   </head>
   <body>
     <div id="intro" aria-hidden="true">
+      <svg width="0" height="0" style="position: absolute">
+        <filter id="intro-ink" color-interpolation-filters="sRGB">
+          <feFlood flood-color="#152a2f" />
+          <feComposite in2="SourceAlpha" operator="in" />
+        </filter>
+      </svg>
       <div class="intro-bg"></div>
       <div class="intro-edge"></div>
       <div class="intro-mark">

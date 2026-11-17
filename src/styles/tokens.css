@@ -2,9 +2,21 @@
  * Design tokens. Every colour, size and timing used by component styles
  * comes from here, so the whole look can be tuned in one place.
  */
+/*
+ * Colour. There are two themes, Dark (the default) and Light, chosen with
+ * the navbar toggle, and each has a High contrast version, chosen in
+ * Display settings. <html> carries data-theme and data-contrast; the
+ * settings preview carries its own data-contrast, which is why every
+ * block below is also written for an element inside the page.
+ *
+ * The --scene-* values are the 3D scene's share of the theme: the
+ * platform and the LED strips read them (see components/three/sceneTheme.js),
+ * so the page and the scene always change together.
+ */
+
+/* Dark: Midnight Teal. A dark blue-green room lit by soft aqua LEDs. */
 :root,
 [data-contrast] {
-  /* Colour: Midnight Teal. A dark blue-green room lit by soft aqua LEDs. */
   --color-bg: #0b1721;
   --color-bg-raised: #0f1e2a;
   --color-surface: #132733;
@@ -22,14 +34,29 @@
   --color-glow: #14606a; /* pool of teal light behind the desk */
   --color-lime: #c8f55a;
   --color-on-accent: #0b1721;
+  --color-scrim: #040a10; /* dims the page behind a dialog */
+  --color-hero-base: var(--color-bg); /* what the hero's glow sits on */
 
+  /* Two soft pools of LED colour, so the page never reads as flat black. */
+  --page-wash:
+    radial-gradient(55rem 38rem at 78% -8%, rgb(25 68 71 / 45%), transparent 62%),
+    radial-gradient(44rem 34rem at -8% 42%, rgb(25 68 71 / 30%), transparent 62%);
+
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 20px 40px -24px rgb(0 0 0 / 70%);
+  --shadow-overlay: 0 24px 60px -20px rgb(0 0 0 / 80%);
+  --shadow-sheet: 0 -24px 60px -20px rgb(0 0 0 / 80%);
+  --shadow-bubble: 0 10px 30px -10px rgb(0 0 0 / 60%);
+  --glow-accent: 0 12px 36px -14px rgb(113 201 200 / 55%);
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent-strong);
+
+  --scene-platform: #2d6069;
+  --scene-platform-side: #0f3540;
+  --scene-led: #71c9c8;
+  --scene-led-light: 2.4; /* how brightly the strips light what is near them */
+  --scene-led-glow: 2.2; /* how brightly the strips themselves glow */
 }
 
-/*
- * High contrast, chosen in Display settings: brighter text, solid borders
- * and a heavier focus ring, on slightly deeper surfaces.
- */
+/* Dark, high contrast: brighter text, solid borders and a heavier focus ring, on slightly deeper surfaces. */
 [data-contrast='high'] {
   --color-bg: #060f17;
   --color-bg-raised: #0a1822;
@@ -47,6 +74,71 @@
   --color-aqua: #9fe3e1;
 
   --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 5px #ffffff;
+}
+
+/*
+ * Light: sampled from the reference design. A warm white page that
+ * shades into mint, deep teal ink and buttons, a leaf-green logo dot.
+ */
+[data-theme='light'],
+[data-theme='light'] [data-contrast] {
+  --color-bg: #f6f5f0;
+  --color-bg-raised: #f7f9f6;
+  --color-surface: #ffffff;
+  --color-surface-hover: #e7f0ec;
+  --color-border: rgb(21 42 47 / 14%);
+  --color-border-strong: rgb(21 42 47 / 50%); /* 3:1 against white, so control outlines can be seen */
+
+  --color-text: #152a2f;
+  --color-text-muted: #3d565b;
+  --color-text-subtle: #4f666b;
+
+  --color-accent: #224f4b; /* deep teal: buttons, links, focus */
+  --color-accent-strong: #163c39;
+  --color-aqua: #2a8f95;
+  --color-glow: #c3ded8; /* the mint the page gathers behind the desk */
+  --color-lime: #86b64e;
+  --color-on-accent: #ffffff;
+  --color-scrim: #152a2f;
+  --color-hero-base: transparent; /* the page's own wash shows through */
+
+  /* Warm white on the left shading into mint on the right. */
+  --page-wash: linear-gradient(100deg, #f8f6f2 0%, #f2f3ee 38%, #d9e9e4 100%);
+
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 80%) inset, 0 18px 36px -24px rgb(21 42 47 / 30%);
+  --shadow-overlay: 0 24px 60px -20px rgb(21 42 47 / 38%);
+  --shadow-sheet: 0 -24px 60px -20px rgb(21 42 47 / 38%);
+  --shadow-bubble: 0 10px 26px -10px rgb(21 42 47 / 40%);
+  --glow-accent: 0 12px 30px -14px rgb(34 79 75 / 55%);
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent-strong);
+
+  --scene-platform: #53868c;
+  --scene-platform-side: #25464a;
+  --scene-led: #7fd9dc;
+  --scene-led-light: 1.5;
+  --scene-led-glow: 2.2;
+}
+
+/* Light, high contrast: near-black ink on plain white, with solid borders. */
+[data-theme='light'][data-contrast='high'],
+[data-theme='light'] [data-contrast='high'] {
+  --color-bg: #ffffff;
+  --color-bg-raised: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-hover: #dfeae6;
+  --color-border: rgb(10 26 30 / 55%);
+  --color-border-strong: rgb(10 26 30 / 92%);
+
+  --color-text: #0a1a1e;
+  --color-text-muted: #1c3034;
+  --color-text-subtle: #263f44;
+
+  --color-accent: #123734;
+  --color-accent-strong: #000000;
+  --color-aqua: #1c6f75;
+
+  --page-wash: none;
+  --focus-ring: 0 0 0 2px var(--color-bg), 0 0 0 5px #000000;
 }
 
 /*
@@ -127,9 +219,6 @@
   --radius-lg: 1.5rem;
   --radius-pill: 999px;
 
-  /* Light */
-  --shadow-card: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 20px 40px -24px rgb(0 0 0 / 70%);
-  --glow-accent: 0 12px 36px -14px rgb(113 201 200 / 55%);
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);

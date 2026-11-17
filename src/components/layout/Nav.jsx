@@ -6,6 +6,7 @@ import { cx } from '../../utils/cx'
 import { Container } from '../ui'
 import { CloseIcon, MenuIcon } from '../ui/icons'
 import { MobileMenu } from './MobileMenu'
+import { ThemeToggle } from './ThemeToggle'
 import { Monogram } from './Monogram'
 import styles from './Nav.module.css'
 
@@ -43,6 +44,8 @@ export function Nav() {
               </li>
             ))}
           </ul>
+
+          <ThemeToggle />
 
           <button
             ref={toggleRef}

@@ -47,6 +47,23 @@ export function CloseIcon(props) {
   )
 }
 
+export function SunIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <circle cx="10" cy="10" r="3.5" />
+      <path d="M10 2v1.75M10 16.25V18M2 10h1.75M16.25 10H18M4.35 4.35l1.24 1.24M14.41 14.41l1.24 1.24M4.35 15.65l1.24-1.24M14.41 5.59l1.24-1.24" />
+    </svg>
+  )
+}
+
+export function MoonIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <path d="M16.5 11.6A6.75 6.75 0 0 1 8.4 3.5a6.75 6.75 0 1 0 8.1 8.1Z" />
+    </svg>
+  )
+}
+
 /* Three sliders: the usual shorthand for settings. */
 export function SlidersIcon(props) {
   return (

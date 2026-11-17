@@ -16,7 +16,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(20rem circle at var(--light-x, 50%) var(--light-y, 0%), rgb(113 201 200 / 16%), transparent 70%);
+  background: radial-gradient(20rem circle at var(--light-x, 50%) var(--light-y, 0%), color-mix(in srgb, var(--color-aqua) 16%, transparent), transparent 70%);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--duration-base) var(--ease-out);

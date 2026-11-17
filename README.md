@@ -91,6 +91,25 @@ Rendering pauses when the hero is off screen or the tab is hidden. Visitors
 who prefer reduced motion get a quick fade instead of the reveal, and a scene
 that holds still.
 
+## Themes
+
+The site has a Dark theme (the default) and a Light theme, switched with the
+sun/moon button in the navbar. The choice is remembered and restored before
+the first paint, like the display settings below.
+
+- Each theme's whole palette is in
+  [`src/styles/tokens.css`](src/styles/tokens.css): the page's colours, and
+  the `--scene-*` values for the 3D platform and LED strips. The scene reads
+  those through
+  [`src/components/three/sceneTheme.js`](src/components/three/sceneTheme.js)
+  and changes its materials and lights in place, so switching never reloads
+  the scene or replays the intro.
+- Each theme also has a High contrast version, chosen in Display settings.
+- The intro overlay in `index.html` paints before the stylesheet loads, so
+  it repeats four Light colours. Keep them in step with `tokens.css`.
+- The still image used when the 3D scene cannot run is captured from the
+  Dark scene, so in Light its platform keeps the Dark theme's teal.
+
 ## Display settings
 
 The button in the bottom corner opens a panel with three choices: text size
@@ -99,7 +118,7 @@ Choices show in the panel's preview first and reach the site on **Apply**;
 they are remembered in the browser's local storage.
 
 - Applied settings are data attributes on `<html>` (`data-text-size`,
-  `data-contrast`, `data-motion`). The design tokens in
+  `data-contrast`, `data-motion`, and `data-theme` for the theme). The design tokens in
   [`src/styles/tokens.css`](src/styles/tokens.css) respond to the first two,
   so a component that uses the tokens needs no code of its own.
 - A few lines of script in `index.html` restore saved settings before the

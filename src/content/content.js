@@ -176,6 +176,12 @@ export const contact = {
   resumeLabel: 'Résumé',
 }
 
+/* The navbar's theme switch. Each label says what pressing it will do. */
+export const themeToggle = {
+  toLight: 'Switch to light mode',
+  toDark: 'Switch to dark mode',
+}
+
 /* The Display settings button and its panel. Each group's `id` is the setting it controls. */
 export const displaySettings = {
   title: 'Display settings',

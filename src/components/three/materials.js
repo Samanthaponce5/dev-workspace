@@ -1,10 +1,10 @@
 /*
  * Colours shared across the 3D scene so the whole diorama can be retuned
- * in one place. Values are plain hex strings that three.js parses.
+ * in one place. Values are plain hex strings that three.js parses. The
+ * platform and LED colours change with the site's theme, so they live
+ * with the theme tokens instead: see sceneTheme.js.
  */
 export const palette = {
-  platform: '#2d6069',
-  platformSide: '#0f3540',
   deskWood: '#1c1c1f',
   deskGrain: '#2c2c31',
   metalDark: '#2a2c33',
@@ -13,7 +13,6 @@ export const palette = {
   laptopKeys: '#23252b',
   chairBlack: '#15161c',
   chairWhite: '#f1f1f5',
-  led: '#71c9c8',
   screenGlow: '#cfe4f2',
   clockWood: '#5a3b23',
   clockFace: '#1a120c',
@@ -72,7 +71,6 @@ export const lightLevels = {
   hemisphere: 0.6,
   key: 2.5,
   fill: 0.55,
-  led: 2.4,
   ledReach: 2.1,
   monitor: 2.6,
   candle: 1.8,

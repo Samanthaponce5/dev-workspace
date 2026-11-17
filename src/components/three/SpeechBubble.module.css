@@ -18,7 +18,7 @@
   font-weight: var(--weight-semibold);
   line-height: 1.35;
   text-align: center;
-  box-shadow: 0 10px 30px -10px rgb(0 0 0 / 60%);
+  box-shadow: var(--shadow-bubble);
   transform-origin: 50% 100%;
   animation: pop var(--duration-base) var(--ease-out) both;
 }

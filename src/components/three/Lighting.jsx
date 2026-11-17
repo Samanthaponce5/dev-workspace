@@ -1,13 +1,17 @@
-import { lightLevels, palette } from './materials'
+import { lightLevels } from './materials'
+import { useSceneTheme } from './sceneTheme'
 
 /**
  * Night-time room lighting. A near-white ambient wash and key light keep
  * everyone's colours true; a faint teal fill ties the scene to the page.
  * The LED strip's aqua light is deliberately short-range, so it pools on
  * the shelf, the back of the desk and the floor beneath, and nowhere else.
- * The monitor, candle and lamp carry their own small lights.
+ * The monitor, candle and lamp carry their own small lights. The LED
+ * light's colour and strength follow the site's theme.
  */
 export function Lighting({ shadows }) {
+  const theme = useSceneTheme()
+
   return (
     <>
       <ambientLight intensity={lightLevels.ambient} color="#e4ecef" />
@@ -33,9 +37,9 @@ export function Lighting({ shadows }) {
 
       {/* LED strip: three short-range aqua lights along the shelf, one under the desk. */}
       {[-1.2, 0, 1.2].map((x) => (
-        <pointLight key={x} position={[x, 1.3, -0.62]} intensity={lightLevels.led} color={palette.led} distance={lightLevels.ledReach} decay={2} />
+        <pointLight key={x} position={[x, 1.3, -0.62]} intensity={theme.ledLight} color={theme.led} distance={lightLevels.ledReach} decay={2} />
       ))}
-      <pointLight position={[0, 0.55, -0.35]} intensity={lightLevels.led} color={palette.led} distance={lightLevels.ledReach * 1.3} decay={2} />
+      <pointLight position={[0, 0.55, -0.35]} intensity={theme.ledLight} color={theme.led} distance={lightLevels.ledReach * 1.3} decay={2} />
     </>
   )
 }

@@ -11,7 +11,7 @@
 
 /* Once the page scrolls, the bar gains a blurred backing so text stays readable. */
 .solid {
-  background: rgb(11 23 33 / 78%);
+  background: color-mix(in srgb, var(--color-bg) 78%, transparent);
   border-bottom-color: var(--color-border);
   backdrop-filter: blur(14px) saturate(140%);
 }
@@ -107,5 +107,10 @@
 
   .menuToggle {
     display: none;
+  }
+
+  /* The theme switch sits just after the last link. */
+  .nav {
+    gap: var(--space-4);
   }
 }

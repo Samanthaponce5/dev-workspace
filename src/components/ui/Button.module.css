@@ -47,7 +47,7 @@
 @media (hover: hover) {
   .primary:hover {
     background: var(--color-accent-strong);
-    box-shadow: 0 16px 44px -12px rgb(113 201 200 / 75%);
+    box-shadow: 0 16px 44px -12px color-mix(in srgb, var(--color-aqua) 75%, transparent);
   }
 
   .button:hover .icon {

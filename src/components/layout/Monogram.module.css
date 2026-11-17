@@ -17,7 +17,7 @@
   height: 0.32em;
   border-radius: 50%;
   background: var(--color-lime);
-  box-shadow: 0 0 12px rgb(200 245 90 / 60%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-lime) 60%, transparent);
   transition: transform var(--duration-base) var(--ease-out);
 }
 

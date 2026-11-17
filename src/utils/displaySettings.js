@@ -1,6 +1,7 @@
 /*
- * The visitor's display settings: which ones exist, and reading, applying
- * and remembering them.
+ * The visitor's display settings: the theme (chosen with the navbar
+ * toggle) and text size, contrast and motion (chosen in the Display
+ * settings panel). Reading, applying and remembering them.
  *
  * Applied settings live as data attributes on <html>, where the design
  * tokens and global styles pick them up (see styles/tokens.css and
@@ -11,10 +12,11 @@
 
 const STORAGE_KEY = 'display-settings'
 
-export const DEFAULT_SETTINGS = Object.freeze({ textSize: 'default', contrast: 'default', motion: 'system' })
+export const DEFAULT_SETTINGS = Object.freeze({ appearance: 'dark', textSize: 'default', contrast: 'default', motion: 'system' })
 
 /* For each setting: its data attribute on <html>, and the one value that differs from the default. */
 const ATTRIBUTES = {
+  appearance: { name: 'theme', value: 'light' },
   textSize: { name: 'textSize', value: 'large' },
   contrast: { name: 'contrast', value: 'high' },
   motion: { name: 'motion', value: 'reduced' },
@@ -42,15 +44,26 @@ export function getAppliedSettings() {
   return applied
 }
 
-/** Puts the settings into force across the site and remembers them for next time. */
-export function applySettings(settings) {
+/** Keeps the browser's own toolbar colour (on phones) in step with the theme. */
+export function syncBrowserColor() {
+  const background = getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim()
+  if (background) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background)
+}
+
+/**
+ * Puts settings into force across the site and remembers them for next
+ * time. Pass only the ones that are changing; the rest stay as they are.
+ */
+export function applySettings(changes) {
+  const settings = { ...getAppliedSettings(), ...changes }
   const { dataset } = document.documentElement
   for (const [key, { name, value }] of Object.entries(ATTRIBUTES)) {
     if (settings[key] === value) dataset[name] = value
     else delete dataset[name]
   }
-  applied = { ...settings }
+  applied = settings
   read = true
+  syncBrowserColor()
 
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(applied))
@@ -64,8 +77,4 @@ export function applySettings(settings) {
 export function subscribeToSettings(listener) {
   listeners.add(listener)
   return () => listeners.delete(listener)
-}
-
-export function sameSettings(a, b) {
-  return Object.keys(DEFAULT_SETTINGS).every((key) => a[key] === b[key])
 }

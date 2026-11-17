@@ -9,6 +9,9 @@ import { SettingsPreview } from './SettingsPreview'
 
 const FOCUSABLE = 'button, input:checked, [href]'
 
+/* Just the settings this panel offers. The theme has its own switch in the navbar and is left alone here. */
+const panelSettings = (settings) => Object.fromEntries(copy.groups.map((group) => [group.id, settings[group.id]]))
+
 /**
  * The Display settings panel: a modal dialog, so the page behind is out
  * of reach while it is open and Escape closes it.
@@ -24,7 +27,7 @@ const FOCUSABLE = 'button, input:checked, [href]'
 export function SettingsDialog({ settings, onApply, onClose }) {
   const dialogRef = useRef(null)
   const titleId = useId()
-  const [draft, setDraft] = useState(settings)
+  const [draft, setDraft] = useState(() => panelSettings(settings))
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -97,7 +100,7 @@ export function SettingsDialog({ settings, onApply, onClose }) {
         <SettingsPreview textSize={draft.textSize} contrast={draft.contrast} />
 
         <footer className={styles.actions}>
-          <button type="button" className={styles.reset} onClick={() => setDraft(DEFAULT_SETTINGS)}>
+          <button type="button" className={styles.reset} onClick={() => setDraft(panelSettings(DEFAULT_SETTINGS))}>
             {copy.reset}
           </button>
           <Button type="submit" className={styles.apply}>

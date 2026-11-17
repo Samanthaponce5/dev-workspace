@@ -26,17 +26,17 @@
 
 @keyframes switch-on {
   0% {
-    box-shadow: 0 0 0 0 rgb(113 201 200 / 0%);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-aqua) 0%, transparent);
     filter: brightness(0.55);
   }
 
   45% {
-    box-shadow: 0 0 28px 2px rgb(113 201 200 / 60%);
+    box-shadow: 0 0 28px 2px color-mix(in srgb, var(--color-aqua) 60%, transparent);
     filter: brightness(1.15);
   }
 
   100% {
-    box-shadow: 0 0 18px -6px rgb(113 201 200 / 45%);
+    box-shadow: 0 0 18px -6px color-mix(in srgb, var(--color-aqua) 45%, transparent);
     filter: brightness(1);
   }
 }

@@ -4,6 +4,10 @@ import '@fontsource-variable/geist'
 import '@fontsource-variable/geist-mono'
 import './styles/global.css'
 import App from './App.jsx'
+import { syncBrowserColor } from './utils/displaySettings'
+
+// A saved Light theme is already on <html> (see index.html); match the browser's toolbar to it.
+syncBrowserColor()
 
 const root = document.getElementById('root')
 const app = (

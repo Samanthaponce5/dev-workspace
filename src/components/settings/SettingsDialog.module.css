@@ -18,7 +18,7 @@
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: linear-gradient(180deg, var(--color-surface), var(--color-bg-raised));
   color: var(--color-text);
-  box-shadow: 0 -24px 60px -20px rgb(0 0 0 / 80%);
+  box-shadow: var(--shadow-sheet);
 }
 
 .dialog[open] {
@@ -26,7 +26,7 @@
 }
 
 .dialog::backdrop {
-  background: rgb(4 10 16 / 55%);
+  background: color-mix(in srgb, var(--color-scrim) 55%, transparent);
 }
 
 .panel {
@@ -108,11 +108,11 @@
     max-height: calc(100dvh - var(--settings-launcher) - var(--space-8));
     border-bottom: 1px solid var(--color-border-strong);
     border-radius: var(--radius-lg);
-    box-shadow: 0 24px 60px -20px rgb(0 0 0 / 80%);
+    box-shadow: var(--shadow-overlay);
   }
 
   .dialog::backdrop {
-    background: rgb(4 10 16 / 35%);
+    background: color-mix(in srgb, var(--color-scrim) 35%, transparent);
   }
 
   .panel {

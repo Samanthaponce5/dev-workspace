@@ -19,8 +19,8 @@
   z-index: -3;
   /* Phone: a broad pool of teal low down, behind the desk. */
   background:
-    radial-gradient(130% 50% at 50% 70%, rgb(20 96 106 / 80%) 0%, rgb(20 96 106 / 44%) 42%, transparent 80%),
-    var(--color-bg);
+    radial-gradient(130% 50% at 50% 70%, color-mix(in srgb, var(--color-glow) 80%, transparent) 0%, color-mix(in srgb, var(--color-glow) 44%, transparent) 42%, transparent 80%),
+    var(--color-hero-base);
 }
 
 .hero::after {
@@ -29,7 +29,7 @@
   inset: auto 0 0;
   z-index: -1;
   height: 12%;
-  background: linear-gradient(180deg, transparent, var(--color-bg));
+  background: linear-gradient(180deg, transparent, var(--color-hero-base));
   pointer-events: none;
 }
 
@@ -99,7 +99,7 @@
   .tagline {
     display: block;
     margin-top: var(--space-4);
-    color: rgb(238 247 246 / 86%);
+    color: color-mix(in srgb, var(--color-text) 86%, transparent);
     font-size: var(--text-lg);
     line-height: 1.4;
   }
@@ -131,8 +131,8 @@
   .backdrop {
     /* Brightest behind the desk, fading to the navy base under the headline. */
     background:
-      radial-gradient(56% 84% at 67% 52%, rgb(20 96 106 / 80%) 0%, rgb(20 96 106 / 48%) 36%, rgb(20 96 106 / 16%) 66%, transparent 88%),
-      var(--color-bg);
+      radial-gradient(56% 84% at 67% 52%, color-mix(in srgb, var(--color-glow) 80%, transparent) 0%, color-mix(in srgb, var(--color-glow) 48%, transparent) 36%, color-mix(in srgb, var(--color-glow) 16%, transparent) 66%, transparent 88%),
+      var(--color-hero-base);
   }
 
   .layout {
