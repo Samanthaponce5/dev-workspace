@@ -74,3 +74,10 @@
     color: var(--color-text);
   }
 }
+
+/* A lookalike for previews: not a control, so it does not react. */
+.sample {
+  border-style: dashed;
+  cursor: default;
+  pointer-events: none;
+}

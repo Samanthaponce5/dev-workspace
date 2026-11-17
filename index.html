@@ -20,6 +20,23 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <!--
+      Display settings the visitor saved earlier, put on <html> before
+      anything paints so the page never flashes its defaults first.
+      Keep the key and attribute names in step with src/utils/displaySettings.js.
+    -->
+    <script>
+      try {
+        var saved = JSON.parse(localStorage.getItem('display-settings'))
+        var root = document.documentElement
+        if (saved && saved.textSize === 'large') root.dataset.textSize = 'large'
+        if (saved && saved.contrast === 'high') root.dataset.contrast = 'high'
+        if (saved && saved.motion === 'reduced') root.dataset.motion = 'reduced'
+      } catch (error) {
+        /* No storage, or nothing usable in it: the defaults apply. */
+      }
+    </script>
+
+    <!--
       Intro overlay: the SP logo, its lime dot and a tiny duck, centred on
       the page's own background. The styles are inline and both pictures
       are embedded, so it paints on the very first frame without waiting
@@ -157,6 +174,8 @@
       @media (prefers-reduced-motion: reduce) {
         .intro-duck { animation: none; }
       }
+
+      [data-motion='reduced'] .intro-duck { animation: none; }
     </style>
     <noscript><style>#intro { display: none; } .intro-pending [data-site-logo] { visibility: visible; }</style></noscript>
   </head>

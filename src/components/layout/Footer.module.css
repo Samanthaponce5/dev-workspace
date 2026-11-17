@@ -1,5 +1,6 @@
 .footer {
-  padding-block: var(--space-6) calc(var(--space-6) + var(--safe-bottom));
+  /* Extra room at the bottom so the fixed Display settings button never covers the footer. */
+  padding-block: var(--space-6) calc(var(--space-6) + var(--settings-launcher) + var(--space-4) + var(--safe-bottom));
   border-top: 1px solid var(--color-border);
   color: var(--color-text-subtle);
   font-size: var(--text-sm);

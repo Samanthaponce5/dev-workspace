@@ -144,6 +144,11 @@ canvas {
   }
 }
 
+/*
+ * Reduced motion, from the system setting or from Display settings
+ * (which sets data-motion on <html>): no smooth scrolling, and every
+ * animation and transition jumps straight to its end.
+ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -157,4 +162,17 @@ canvas {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+html[data-motion='reduced'] {
+  scroll-behavior: auto;
+}
+
+[data-motion='reduced'] *,
+[data-motion='reduced'] *::before,
+[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }

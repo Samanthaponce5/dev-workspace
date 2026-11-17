@@ -19,11 +19,16 @@ import styles from './HeroScene.module.css'
  * (index.html also preloads it, so on a slow connection it is usually
  * already on its way.)
  */
-const liveScene = { Component: null }
-const liveSceneLoaded = canRender3D
-  ? import('../../components/three/DeskScene').then((module) => {
-      liveScene.Component = module.default
-    })
+const liveScene = { Component: null, failed: false }
+const liveSceneSettled = canRender3D
+  ? import('../../components/three/DeskScene').then(
+      (module) => {
+        liveScene.Component = module.default
+      },
+      () => {
+        liveScene.failed = true // offline, or the file could not be fetched: the still image takes over
+      },
+    )
   : null
 
 /* How long after the page opened to keep waiting for the live scene before revealing with the still image. */
@@ -34,26 +39,43 @@ const POSTER_LEAD_MS = 1500
 const FONT_WAIT_MS = 700
 
 /*
- * True once the scene's bundle has loaded and `liveScene.Component` can
- * be rendered. This is plain state rather than React.lazy with Suspense,
- * because React deliberately waits about 300ms before replacing a
- * Suspense fallback, which delayed the canvas for no reason.
+ * Where the scene's bundle has got to: 'loading', then 'loaded' (and
+ * `liveScene.Component` can be rendered) or 'failed'. This is plain state
+ * rather than React.lazy with Suspense, because React deliberately waits
+ * about 300ms before replacing a Suspense fallback, which delayed the
+ * canvas for no reason.
  */
-function useLiveSceneLoaded() {
-  const [loaded, setLoaded] = useState(liveScene.Component !== null)
+const liveSceneStatus = () => (liveScene.Component ? 'loaded' : liveScene.failed ? 'failed' : 'loading')
+
+function useLiveSceneStatus() {
+  const [status, setStatus] = useState(liveSceneStatus)
   useEffect(() => {
     let cancelled = false
-    liveSceneLoaded?.then(
-      () => {
-        if (!cancelled) setLoaded(true)
-      },
-      () => {}, // a failed download falls through to the still image
-    )
+    liveSceneSettled?.then(() => {
+      if (!cancelled) setStatus(liveSceneStatus())
+    })
     return () => {
       cancelled = true
     }
   }, [])
-  return loaded
+  return status
+}
+
+/*
+ * True while the hero is scrolled out of sight above the window, which
+ * is how the page opens from a link to a section further down. Only
+ * watched while `watching` is true.
+ */
+function useScrolledPast(elementRef, watching) {
+  const [past, setPast] = useState(false)
+  useEffect(() => {
+    if (!watching) return undefined
+    const check = () => setPast(elementRef.current.getBoundingClientRect().bottom <= 0)
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [elementRef, watching])
+  return past
 }
 
 /* True after `ms` have passed since the page opened. */
@@ -93,11 +115,14 @@ function useFontsSettled(ms) {
  * intro's reveal plays over a landing page that is already assembled, and
  * the characters' greeting starts the moment the reveal clears.
  *
- * If WebGL is missing, the device is low-power, or the live scene is
- * taking unusually long, the reveal goes ahead with a still image of the
- * finished scene in the same position. A live scene that turns up later
- * fades in over that image without moving anything, and the greeting
- * plays then.
+ * If WebGL is missing, the device is low-power, the scene's download
+ * fails, or the live scene is taking unusually long, the reveal goes
+ * ahead with a still image of the finished scene in the same position.
+ * A live scene that turns up later fades in over that image without
+ * moving anything, and the greeting plays then.
+ *
+ * If the page opens on a section further down, the hero is out of sight
+ * and the scene is not being drawn, so the reveal does not wait for it.
  *
  * Rendering pauses whenever the hero scrolls off screen or the tab is
  * hidden.
@@ -110,7 +135,9 @@ export function HeroScene({ containerRef, stageRef }) {
   const introDone = useIntroDone()
   const frame = useRelativeFrame(containerRef, stageRef)
   const [sceneRef, inView] = useInView({ rootMargin: '120px' })
-  const sceneLoaded = useLiveSceneLoaded()
+  const sceneStatus = useLiveSceneStatus()
+  const sceneFailed = sceneStatus === 'failed'
+  const heroOutOfSight = useScrolledPast(containerRef, !introDone)
   const waitedTooLong = useElapsedSinceLoad(LIVE_WAIT_MS)
   const posterMayBeNeeded = useElapsedSinceLoad(LIVE_WAIT_MS - POSTER_LEAD_MS)
   const fontsSettled = useFontsSettled(FONT_WAIT_MS)
@@ -123,22 +150,23 @@ export function HeroScene({ containerRef, stageRef }) {
 
   useEffect(() => {
     if (introDone || !fontsSettled) return
-    if (live) revealIntro({ toShelf: true, reducedMotion })
-    else if ((!canRender3D || waitedTooLong) && posterSettled) revealIntro({ toShelf: false, reducedMotion })
-  }, [introDone, fontsSettled, live, waitedTooLong, posterSettled, reducedMotion])
+    if (heroOutOfSight) revealIntro({ toShelf: false, reducedMotion })
+    else if (live) revealIntro({ toShelf: true, reducedMotion })
+    else if ((!canRender3D || sceneFailed || waitedTooLong) && posterSettled) revealIntro({ toShelf: false, reducedMotion })
+  }, [introDone, fontsSettled, heroOutOfSight, live, sceneFailed, waitedTooLong, posterSettled, reducedMotion])
 
   const showing = live && introDone
 
   return (
     <div ref={sceneRef} className={styles.scene}>
       {/* On a normal load the live scene is ready first and the still image is never downloaded. */}
-      {(!can3D || (posterMayBeNeeded && !(live && !late))) && (
+      {(!can3D || ((posterMayBeNeeded || sceneFailed) && !(live && !late))) && (
         <ScenePoster
           frame={frame}
           isMobile={isMobile}
           hidden={live}
           late={late}
-          label={can3D ? undefined : scene.description}
+          label={can3D && !sceneFailed ? undefined : scene.description}
           onSettled={settlePoster}
         />
       )}
@@ -147,7 +175,7 @@ export function HeroScene({ containerRef, stageRef }) {
         <>
           <div className={styles.canvas} data-ready={live || undefined} data-late={late || undefined}>
             {/* Wait for the stage to be measured so the camera is right on its first frame. */}
-            {sceneLoaded && frame && (
+            {sceneStatus === 'loaded' && frame && (
               <liveScene.Component
                 scene={scene}
                 frame={frame}

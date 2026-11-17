@@ -1,7 +1,8 @@
 .controls {
   position: absolute;
   right: max(var(--space-gutter), var(--safe-right));
-  bottom: var(--space-5);
+  /* Above the Display settings button, which is fixed to the same corner. */
+  bottom: calc(var(--settings-launcher) + var(--space-4) + var(--space-3) + var(--safe-bottom));
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -18,6 +19,8 @@
 }
 
 .control {
+  /* When focus scrolls one into view, it stops clear of the Display settings button. */
+  scroll-margin-bottom: calc(var(--settings-launcher) + var(--space-6));
   min-height: 2.75rem;
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border-strong);

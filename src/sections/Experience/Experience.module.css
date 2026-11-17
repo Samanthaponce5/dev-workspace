@@ -167,6 +167,10 @@
   }
 }
 
+:global([data-motion='reduced']) .live::after {
+  display: none;
+}
+
 .roleLabel {
   color: var(--color-accent);
 }

@@ -63,6 +63,12 @@
   }
 }
 
+:global([data-motion='reduced']) .bubble,
+:global([data-motion='reduced']) .bubble[data-timed],
+:global([data-motion='reduced']) .bubble[data-leaving] {
+  animation: none;
+}
+
 @keyframes pop {
   from {
     opacity: 0;

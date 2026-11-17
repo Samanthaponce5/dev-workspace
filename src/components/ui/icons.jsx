@@ -47,6 +47,26 @@ export function CloseIcon(props) {
   )
 }
 
+/* Three sliders: the usual shorthand for settings. */
+export function SlidersIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <path d="M3 5h6M13 5h4M3 10h2M9 10h8M3 15h8M15 15h2" />
+      <circle cx="11" cy="5" r="2" />
+      <circle cx="7" cy="10" r="2" />
+      <circle cx="13" cy="15" r="2" />
+    </svg>
+  )
+}
+
+export function CheckIcon(props) {
+  return (
+    <svg {...baseProps} {...props}>
+      <path d="M4.5 10.5l3.5 3.5 7.5-8" />
+    </svg>
+  )
+}
+
 /* Thinner line icons for the Experience stages and the Contact list. */
 const fineProps = { ...baseProps, width: 24, height: 24, strokeWidth: 1.5 }
 

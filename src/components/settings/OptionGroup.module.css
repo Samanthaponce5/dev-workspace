@@ -1,0 +1,89 @@
+.group {
+  display: flex;
+  flex-wrap: wrap; /* at large text sizes the options drop under the label */
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.label {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+}
+
+.options {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-1);
+  padding: 3px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+.option {
+  position: relative;
+  display: grid;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The real radio button sits invisibly over its face, so it takes clicks, focus and arrow keys. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 6.25em; /* every option the same width, with or without its tick */
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-4);
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.tick {
+  display: none;
+  flex: none;
+}
+
+.input:checked + .face {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.input:checked + .face .tick {
+  display: block;
+}
+
+.input:focus-visible + .face {
+  box-shadow: var(--focus-ring);
+}
+
+@media (hover: hover) {
+  .input:not(:checked):hover + .face {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+}

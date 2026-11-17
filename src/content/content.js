@@ -176,6 +176,45 @@ export const contact = {
   resumeLabel: 'Résumé',
 }
 
+/* The Display settings button and its panel. Each group's `id` is the setting it controls. */
+export const displaySettings = {
+  title: 'Display settings',
+  close: 'Close display settings',
+  groups: [
+    {
+      id: 'textSize',
+      label: 'Text size',
+      options: [
+        { value: 'default', label: 'Default' },
+        { value: 'large', label: 'Large' },
+      ],
+    },
+    {
+      id: 'contrast',
+      label: 'Contrast',
+      options: [
+        { value: 'default', label: 'Default' },
+        { value: 'high', label: 'High' },
+      ],
+    },
+    {
+      id: 'motion',
+      label: 'Motion',
+      options: [
+        { value: 'system', label: 'System' },
+        { value: 'reduced', label: 'Reduced' },
+      ],
+    },
+  ],
+  preview: {
+    label: 'Preview',
+    sampleNote: 'Sample button',
+  },
+  reset: 'Reset',
+  apply: 'Apply',
+  applied: 'Display settings applied.',
+}
+
 export const footer = {
   note: 'Designed and built by Samantha Ponce. Andy supervised.',
   backToTop: 'Back to top',

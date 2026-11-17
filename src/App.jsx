@@ -1,5 +1,6 @@
 import { Footer } from './components/layout/Footer'
 import { Nav } from './components/layout/Nav'
+import { DisplaySettings } from './components/settings/DisplaySettings'
 import { SkipLink } from './components/ui'
 import { About } from './sections/About/About'
 import { Contact } from './sections/Contact/Contact'
@@ -20,6 +21,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+      <DisplaySettings />
     </>
   )
 }

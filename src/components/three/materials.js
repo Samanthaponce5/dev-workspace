@@ -49,18 +49,16 @@ export const samPalette = {
 /* Andy the Shih Tzu. */
 export const andyPalette = {
   body: '#bd966a', // muted tan
-  tan: '#c7a277', // legs
-  beige: '#c9ae8c', // forehead
-  sweep: '#d5bf9d', // the lighter fur swept either side of his parting
-  taupe: '#9d846e', // sides of the head, the parting, round the eyes
-  greige: '#cdbfab', // cheeks and muzzle: a lighter grey-brown
-  brown: '#4e3528', // ears and lower jaw
-  cream: '#f5ecdc', // chin, bib and paws
+  tan: '#c7a277', // legs and tail
+  head: '#cdae88', // soft beige
+  muzzle: '#f1e4d0', // the two cheeks under his nose
+  brown: '#4e3528', // ears
+  cream: '#f5ecdc', // bib and paws
   creamShade: '#d8c5aa', // the grooves between his toes
   nose: '#17120f',
   eye: '#1d120d',
   mouth: '#2a1512',
-  tongue: '#db8795',
+  tongue: '#e58c9b',
 }
 
 /*

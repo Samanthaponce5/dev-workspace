@@ -66,7 +66,7 @@
   max-width: 14em;
   margin-top: var(--space-5);
   color: var(--color-text);
-  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.625rem);
+  font-size: calc(clamp(1.375rem, 1.1rem + 1.2vw, 1.625rem) * var(--heading-scale));
   font-weight: var(--weight-medium);
   line-height: 1.25;
   letter-spacing: -0.015em;
@@ -147,17 +147,17 @@
   }
 
   .name {
-    font-size: clamp(4rem, 6.2vw, 5.75rem);
+    font-size: calc(clamp(4rem, 6.2vw, 5.75rem) * var(--display-scale));
   }
 
   .role {
     margin-top: var(--space-6);
-    font-size: clamp(1.375rem, 1.75vw, 1.625rem);
+    font-size: calc(clamp(1.375rem, 1.75vw, 1.625rem) * var(--heading-scale));
   }
 
   .tagline {
     margin-top: var(--space-5);
-    font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+    font-size: calc(clamp(1.125rem, 1.5vw, 1.375rem) * var(--text-scale));
   }
 
   .actions {

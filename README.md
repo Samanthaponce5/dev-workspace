@@ -57,6 +57,7 @@ src/
     layout/       Nav, mobile menu, logo and footer
     three/        The 3D desk scene: camera, lighting, furniture, props, textures
     characters/   Mini Samantha and Andy, modelled in code
+    settings/     The Display settings button and its panel
   sections/       Hero, Work, About, Experience, Contact
   intro/          The reveal that hands the intro over to the page
   hooks/          useReducedMotion, useIsMobile, useInView…
@@ -89,6 +90,25 @@ A scene that arrives late fades in over the image without moving anything.
 Rendering pauses when the hero is off screen or the tab is hidden. Visitors
 who prefer reduced motion get a quick fade instead of the reveal, and a scene
 that holds still.
+
+## Display settings
+
+The button in the bottom corner opens a panel with three choices: text size
+(Default or Large), contrast (Default or High) and motion (System or Reduced).
+Choices show in the panel's preview first and reach the site on **Apply**;
+they are remembered in the browser's local storage.
+
+- Applied settings are data attributes on `<html>` (`data-text-size`,
+  `data-contrast`, `data-motion`). The design tokens in
+  [`src/styles/tokens.css`](src/styles/tokens.css) respond to the first two,
+  so a component that uses the tokens needs no code of its own.
+- A few lines of script in `index.html` restore saved settings before the
+  first paint. Its storage key and attribute names must match
+  [`src/utils/displaySettings.js`](src/utils/displaySettings.js).
+- Reduced motion, from the setting or from the visitor's system, swaps the
+  intro for a quick fade, holds the 3D scene still and turns off smooth
+  scrolling. Components ask `useReducedMotion()`; styles are covered by one
+  rule in [`src/styles/global.css`](src/styles/global.css).
 
 ## Regenerating the still images
 
