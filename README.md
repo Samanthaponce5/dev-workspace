@@ -71,7 +71,9 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 ## How the page loads
 
 1. **Intro.** `index.html` carries a small overlay with its styles inline:
-   seven curved pieces of the SP letters swirl in and lock together, the
+   five pieces cut from the real SP letters (with rounded joins, so they
+   never change shape) drift out, sweep in on curves and lock together, S
+   first and then P, with one soft settle. The
    lime dot lands beside them with one soft glow and a few sparks, and a
    tiny duck hops in reply. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
