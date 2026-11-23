@@ -71,8 +71,8 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 ## How the page loads
 
 1. **Intro.** `index.html` carries a small overlay with its styles inline:
-   the SP logo assembles from four pieces, the lime dot bounces in beside it
-   and a tiny duck reacts. It is all CSS, so it plays from the first frame
+   the SP logo assembles from four pieces and gives a small pop, the lime dot
+   bounces in beside it with a few sparks, and a tiny duck reacts. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
 2. **Prerendered page.** `npm run build` renders the React app once and writes
    the result into `dist/index.html`, so the text is in the HTML for search
@@ -82,8 +82,9 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
    mounts behind the intro at its final size, compiles its shaders in the
    background, and signals once it has drawn a complete frame.
 4. **Reveal.** Once the logo has assembled and the scene is ready, the logo
-   glides into the navbar, the duck hops to its spot on the shelf, and a
-   curved band of teal light sweeps the overlay away. Samantha's greeting
+   flies along a curve into the navbar, trailing a thin line of light, the
+   duck hops to its spot on the shelf, and the page rises into view under a
+   glowing arc. Samantha's greeting
    starts as soon as it has cleared.
 
 If WebGL is missing, the device is low-powered, or the scene takes unusually

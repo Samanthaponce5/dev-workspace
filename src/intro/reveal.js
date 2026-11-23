@@ -8,9 +8,9 @@ import { getSceneDuckRect, showSceneDuck } from '../utils/sceneBridge'
  * into place and has the tiny duck react, all in CSS, from the first
  * frame. When that has played and the page behind is ready, this plays
  * one short move: the duck dips and hops in an arc to the real duck's spot
- * on the monitor shelf; the logo shrinks and glides to the navbar logo's
- * exact position; and a curved band of teal light sweeps the overlay's
- * background away, from off the bottom-left corner of the window.
+ * on the monitor shelf; the logo shrinks and glides along a curve to the
+ * navbar logo's exact position, leaving a thin trail of light; and the
+ * page rises into view under a glowing arc, like the edge of a planet.
  *
  * Every target is measured from the live page at the moment the reveal
  * starts, so it is right for any screen size. If the duck's landing spot
@@ -21,8 +21,9 @@ const DIP_MS = 110 // the duck crouches...
 const HOP_MS = 640 // ...then everything moves together
 const SWAP_FADE_MS = 90 // the moving pieces fade over their real counterparts
 const WIPE_SOFTNESS = 56 // px of feathering on the sweep's edge (see .intro-bg)
-const SWEEP_TRAIL = 200 // px the band of light behind the edge reaches back (see .intro-edge)
-const SWEEP_ORIGIN = { x: -0.3, y: 1.25 } // the sweep's centre, as fractions of the window: off its bottom-left corner
+const SWEEP_TRAIL = 170 // px the light behind the rim reaches back (see .intro-edge)
+const SWEEP_DEPTH = 0.9 // how far below the window the sweep's centre is, as a share of its width: the larger, the flatter the arc
+const TRAIL_LENGTH = 0.28 // of the logo's path, how much the trail behind it covers
 const FADE_MS = 200 // for the plain fade used with reduced motion
 
 const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2)
@@ -51,10 +52,64 @@ function inkRect(span) {
 
 const isOnScreen = (rect) => rect && rect.width > 1 && rect.left >= 0 && rect.top >= 0 && rect.left + rect.width <= window.innerWidth && rect.top + rect.height <= window.innerHeight
 
-/* Moves `element` from its own box to `target` by transform alone. */
-function glide(element, from, target, t) {
-  const scale = lerp(1, target.width / from.width, t)
-  element.style.transform = `translate(${lerp(0, target.left - from.left, t)}px, ${lerp(0, target.top - from.top, t)}px) scale(${scale})`
+/* A point on a quadratic curve. */
+const curve = (a, control, b, t) => (1 - t) ** 2 * a + 2 * (1 - t) * t * control + t ** 2 * b
+
+/*
+ * The logo's flight bends: it rises first and then sweeps across, rather
+ * than sliding straight to the corner. This is the bend's control point
+ * for a flight from `start` to `end`.
+ */
+const bendOf = (start, end) => ({ x: start.x + (end.x - start.x) * 0.25, y: end.y + (start.y - end.y) * 0.15 })
+
+/*
+ * The logo's flight, as one piece: where the letters' and the dot's
+ * top-left corners are, and how much each is scaled, `t` of the way
+ * there. The letters follow the bend; the dot keeps its place beside them,
+ * scaled with them, plus a share of any last fraction of a pixel it needs
+ * to land exactly on the navbar dot.
+ */
+function logoFlight(from, to) {
+  const start = { x: from.letters.left, y: from.letters.top }
+  const end = { x: to.letters.left, y: to.letters.top }
+  const bend = bendOf(start, end)
+  const growth = to.letters.width / from.letters.width
+  const offset = { x: from.dot.left - from.letters.left, y: from.dot.top - from.letters.top }
+  const miss = { x: to.dot.left - (end.x + offset.x * growth), y: to.dot.top - (end.y + offset.y * growth) }
+  return (t) => {
+    const letters = { x: curve(start.x, bend.x, end.x, t), y: curve(start.y, bend.y, end.y, t), scale: lerp(1, growth, t) }
+    const dot = { x: letters.x + offset.x * letters.scale + miss.x * t, y: letters.y + offset.y * letters.scale + miss.y * t, scale: lerp(1, to.dot.width / from.dot.width, t) }
+    return { letters, dot }
+  }
+}
+
+/* Puts `element` (transform-origin 0 0) with its top-left corner at `place`, scaled. */
+function place(element, from, { x, y, scale }) {
+  element.style.transform = `translate(${x - from.left}px, ${y - from.top}px) scale(${scale})`
+}
+
+/* The trail: a short tail of light along the dot's flight, ending where the dot is now, fading as it lands. */
+function prepareTrail(overlay, flight, from) {
+  const paths = overlay.querySelectorAll('.intro-trail path')
+  if (!paths.length) return () => {}
+  const radius = from.dot.width / 2
+  const points = Array.from({ length: 33 }, (_, i) => {
+    const { dot } = flight(i / 32)
+    return `${(dot.x + radius * dot.scale).toFixed(1)} ${(dot.y + radius * dot.scale).toFixed(1)}`
+  })
+  for (const path of paths) {
+    path.setAttribute('d', `M${points.join(' L')}`)
+    path.setAttribute('pathLength', '1')
+    path.style.strokeDasharray = `${TRAIL_LENGTH} 2`
+  }
+  const draw = (t) => {
+    for (const path of paths) {
+      path.style.strokeDashoffset = `${TRAIL_LENGTH - t}`
+      path.style.opacity = String(Math.min(1, t * 6) * (1 - t ** 3))
+    }
+  }
+  draw(0)
+  return draw
 }
 
 /*
@@ -148,14 +203,17 @@ function play(overlay, toShelf) {
   const arc = landing ? Math.max(70, travel * 0.3) : from.duck.height * 1.1
   const control = { x: (duckStart.x + duckEnd.x) / 2, y: Math.min(duckStart.y, duckEnd.y) - arc }
 
-  // The sweep: a circle far off the bottom-left corner, so its edge crosses the window as a gentle arc,
-  // from where it first touches the window until its trailing light has left the far corner.
-  const sweepCentre = { x: window.innerWidth * SWEEP_ORIGIN.x, y: window.innerHeight * SWEEP_ORIGIN.y }
+  // The sweep: a circle centred well below the window, so its edge rises from the bottom as a broad arc,
+  // from where it first touches the window until its trailing light has left the top corners.
+  const sweepCentre = { x: window.innerWidth / 2, y: window.innerHeight + window.innerWidth * SWEEP_DEPTH }
   const reach = reachOfWindow(sweepCentre)
   const sweepFrom = reach.nearest
   const sweepTo = reach.farthest + Math.max(WIPE_SOFTNESS, SWEEP_TRAIL)
   overlay.style.setProperty('--wipe-x', `${sweepCentre.x}px`)
   overlay.style.setProperty('--wipe-y', `${sweepCentre.y}px`)
+
+  const flight = logoFlight(from, to)
+  const drawTrail = prepareTrail(overlay, flight, from)
 
   const startedAt = performance.now()
   const frame = (now) => {
@@ -177,9 +235,11 @@ function play(overlay, toShelf) {
     const y = along(duckStart.y, control.y, duckEnd.y)
     duck.style.transform = `translate(${x - duckStart.x}px, ${y - duckStart.y}px) scale(${lerp(1, duckScale, eased)})`
 
-    // Logo: letters and dot shrink and glide to the navbar together.
-    glide(letters, from.letters, to.letters, eased)
-    glide(dot, from.dot, to.dot, eased)
+    // Logo: letters and dot shrink and fly to the navbar together, trailing light.
+    const logo = flight(eased)
+    place(letters, from.letters, logo.letters)
+    place(dot, from.dot, logo.dot)
+    drawTrail(eased)
 
     // The sweep keeps pace with the duck, a little ahead: it starts as he leaves and has cleared the page just before he lands.
     overlay.style.setProperty('--wipe-r', `${lerp(sweepFrom, sweepTo, easeInOut(Math.min(t * 1.12, 1)) ** 0.85)}px`)

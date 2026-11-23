@@ -271,7 +271,8 @@ const round = (value) => Math.round(value * 10000) / 10000
  * mask, filled with the text colour (so it suits every theme), and cut by
  * clip paths into four pieces, each with where it flies in from (dx, dy,
  * r) and the point it turns about (ox, oy). The pieces' clips overlap by
- * half a pixel, so no seam shows when they meet.
+ * half a pixel, so no seam shows when they meet. They sit in one group,
+ * which gives the finished word its little pop.
  */
 function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, pLeft, stemRight }) {
   const f = (value) => Math.round(value * 100) / 100
@@ -287,7 +288,7 @@ function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, pLeft, stemRi
   const groups = pieces
     .map(({ name, box: [x, y, w, h], from: [dx, dy, r] }, i) => `<g class="intro-piece" style="--i:${i};--dx:${f(dx * H)}px;--dy:${f(dy * H)}px;--r:${r}deg;--ox:${f(x + w / 2)}px;--oy:${f(y + h / 2)}px"><rect width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)" clip-path="url(#intro-cut-${name})"/></g>`)
     .join('')
-  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${groups}</svg>`
+  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs><g class="intro-word">${groups}</g></svg>`
 }
 {
   const site = await openSite({ width: 1440, height: 900, scale: INTRO_SCALE, mobile: false })
