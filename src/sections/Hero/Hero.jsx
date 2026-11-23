@@ -5,10 +5,6 @@ import { hero } from '../../content/content'
 import { HeroScene } from './HeroScene'
 import styles from './Hero.module.css'
 
-/* The name is shown as two lines so it never wraps awkwardly on any screen. */
-const [firstName, ...rest] = hero.title.split(' ')
-const lastName = rest.join(' ')
-
 /**
  * Opening section. The 3D scene is drawn on a canvas that covers the whole
  * hero, so the diorama and its glow are never clipped by a box. The empty
@@ -31,8 +27,7 @@ export function Hero() {
       <Container wide className={styles.layout}>
         <div className={styles.intro}>
           <h1 id="hero-heading" className={styles.name}>
-            <span className={styles.nameLine}>{firstName}</span>{' '}
-            <span className={styles.nameLine}>{lastName}</span>
+            {hero.title}
           </h1>
 
           <p className={styles.role}>{hero.role}</p>

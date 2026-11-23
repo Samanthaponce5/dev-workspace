@@ -3,8 +3,9 @@
  *
  *   - the still images ("posters") of the desk scene, which the hero
  *     shows when the 3D scene is slow to load or WebGL isn't available;
- *   - the intro's two embedded pictures (the SP letters and the tiny
- *     duck) and the proportions of the navbar logo, written into
+ *   - the intro's embedded pictures and proportions (the SP letters,
+ *     cut into the pieces that assemble, the tiny duck, and how the
+ *     navbar logo's dot sits beside its letters), written into
  *     index.html so the intro matches what it lands on.
  *
  *   1. Start the dev server:  npm run dev
@@ -227,8 +228,25 @@ const MEASURE_LOGO = `(async () => {
   context.fillStyle = style.color
   context.fillText(span.textContent, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent)
 
+  // Where to cut the letters into pieces: the gap between S and P, and the right edge of the P's stem.
+  const { width: W, height: H } = canvas
+  const alpha = context.getImageData(0, 0, W, H).data
+  const inked = (x, y) => alpha[(y * W + x) * 4 + 3] > 24
+  const columnInk = (x) => { let sum = 0; for (let y = 0; y < H; y += 1) sum += inked(x, y) ? 1 : 0; return sum }
+  let gapLeft = Math.round(W * 0.5), gapRight = gapLeft, least = Infinity
+  for (let x = Math.round(W * 0.3); x < Math.round(W * 0.7); x += 1) {
+    const ink = columnInk(x)
+    if (ink < least) { least = ink; gapLeft = gapRight = x } else if (ink === least && x === gapRight + 1) gapRight = x
+  }
+  const stemRow = Math.round(H * 0.88)
+  let x = gapRight + 1
+  while (x < W && !inked(x, stemRow)) x += 1
+  const pLeft = x
+  while (x < W && inked(x, stemRow)) x += 1
+  const stemRight = x
+
   return {
-    letters: { src: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height },
+    letters: { src: canvas.toDataURL('image/png'), width: W, height: H, gapLeft, gapRight, pLeft, stemRight },
     // All relative to the height of the letters.
     dotRatio: dot.width / ink.height,
     gapRatio: (dot.left - (ink.left + ink.width)) / ink.height,
@@ -247,6 +265,30 @@ const ISOLATE_DUCK = `(() => {
 })()`
 
 const round = (value) => Math.round(value * 10000) / 10000
+
+/*
+ * The intro's letters as an SVG: the picture of the letters is an alpha
+ * mask, filled with the text colour (so it suits every theme), and cut by
+ * clip paths into four pieces, each with where it flies in from (dx, dy,
+ * r) and the point it turns about (ox, oy). The pieces' clips overlap by
+ * half a pixel, so no seam shows when they meet.
+ */
+function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, pLeft, stemRight }) {
+  const f = (value) => Math.round(value * 100) / 100
+  const split = (gapLeft + gapRight + 1) / 2
+  const waist = H * 0.5
+  const pieces = [
+    { name: 's-top', box: [0, 0, split, waist + 0.5], from: [-0.55, -0.5, -38] },
+    { name: 'p-bowl', box: [stemRight - 0.5, 0, W - stemRight + 0.5, H], from: [0.6, -0.45, 42] },
+    { name: 's-bottom', box: [0, waist - 0.5, split, H - waist + 0.5], from: [-0.35, 0.55, 30] },
+    { name: 'p-stem', box: [split, 0, stemRight - split, H], from: [0.25, 0.65, -24] },
+  ]
+  const clips = pieces.map(({ name, box: [x, y, w, h] }) => `<clipPath id="intro-cut-${name}"><rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}"/></clipPath>`).join('')
+  const groups = pieces
+    .map(({ name, box: [x, y, w, h], from: [dx, dy, r] }, i) => `<g class="intro-piece" style="--i:${i};--dx:${f(dx * H)}px;--dy:${f(dy * H)}px;--r:${r}deg;--ox:${f(x + w / 2)}px;--oy:${f(y + h / 2)}px"><rect width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)" clip-path="url(#intro-cut-${name})"/></g>`)
+    .join('')
+  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${groups}</svg>`
+}
 {
   const site = await openSite({ width: 1440, height: 900, scale: INTRO_SCALE, mobile: false })
   const logo = await site.evaluate(MEASURE_LOGO)
@@ -258,7 +300,7 @@ const round = (value) => Math.round(value * 10000) / 10000
 
   const htmlPath = `${root}index.html`
   const html = readFileSync(htmlPath, 'utf8')
-    .replace(/(<img class="intro-letters" data-intro-letters )src="[^"]*" width="\d+" height="\d+"/, `$1src="${logo.letters.src}" width="${logo.letters.width}" height="${logo.letters.height}"`)
+    .replace(/<!-- intro-letters -->.*?<!-- \/intro-letters -->/s, () => `<!-- intro-letters -->${lettersSvg(logo.letters)}<!-- /intro-letters -->`)
     .replace(/(<img class="intro-duck" data-intro-duck )src="[^"]*" width="\d+" height="\d+"/, `$1src="data:image/webp;base64,${webp}" width="${box.width}" height="${box.height}"`)
     .replace(/\/\* intro-geometry \*\/.*?\/\* \/intro-geometry \*\//, `/* intro-geometry */ --dot-ratio: ${round(logo.dotRatio)}; --gap-ratio: ${round(logo.gapRatio)}; --drop-ratio: ${round(logo.dropRatio)}; /* /intro-geometry */`)
   writeFileSync(htmlPath, html)

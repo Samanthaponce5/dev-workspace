@@ -21,7 +21,8 @@ export const nav = [
 ]
 
 export const hero = {
-  title: site.name,
+  /* The big heading. The full name stays in the page title, the navbar logo and search results. */
+  title: 'Sam',
   role: `${site.role} at ${site.company}`,
   /* Shown on tablet and desktop only, to keep the phone hero compact. */
   tagline: 'I build fast, accessible interfaces.',

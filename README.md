@@ -70,9 +70,10 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 
 ## How the page loads
 
-1. **Intro.** `index.html` carries a small overlay (the SP logo and a tiny
-   duck) with its styles and images inline, so it paints before any script
-   has arrived.
+1. **Intro.** `index.html` carries a small overlay with its styles inline:
+   the SP logo assembles from four pieces, the lime dot bounces in beside it
+   and a tiny duck reacts. It is all CSS, so it plays from the first frame
+   without any JavaScript, in the visitor's theme (it uses the theme tokens).
 2. **Prerendered page.** `npm run build` renders the React app once and writes
    the result into `dist/index.html`, so the text is in the HTML for search
    engines, link previews and visitors without JavaScript. React then attaches
@@ -80,16 +81,18 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 3. **3D scene.** The scene's bundle is preloaded alongside the main script. It
    mounts behind the intro at its final size, compiles its shaders in the
    background, and signals once it has drawn a complete frame.
-4. **Reveal.** At that signal the duck hops to its spot on the shelf, the logo
-   glides into the navbar, and the greeting starts as soon as the intro clears.
+4. **Reveal.** Once the logo has assembled and the scene is ready, the logo
+   glides into the navbar, the duck hops to its spot on the shelf, and a
+   curved band of teal light sweeps the overlay away. Samantha's greeting
+   starts as soon as it has cleared.
 
 If WebGL is missing, the device is low-powered, or the scene takes unusually
 long, the reveal goes ahead with a still image of the scene in the same place.
 A scene that arrives late fades in over the image without moving anything.
 
 Rendering pauses when the hero is off screen or the tab is hidden. Visitors
-who prefer reduced motion get a quick fade instead of the reveal, and a scene
-that holds still.
+who prefer reduced motion get the logo already in place, a quick fade
+instead of the reveal, and a scene that holds still.
 
 ## Themes
 
@@ -131,8 +134,8 @@ they are remembered in the browser's local storage.
 
 ## Regenerating the still images
 
-The still images in `public/`, the duck and logo pictures inside the intro,
-and their measurements are captured from the live scene. Run this again after
+The still images in `public/`, the duck picture and the pieced SP letters
+inside the intro, and their measurements are captured from the live site. Run this again after
 changing the scene, the duck or the navbar logo:
 
 ```bash

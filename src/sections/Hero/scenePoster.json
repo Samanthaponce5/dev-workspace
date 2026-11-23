@@ -10,9 +10,9 @@
   "mobile": {
     "src": "/scene-mobile.webp",
     "width": 499,
-    "height": 355,
+    "height": 355.5,
     "pixelsPerUnit": 87.197,
     "anchorX": 0.508,
-    "anchorY": 0.4673
+    "anchorY": 0.4663
   }
 }

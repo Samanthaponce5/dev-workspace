@@ -2,24 +2,27 @@ import { markIntroDone } from '../utils/intro'
 import { getSceneDuckRect, showSceneDuck } from '../utils/sceneBridge'
 
 /*
- * The intro's reveal: "Shelf hop".
+ * The intro's reveal.
  *
- * The overlay (see index.html) shows the SP logo, its lime dot and a tiny
- * duck, centred. When the page behind it is ready, this plays one short
- * move: the duck dips and hops in an arc to the real duck's spot on the
- * monitor shelf; the logo shrinks and glides to the navbar logo's exact
- * position; and the overlay's background is wiped away in a growing
- * circle centred on where the duck lands.
+ * The overlay (see index.html) assembles the SP logo, bounces its lime dot
+ * into place and has the tiny duck react, all in CSS, from the first
+ * frame. When that has played and the page behind is ready, this plays
+ * one short move: the duck dips and hops in an arc to the real duck's spot
+ * on the monitor shelf; the logo shrinks and glides to the navbar logo's
+ * exact position; and a curved band of teal light sweeps the overlay's
+ * background away, from off the bottom-left corner of the window.
  *
  * Every target is measured from the live page at the moment the reveal
- * starts, so it is right for any screen size. Nothing here waits: if the
- * duck's landing spot isn't available the duck hops in place instead.
+ * starts, so it is right for any screen size. If the duck's landing spot
+ * isn't available the duck hops in place instead.
  */
 
 const DIP_MS = 110 // the duck crouches...
 const HOP_MS = 640 // ...then everything moves together
 const SWAP_FADE_MS = 90 // the moving pieces fade over their real counterparts
-const WIPE_SOFTNESS = 56 // px of feathering on the wipe's edge
+const WIPE_SOFTNESS = 56 // px of feathering on the sweep's edge (see .intro-bg)
+const SWEEP_TRAIL = 200 // px the band of light behind the edge reaches back (see .intro-edge)
+const SWEEP_ORIGIN = { x: -0.3, y: 1.25 } // the sweep's centre, as fractions of the window: off its bottom-left corner
 const FADE_MS = 200 // for the plain fade used with reduced motion
 
 const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2)
@@ -54,6 +57,25 @@ function glide(element, from, target, t) {
   element.style.transform = `translate(${lerp(0, target.left - from.left, t)}px, ${lerp(0, target.top - from.top, t)}px) scale(${scale})`
 }
 
+/*
+ * Resolves once the overlay's own animations (the logo assembling, the dot
+ * landing, the duck's reaction) have played. The duck's idle bob repeats
+ * forever, so it doesn't count. With reduced motion there are none.
+ */
+function assembled(overlay) {
+  if (typeof overlay.getAnimations !== 'function') return Promise.resolve()
+  const playing = overlay.getAnimations({ subtree: true }).filter((animation) => animation.effect?.getComputedTiming().endTime !== Infinity)
+  return Promise.all(playing.map((animation) => animation.finished.catch(() => {})))
+}
+
+/* How far a point is from the nearest and the farthest parts of the window. */
+function reachOfWindow(point) {
+  const { innerWidth: width, innerHeight: height } = window
+  const nearest = Math.hypot(Math.max(0 - point.x, 0, point.x - width), Math.max(0 - point.y, 0, point.y - height))
+  const farthest = Math.max(...[0, width].flatMap((x) => [0, height].map((y) => Math.hypot(x - point.x, y - point.y))))
+  return { nearest, farthest }
+}
+
 function finish(overlay) {
   // The real navbar logo and the real duck appear in the same frame the moving ones arrive.
   document.documentElement.classList.remove('intro-pending')
@@ -83,9 +105,8 @@ export function revealIntro({ toShelf = true, reducedMotion = false } = {}) {
     markIntroDone()
     return
   }
-  performance.mark('intro:reveal-start')
-
   if (reducedMotion) {
+    performance.mark('intro:reveal-start')
     document.documentElement.classList.remove('intro-pending')
     showSceneDuck()
     overlay.dataset.state = 'fading'
@@ -96,6 +117,13 @@ export function revealIntro({ toShelf = true, reducedMotion = false } = {}) {
     return
   }
 
+  // The logo finishes assembling first. On a slow connection it has long since; on a fast one the
+  // page can be ready while the dot is still landing, and this waits out the few hundred ms left.
+  assembled(overlay).then(() => play(overlay, toShelf))
+}
+
+function play(overlay, toShelf) {
+  performance.mark('intro:reveal-start')
   const letters = overlay.querySelector('.intro-letters')
   const dot = overlay.querySelector('.intro-dot')
   const duck = overlay.querySelector('.intro-duck')
@@ -120,10 +148,14 @@ export function revealIntro({ toShelf = true, reducedMotion = false } = {}) {
   const arc = landing ? Math.max(70, travel * 0.3) : from.duck.height * 1.1
   const control = { x: (duckStart.x + duckEnd.x) / 2, y: Math.min(duckStart.y, duckEnd.y) - arc }
 
-  // The wipe opens from where the duck lands until it has cleared the farthest corner.
-  const wipeRadius = Math.max(...[0, window.innerWidth].flatMap((x) => [0, window.innerHeight].map((y) => Math.hypot(x - duckEnd.x, y - duckEnd.y)))) + WIPE_SOFTNESS
-  overlay.style.setProperty('--wipe-x', `${duckEnd.x}px`)
-  overlay.style.setProperty('--wipe-y', `${duckEnd.y}px`)
+  // The sweep: a circle far off the bottom-left corner, so its edge crosses the window as a gentle arc,
+  // from where it first touches the window until its trailing light has left the far corner.
+  const sweepCentre = { x: window.innerWidth * SWEEP_ORIGIN.x, y: window.innerHeight * SWEEP_ORIGIN.y }
+  const reach = reachOfWindow(sweepCentre)
+  const sweepFrom = reach.nearest
+  const sweepTo = reach.farthest + Math.max(WIPE_SOFTNESS, SWEEP_TRAIL)
+  overlay.style.setProperty('--wipe-x', `${sweepCentre.x}px`)
+  overlay.style.setProperty('--wipe-y', `${sweepCentre.y}px`)
 
   const startedAt = performance.now()
   const frame = (now) => {
@@ -149,8 +181,8 @@ export function revealIntro({ toShelf = true, reducedMotion = false } = {}) {
     glide(letters, from.letters, to.letters, eased)
     glide(dot, from.dot, to.dot, eased)
 
-    // The wipe keeps pace with the duck: it opens as he leaves and has cleared the page as he lands.
-    overlay.style.setProperty('--wipe-r', `${eased ** 0.85 * wipeRadius}px`)
+    // The sweep keeps pace with the duck, a little ahead: it starts as he leaves and has cleared the page just before he lands.
+    overlay.style.setProperty('--wipe-r', `${lerp(sweepFrom, sweepTo, easeInOut(Math.min(t * 1.12, 1)) ** 0.85)}px`)
 
     if (t < 1) {
       requestAnimationFrame(frame)

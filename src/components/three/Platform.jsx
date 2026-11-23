@@ -1,4 +1,4 @@
-import { RoundedBox } from '@react-three/drei'
+import { RoundedBox } from './RoundedBox'
 import { PLATFORM } from './dimensions'
 import { useSceneTheme } from './sceneTheme'
 

@@ -1,4 +1,4 @@
-import { RoundedBox } from '@react-three/drei'
+import { RoundedBox } from './RoundedBox'
 import { CHAIR_SEAT_HEIGHT as SEAT_HEIGHT, CHAIR_SEAT_TOP } from './dimensions'
 import { palette } from './materials'
 

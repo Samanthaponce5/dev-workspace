@@ -1,4 +1,4 @@
-import { RoundedBox } from '@react-three/drei'
+import { RoundedBox } from './RoundedBox'
 import { DESK } from './dimensions'
 import { palette } from './materials'
 import { useWoodTexture } from './textures/useWoodTexture'

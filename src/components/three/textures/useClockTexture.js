@@ -4,10 +4,12 @@ import { createCanvasTexture } from './createCanvasTexture'
 const WIDTH = 512
 const HEIGHT = 192
 
+/* Made once and reused: setting one up loads the visitor's locale data, which is slow. */
+let timeFormat = null
+
 function formatTime(date) {
-  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' })
-    .format(date)
-    .replace(/\s?(AM|PM|am|pm)$/, '')
+  timeFormat ??= new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' })
+  return timeFormat.format(date).replace(/\s?(AM|PM|am|pm)$/, '')
 }
 
 function drawClock(context, time, temperature) {
@@ -46,11 +48,13 @@ export function useClockTexture(temperature) {
     }
 
     tick()
-    // Redraw once web fonts are in, so the digits don't stay in a fallback face.
+    // Redraw once web fonts are in, so the digits don't stay in a fallback face. Usually they already are.
     let cancelled = false
-    document.fonts?.ready.then(() => {
-      if (!cancelled) target.paint((context) => drawClock(context, formatTime(new Date()), temperature))
-    })
+    if (document.fonts && document.fonts.status !== 'loaded') {
+      document.fonts.ready.then(() => {
+        if (!cancelled) target.paint((context) => drawClock(context, formatTime(new Date()), temperature))
+      })
+    }
     return () => {
       cancelled = true
       window.clearTimeout(timeoutId)

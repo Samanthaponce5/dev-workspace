@@ -52,14 +52,11 @@
 
 .name {
   color: var(--color-text);
-  font-size: var(--text-display);
+  /* One short word, so it can be set larger than the site's usual display size. */
+  font-size: calc(clamp(4.5rem, 2.5rem + 12vw, 7rem) * var(--display-scale));
   font-weight: var(--weight-heavy);
   line-height: 0.98;
   letter-spacing: -0.045em;
-}
-
-.nameLine {
-  display: block;
 }
 
 .role {
@@ -147,7 +144,7 @@
   }
 
   .name {
-    font-size: calc(clamp(4rem, 6.2vw, 5.75rem) * var(--display-scale));
+    font-size: calc(clamp(6rem, 10vw, 9.5rem) * var(--display-scale));
   }
 
   .role {

@@ -1,4 +1,4 @@
-import { RoundedBox } from '@react-three/drei'
+import { RoundedBox } from '../RoundedBox'
 import { palette } from '../materials'
 import { useClockTexture } from '../textures/useClockTexture'
 
