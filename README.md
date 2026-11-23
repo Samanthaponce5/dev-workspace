@@ -71,8 +71,9 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 ## How the page loads
 
 1. **Intro.** `index.html` carries a small overlay with its styles inline:
-   the SP logo assembles from four clean pieces (the S, then the P), the lime
-   dot drops in beside it with one soft glow, and a tiny duck hops in reply. It is all CSS, so it plays from the first frame
+   seven curved pieces of the SP letters swirl in and lock together, the
+   lime dot lands beside them with one soft glow and a few sparks, and a
+   tiny duck hops in reply. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
 2. **Prerendered page.** `npm run build` renders the React app once and writes
    the result into `dist/index.html`, so the text is in the HTML for search

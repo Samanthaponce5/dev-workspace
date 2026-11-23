@@ -238,31 +238,6 @@ const MEASURE_LOGO = `(async () => {
     const ink = columnInk(x)
     if (ink < least) { least = ink; gapLeft = gapRight = x } else if (ink === least && x === gapRight + 1) gapRight = x
   }
-  // The S is cut once across the middle of its spine, at right angles to it, with the cut running out
-  // level through the letter's two counters, so each half is a clean hook and no curve is clipped.
-  const split = Math.round((gapLeft + gapRight + 1) / 2)
-  let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0
-  for (let y = Math.round(H * 0.44); y < Math.round(H * 0.6); y += 1) {
-    for (let x = 0; x < split; x += 1) {
-      if (!inked(x, y)) continue
-      n += 1; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y
-    }
-  }
-  const cx = sx / n, cy = sy / n
-  const angle = 0.5 * Math.atan2(2 * (sxy / n - cx * cy), sxx / n - cx * cx - (syy / n - cy * cy)) // the spine's direction
-  let across = { x: -Math.sin(angle), y: Math.cos(angle) } // at right angles to it, pointing down
-  if (across.y < 0) across = { x: -across.x, y: -across.y }
-  const clearRow = (y, from, to) => { for (let x = Math.max(0, Math.floor(from)); x <= Math.min(split - 1, Math.ceil(to)); x += 1) if (inked(x, Math.round(y))) return false; return true }
-  let sCut = null
-  for (let reach = 4; reach < H * 0.4 && !sCut; reach += 0.5) {
-    const upper = [cx - across.x * reach, cy - across.y * reach] // where the cut leaves the spine's top edge
-    const lower = [cx + across.x * reach, cy + across.y * reach] // ...and its bottom edge
-    const upperRight = upper[0] > lower[0] // which counter each side opens into
-    const upperClear = upperRight ? clearRow(upper[1], upper[0], split) : clearRow(upper[1], 0, upper[0])
-    const lowerClear = upperRight ? clearRow(lower[1], 0, lower[0]) : clearRow(lower[1], lower[0], split)
-    if (upperClear && lowerClear) sCut = { upper, lower, upperRight }
-  }
-
   const stemRow = Math.round(H * 0.88)
   let x = gapRight + 1
   while (x < W && !inked(x, stemRow)) x += 1
@@ -271,7 +246,7 @@ const MEASURE_LOGO = `(async () => {
   const stemRight = x
 
   return {
-    letters: { src: canvas.toDataURL('image/png'), width: W, height: H, gapLeft, gapRight, pLeft, stemRight, sCut },
+    letters: { src: canvas.toDataURL('image/png'), width: W, height: H, gapLeft, gapRight, pLeft, stemRight },
     // All relative to the height of the letters.
     dotRatio: dot.width / ink.height,
     gapRatio: (dot.left - (ink.left + ink.width)) / ink.height,
@@ -294,54 +269,165 @@ const round = (value) => Math.round(value * 10000) / 10000
 /*
  * The intro's letters as an SVG. The picture of the letters is an alpha
  * mask, filled with the text colour, so it suits every theme. Clip paths
- * cut it into four clean pieces: the S once across its spine, the P into
- * its stem and its bowl. Each piece carries where it starts from (dx, dy,
- * r: a short way off, turned a little) and when it moves (delay): the S
- * first, the P close behind. The clips overlap a little, and each letter
- * is replaced by its whole self once its pieces are home, so no join shows.
+ * cut it into seven pieces that follow the letters' own strokes: the S
+ * into its upper hook, upper curve, spine, lower curve and lower hook, the
+ * P into its stem and bowl. Where a cut crosses a stroke it is a gentle
+ * curve, so each piece ends rounded and its neighbour's end cups it.
+ *
+ * Each piece swirls in: it is carried round the word's centre (--a) while
+ * it closes in from further out (--dx, --dy) and turns a little on its
+ * own (--r), so its path is a curve, not a line. Two faint echoes follow
+ * it, a few milliseconds behind, as a trail. Each letter is replaced by
+ * its whole self the moment its last piece is home, so no join shows.
  */
 
-function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, stemRight, sCut }) {
+/* The S's cut points, as fractions of the S's width and the letters' height (worked out from the Geist S). */
+const S_POINTS = {
+  topCut: [0.494, -0.02], // through the top curve...
+  topCounter: [0.494, 0.295], // ...ending in the upper counter
+  upperBack: [0.321, 0.274], // across the upper curve where it turns into the spine...
+  upperFront: [0.185, 0.611], // ...ending in the lower counter
+  lowerBack: [0.889, 0.442], // across the spine where it turns into the lower curve...
+  lowerFront: [0.543, 0.663],
+  bottomCounter: [0.494, 0.663], // through the bottom curve
+  bottomCut: [0.494, 1.02],
+}
+
+/* The cuts that cross a stroke, and how far each bows (as a share of its length). */
+const CURVED_CUTS = { 'topCut-topCounter': 0.16, 'upperBack-upperFront': -0.14, 'lowerBack-lowerFront': 0.14, 'bottomCounter-bottomCut': -0.16 }
+
+/* The S's five pieces, as loops of named points (or [x, y] fractions). */
+const S_PIECES = {
+  'upper-hook': ['topCut', [1, -0.02], [1, 0.442], 'lowerBack', 'topCounter'],
+  'upper-curve': [[-0.02, -0.02], 'topCut', 'topCounter', 'upperBack', 'upperFront', [-0.02, 0.611]],
+  spine: ['upperBack', 'topCounter', 'lowerBack', 'lowerFront', 'upperFront'],
+  'lower-curve': ['lowerBack', [1, 0.442], [1, 1.02], 'bottomCut', 'bottomCounter', 'lowerFront'],
+  'lower-hook': [[-0.02, 0.611], 'upperFront', 'lowerFront', 'bottomCounter', 'bottomCut', [-0.02, 1.02]],
+}
+
+/*
+ * How each piece arrives: in the order they move (--delay), the swirl round
+ * the centre (a, degrees; all the same way, so they move as one), how far
+ * out they start (out, letters' heights; straight out from the word's
+ * centre unless `from` gives a direction) and their own turn (r, degrees).
+ */
+const ARRIVALS = [
+  { name: 'upper-curve', delay: 0, a: -56, out: 0.95, r: 24 },
+  { name: 'p-bowl', delay: 40, a: -50, out: 0.9, r: 20 },
+  { name: 'spine', delay: 80, a: -60, out: 1.05, r: 26 },
+  { name: 'lower-curve', delay: 120, a: -54, out: 0.92, r: 22 },
+  { name: 'p-stem', delay: 160, a: -48, out: 0.95, r: 18, from: [-0.35, 1] }, // from below, so its path doesn't cross the bowl's
+  { name: 'upper-hook', delay: 200, a: -58, out: 0.85, r: 24 },
+  { name: 'lower-hook', delay: 240, a: -52, out: 0.95, r: 22 },
+]
+const SWIRL_MS = 700
+const TRAIL = [
+  { lag: 40, peak: 0.22 },
+  { lag: 80, peak: 0.1 },
+]
+
+/* Points along a gentle curve from a to b (not including a and b), bowing to the left of a→b by `bow` of its length. */
+function bowed(a, b, bow, steps = 10) {
+  const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
+  const length = Math.hypot(b[0] - a[0], b[1] - a[1])
+  const control = [mid[0] + ((a[1] - b[1]) / length) * bow * length, mid[1] + ((b[0] - a[0]) / length) * bow * length]
+  return Array.from({ length: steps - 1 }, (_, i) => {
+    const t = (i + 1) / steps
+    return [(1 - t) ** 2 * a[0] + 2 * (1 - t) * t * control[0] + t ** 2 * b[0], (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * control[1] + t ** 2 * b[1]]
+  })
+}
+
+/* A loop of points, with every curved cut drawn as its curve (the same curve, traversed either way, for the two pieces that share it). */
+function outline(loop, resolve, cuts) {
+  const points = []
+  loop.forEach((spec, i) => {
+    const next = loop[(i + 1) % loop.length]
+    const here = resolve(spec)
+    points.push(here)
+    if (typeof spec !== 'string' || typeof next !== 'string') return
+    if (cuts[`${spec}-${next}`] !== undefined) points.push(...bowed(here, resolve(next), cuts[`${spec}-${next}`]))
+    else if (cuts[`${next}-${spec}`] !== undefined) points.push(...bowed(resolve(next), here, cuts[`${next}-${spec}`]).reverse())
+  })
+  return points
+}
+
+/*
+ * The same outline pushed out evenly by `reach` px all round, so
+ * neighbouring pieces overlap a little and never show a hairline between
+ * them, even as they settle, without any piece carrying a visible sliver
+ * of its neighbour while it is in flight.
+ */
+function grown(points, reach) {
+  const area = points.reduce((sum, [x, y], i) => {
+    const [nx, ny] = points[(i + 1) % points.length]
+    return sum + x * ny - nx * y
+  }, 0)
+  const side = area > 0 ? 1 : -1 // which way is outside, given the loop's direction
+  const unit = ([x, y]) => {
+    const length = Math.hypot(x, y) || 1
+    return [x / length, y / length]
+  }
+  return points.map((point, i) => {
+    const before = points[(i - 1 + points.length) % points.length]
+    const after = points[(i + 1) % points.length]
+    const [ax, ay] = unit([point[0] - before[0], point[1] - before[1]])
+    const [bx, by] = unit([after[0] - point[0], after[1] - point[1]])
+    const n1 = [ay * side, -ax * side]
+    const n2 = [by * side, -bx * side]
+    const [mx, my] = unit([n1[0] + n2[0], n1[1] + n2[1]])
+    const stretch = reach / Math.max(0.35, mx * n1[0] + my * n1[1])
+    return [point[0] + mx * stretch, point[1] + my * stretch]
+  })
+}
+
+function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, stemRight }) {
   const f = (value) => Math.round(value * 100) / 100
   const split = (gapLeft + gapRight + 1) / 2
-  const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]
-  // The S's two halves: above and below its cut (see MEASURE_LOGO), or a level cut if none was found.
-  const sHalves = (shift) => {
-    if (!sCut) return [rect(-1, -1, split + 1, H / 2 + 1 + shift), rect(-1, H / 2 - shift, split + 1, H / 2 + 1 + shift)]
-    const { upper, lower, upperRight } = sCut
-    const up = [upper[0], upper[1] + shift]
-    const down = [lower[0], lower[1] + shift]
-    const top = upperRight ? [[-1, -1], [split, -1], [split, up[1]], up, down, [-1, down[1]]] : [[-1, -1], [split, -1], [split, down[1]], down, up, [-1, up[1]]]
-    const upB = [upper[0], upper[1] - shift]
-    const downB = [lower[0], lower[1] - shift]
-    const bottom = upperRight ? [[-1, downB[1]], downB, upB, [split, upB[1]], [split, H + 1], [-1, H + 1]] : [[-1, upB[1]], upB, downB, [split, downB[1]], [split, H + 1], [-1, H + 1]]
-    return [top, bottom]
+  const sPoint = (spec) => {
+    const [fx, fy] = typeof spec === 'string' ? S_POINTS[spec] : spec
+    return [fx * split, fy * H]
   }
-  const OVERLAP = 1.5 // px each piece reaches past its cut, so pieces a hair from home still look joined
-  const [sTop, sBottom] = sHalves(OVERLAP)
-  const pieces = [
-    { name: 's-top', letter: 's', shape: sTop, from: [-0.08, -0.16, -8], delay: 0 },
-    { name: 's-bottom', letter: 's', shape: sBottom, from: [-0.1, 0.16, 7], delay: 40 },
-    { name: 'p-stem', letter: 'p', shape: rect(split - 0.5, -1, stemRight - split + 0.5 + OVERLAP, H + 2), from: [0.03, 0.2, -5], delay: 110 },
-    { name: 'p-bowl', letter: 'p', shape: rect(stemRight - OVERLAP, -1, W - stemRight + 1 + OVERLAP, H + 2), from: [0.12, -0.14, 10], delay: 150 },
-  ]
-  // Each letter is swapped for its whole self the moment its last piece is home (see .intro-piece in index.html).
-  const ASSEMBLE_MS = 440
-  const START_MS = 30
-  const homeAt = (letter) => START_MS + ASSEMBLE_MS + Math.max(...pieces.filter((piece) => piece.letter === letter).map((piece) => piece.delay))
-  const letterBox = { s: rect(-1, -1, split + 1, H + 2), p: rect(split, -1, W - split + 1, H + 2) }
-  const centre = (shape) => shape.reduce(([x, y], [px, py]) => [x + px / shape.length, y + py / shape.length], [0, 0])
-  const polygon = (shape) => `<polygon points="${shape.map(([x, y]) => `${f(x)},${f(y)}`).join(' ')}"/>`
-  const clips = [...pieces.map(({ name, shape }) => `<clipPath id="intro-cut-${name}">${polygon(shape)}</clipPath>`), ...['s', 'p'].map((letter) => `<clipPath id="intro-cut-${letter}">${polygon(letterBox[letter])}</clipPath>`)].join('')
+  const pPoints = { stemTop: [stemRight, -2], stemBottom: [stemRight, H + 2] }
+  const pPoint = (spec) => (typeof spec === 'string' ? pPoints[spec] : spec)
+  const shapes = {
+    ...Object.fromEntries(Object.entries(S_PIECES).map(([name, loop]) => [name, outline(loop, sPoint, CURVED_CUTS)])),
+    'p-stem': outline([[split, -2], 'stemTop', 'stemBottom', [split, H + 2]], pPoint, { 'stemTop-stemBottom': 0.05 }),
+    'p-bowl': outline(['stemTop', [W + 2, -2], [W + 2, H + 2], 'stemBottom'], pPoint, { 'stemTop-stemBottom': 0.05 }),
+  }
+  const letterOf = (name) => (name.startsWith('p-') ? 'p' : 's')
+  const centreOf = (points) => points.reduce(([x, y], [px, py]) => [x + px / points.length, y + py / points.length], [0, 0])
+  const word = [W / 2, H / 2]
+  const homeAt = (letter) => SWIRL_MS + Math.max(...ARRIVALS.filter((arrival) => letterOf(arrival.name) === letter).map((arrival) => arrival.delay))
+  const letterBox = { s: [[-2, -2], [split, -2], [split, H + 2], [-2, H + 2]], p: [[split, -2], [W + 2, -2], [W + 2, H + 2], [split, H + 2]] }
+
+  const polygon = (points) => `<polygon points="${points.map(([x, y]) => `${f(x)},${f(y)}`).join(' ')}"/>`
+  const clips = [
+    ...Object.entries(shapes).map(([name, points]) => `<clipPath id="intro-cut-${name}">${polygon(grown(points, 1.5))}</clipPath>`),
+    ...['s', 'p'].map((letter) => `<clipPath id="intro-cut-${letter}">${polygon(letterBox[letter])}</clipPath>`),
+  ].join('')
   const letters = `width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)"`
-  const groups = pieces
-    .map(({ name, letter, shape, from: [dx, dy, r], delay }) => {
-      const [ox, oy] = centre(shape)
-      return `<g class="intro-piece" style="--delay:${delay}ms;--home:${homeAt(letter)}ms;--dx:${f(dx * H)}px;--dy:${f(dy * H)}px;--r:${r}deg;--ox:${f(ox)}px;--oy:${f(oy)}px"><rect ${letters} clip-path="url(#intro-cut-${name})"/></g>`
-    })
-    .join('')
+
+  const piece = ({ name, delay, a, out, r, from }, className, extra = '') => {
+    const [px, py] = centreOf(shapes[name])
+    let [ux, uy] = from ?? [px - word[0], py - word[1]]
+    const length = Math.hypot(ux, uy) || 1
+    ;[ux, uy] = [ux / length, uy / length]
+    return `<g class="intro-orbit" style="--delay:${delay}ms;--a:${a}deg"><g class="${className}" style="--delay:${delay}ms;--home:${homeAt(letterOf(name))}ms;--dx:${f(ux * out * H)}px;--dy:${f(uy * out * H)}px;--r:${r}deg;--ox:${f(px)}px;--oy:${f(py)}px${extra}"><rect ${letters} clip-path="url(#intro-cut-${name})"/></g></g>`
+  }
+  const trails = TRAIL.flatMap(({ lag, peak }) => ARRIVALS.map((arrival) => piece({ ...arrival, delay: arrival.delay + lag }, 'intro-piece intro-echo', `;--peak:${peak}`))).join('')
+  const pieces = ARRIVALS.map((arrival) => piece(arrival, 'intro-piece')).join('')
   const wholes = ['s', 'p'].map((letter) => `<rect class="intro-whole" style="--home:${homeAt(letter)}ms" ${letters} clip-path="url(#intro-cut-${letter})"/>`).join('')
-  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${groups}${wholes}</svg>`
+
+  // Three thin arcs of light that swirl round the word with the pieces, then fade.
+  const arc = (from, to, rx, ry) => {
+    const at = (deg) => [word[0] + rx * Math.cos((deg * Math.PI) / 180), word[1] + ry * Math.sin((deg * Math.PI) / 180)]
+    const [x0, y0] = at(from)
+    const [x1, y1] = at(to)
+    return `<path pathLength="1" d="M${f(x0)} ${f(y0)}A${f(rx)} ${f(ry)} 0 0 1 ${f(x1)} ${f(y1)}"/>`
+  }
+  const arcs = `<g class="intro-arcs" style="--cx:${f(word[0])}px;--cy:${f(word[1])}px">${arc(195, 250, W * 0.6, H * 0.78)}${arc(15, 70, W * 0.62, H * 0.8)}${arc(100, 140, W * 0.55, H * 0.72)}</g>`
+
+  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="--cx:${f(word[0])}px;--cy:${f(word[1])}px"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${arcs}${trails}${pieces}${wholes}</svg>`
 }
 
 {
