@@ -267,167 +267,115 @@ const ISOLATE_DUCK = `(() => {
 const round = (value) => Math.round(value * 10000) / 10000
 
 /*
- * The intro's letters as an SVG. The picture of the letters is an alpha
- * mask, filled with the text colour, so it suits every theme. Clip paths
- * cut it into seven pieces that follow the letters' own strokes: the S
- * into its upper hook, upper curve, spine, lower curve and lower hook, the
- * P into its stem and bowl. Where a cut crosses a stroke it is a gentle
- * curve, so each piece ends rounded and its neighbour's end cups it.
+ * The intro's letters as an SVG.
  *
- * Each piece swirls in: it is carried round the word's centre (--a) while
- * it closes in from further out (--dx, --dy) and turns a little on its
- * own (--r), so its path is a curve, not a line. Two faint echoes follow
- * it, a few milliseconds behind, as a trail. Each letter is replaced by
- * its whole self the moment its last piece is home, so no join shows.
+ * Five rounded pieces swirl in and join: the S's upper curve, spine and
+ * lower curve, and the P's stem and bowl. Each piece is a stroke drawn
+ * along the letter's centre line at the letter's own thickness, with
+ * round ends, so every exposed end is smooth. (The centre lines below
+ * were traced from the Geist letters at the size this script draws them,
+ * 159 × 95; they are scaled if that size changes.)
+ *
+ * Each piece travels its own cubic Bézier curve into place, turning a
+ * little and straightening as it arrives, with smooth acceleration and a
+ * gentle stop. Its motion is sampled into a keyframe list here, so the
+ * whole assembly is one CSS timeline. Short teal trails follow three of
+ * the pieces and fade before the letters meet.
+ *
+ * The finished logo is the real one: once the pieces are home, the exact
+ * letters (the picture of them, as an alpha mask filled with the text
+ * colour) fade in over them in a very short crossfade, and the pieces,
+ * still solid underneath so the letters never look see-through, go.
  */
 
-/* The S's cut points, as fractions of the S's width and the letters' height (worked out from the Geist S). */
-const S_POINTS = {
-  topCut: [0.494, -0.02], // through the top curve...
-  topCounter: [0.494, 0.295], // ...ending in the upper counter
-  upperBack: [0.321, 0.274], // across the upper curve where it turns into the spine...
-  upperFront: [0.185, 0.611], // ...ending in the lower counter
-  lowerBack: [0.889, 0.442], // across the spine where it turns into the lower curve...
-  lowerFront: [0.543, 0.663],
-  bottomCounter: [0.494, 0.663], // through the bottom curve
-  bottomCut: [0.494, 1.02],
-}
-
-/* The cuts that cross a stroke, and how far each bows (as a share of its length). */
-const CURVED_CUTS = { 'topCut-topCounter': 0.16, 'upperBack-upperFront': -0.14, 'lowerBack-lowerFront': 0.14, 'bottomCounter-bottomCut': -0.16 }
-
-/* The S's five pieces, as loops of named points (or [x, y] fractions). */
-const S_PIECES = {
-  'upper-hook': ['topCut', [1, -0.02], [1, 0.442], 'lowerBack', 'topCounter'],
-  'upper-curve': [[-0.02, -0.02], 'topCut', 'topCounter', 'upperBack', 'upperFront', [-0.02, 0.611]],
-  spine: ['upperBack', 'topCounter', 'lowerBack', 'lowerFront', 'upperFront'],
-  'lower-curve': ['lowerBack', [1, 0.442], [1, 1.02], 'bottomCut', 'bottomCounter', 'lowerFront'],
-  'lower-hook': [[-0.02, 0.611], 'upperFront', 'lowerFront', 'bottomCounter', 'bottomCut', [-0.02, 1.02]],
-}
+const TRACED = { width: 159, height: 95 }
 
 /*
- * How each piece arrives: in the order they move (--delay), the swirl round
- * the centre (a, degrees; all the same way, so they move as one), how far
- * out they start (out, letters' heights; straight out from the word's
- * centre unless `from` gives a direction) and their own turn (r, degrees).
+ * name, the centre line (in traced units), its thickness, the point it
+ * turns about, and how it arrives: where it starts (from: as letters'
+ * heights from home), which way it swirls (1 clockwise, -1 the other way),
+ * how far it is turned at the start (degrees) and when it sets off.
  */
-const ARRIVALS = [
-  { name: 'upper-curve', delay: 0, a: -56, out: 0.95, r: 24 },
-  { name: 'p-bowl', delay: 40, a: -50, out: 0.9, r: 20 },
-  { name: 'spine', delay: 80, a: -60, out: 1.05, r: 26 },
-  { name: 'lower-curve', delay: 120, a: -54, out: 0.92, r: 22 },
-  { name: 'p-stem', delay: 160, a: -48, out: 0.95, r: 18, from: [-0.35, 1] }, // from below, so its path doesn't cross the bowl's
-  { name: 'upper-hook', delay: 200, a: -58, out: 0.85, r: 24 },
-  { name: 'lower-hook', delay: 240, a: -52, out: 0.95, r: 22 },
+const PIECES = [
+  { name: 's-upper', d: 'M63 24C63 13.5 52.5 9 37 9C20.5 9 12.5 15 12.5 24C12.5 31.5 15.5 36 21 39', width: 20, pivot: [34, 22], from: [-0.3, -0.36], swirl: 1, turn: -16, delay: 0, trail: true },
+  { name: 'p-bowl', d: 'M97 10H122.5C139 10 148 18.5 148 32C148 45.5 139 53.5 122.5 53.5H97', width: 19.5, pivot: [128, 32], from: [0.42, -0.3], swirl: -1, turn: 14, delay: 65, trail: true },
+  { name: 's-spine', d: 'M21 39C31 44.5 44 48.5 56.5 53.5', width: 19.5, pivot: [39, 46], from: [-0.46, 0.08], swirl: -1, turn: 12, delay: 130 },
+  { name: 's-lower', d: 'M56.5 53.5C62.5 56.5 65 61.5 65 68.5C65 78.5 54.5 85 38.5 85C22.5 85 12.5 80 12 72', width: 20, pivot: [44, 72], from: [0.26, 0.4], swirl: 1, turn: -16, delay: 195, trail: true },
+  { name: 'p-stem', d: 'M96.5 12V81', width: 22, pivot: [96.5, 46], from: [-0.06, 0.5], swirl: -1, turn: 10, delay: 260 },
 ]
-const SWIRL_MS = 700
-const TRAIL = [
-  { lag: 40, peak: 0.22 },
-  { lag: 80, peak: 0.1 },
-]
+const TRAVEL_MS = 700
+const HANDOFF_MS = 960 // every piece is home by now (the last sets off at 260 ms)
+const CROSSFADE_MS = 70 // the exact letters fade in over the pieces...
+const PIECES_OUT_MS = 50 // ...which then go, unseen beneath them
+const SAMPLES = 24
 
-/* Points along a gentle curve from a to b (not including a and b), bowing to the left of a→b by `bow` of its length. */
-function bowed(a, b, bow, steps = 10) {
-  const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
-  const length = Math.hypot(b[0] - a[0], b[1] - a[1])
-  const control = [mid[0] + ((a[1] - b[1]) / length) * bow * length, mid[1] + ((b[0] - a[0]) / length) * bow * length]
-  return Array.from({ length: steps - 1 }, (_, i) => {
-    const t = (i + 1) / steps
-    return [(1 - t) ** 2 * a[0] + 2 * (1 - t) * t * control[0] + t ** 2 * b[0], (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * control[1] + t ** 2 * b[1]]
-  })
-}
-
-/* A loop of points, with every curved cut drawn as its curve (the same curve, traversed either way, for the two pieces that share it). */
-function outline(loop, resolve, cuts) {
-  const points = []
-  loop.forEach((spec, i) => {
-    const next = loop[(i + 1) % loop.length]
-    const here = resolve(spec)
-    points.push(here)
-    if (typeof spec !== 'string' || typeof next !== 'string') return
-    if (cuts[`${spec}-${next}`] !== undefined) points.push(...bowed(here, resolve(next), cuts[`${spec}-${next}`]))
-    else if (cuts[`${next}-${spec}`] !== undefined) points.push(...bowed(resolve(next), here, cuts[`${next}-${spec}`]).reverse())
-  })
-  return points
-}
-
-/*
- * The same outline pushed out evenly by `reach` px all round, so
- * neighbouring pieces overlap a little and never show a hairline between
- * them, even as they settle, without any piece carrying a visible sliver
- * of its neighbour while it is in flight.
- */
-function grown(points, reach) {
-  const area = points.reduce((sum, [x, y], i) => {
-    const [nx, ny] = points[(i + 1) % points.length]
-    return sum + x * ny - nx * y
-  }, 0)
-  const side = area > 0 ? 1 : -1 // which way is outside, given the loop's direction
-  const unit = ([x, y]) => {
-    const length = Math.hypot(x, y) || 1
-    return [x / length, y / length]
+/* The easing of each journey: smooth acceleration, then a long gentle stop (cubic-bezier(0.5, 0.05, 0.3, 1)). */
+function ease(t) {
+  const [x1, y1, x2, y2] = [0.5, 0.05, 0.3, 1]
+  const coord = (a, b, s) => 3 * a * s * (1 - s) ** 2 + 3 * b * s ** 2 * (1 - s) + s ** 3
+  let lo = 0
+  let hi = 1
+  for (let i = 0; i < 40; i += 1) {
+    const mid = (lo + hi) / 2
+    if (coord(x1, x2, mid) < t) lo = mid
+    else hi = mid
   }
-  return points.map((point, i) => {
-    const before = points[(i - 1 + points.length) % points.length]
-    const after = points[(i + 1) % points.length]
-    const [ax, ay] = unit([point[0] - before[0], point[1] - before[1]])
-    const [bx, by] = unit([after[0] - point[0], after[1] - point[1]])
-    const n1 = [ay * side, -ax * side]
-    const n2 = [by * side, -bx * side]
-    const [mx, my] = unit([n1[0] + n2[0], n1[1] + n2[1]])
-    const stretch = reach / Math.max(0.35, mx * n1[0] + my * n1[1])
-    return [point[0] + mx * stretch, point[1] + my * stretch]
-  })
+  return coord(y1, y2, (lo + hi) / 2)
 }
 
-function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, stemRight }) {
+function lettersSvg({ src, width: W, height: H, gapLeft, gapRight }) {
   const f = (value) => Math.round(value * 100) / 100
   const split = (gapLeft + gapRight + 1) / 2
-  const sPoint = (spec) => {
-    const [fx, fy] = typeof spec === 'string' ? S_POINTS[spec] : spec
-    return [fx * split, fy * H]
-  }
-  const pPoints = { stemTop: [stemRight, -2], stemBottom: [stemRight, H + 2] }
-  const pPoint = (spec) => (typeof spec === 'string' ? pPoints[spec] : spec)
-  const shapes = {
-    ...Object.fromEntries(Object.entries(S_PIECES).map(([name, loop]) => [name, outline(loop, sPoint, CURVED_CUTS)])),
-    'p-stem': outline([[split, -2], 'stemTop', 'stemBottom', [split, H + 2]], pPoint, { 'stemTop-stemBottom': 0.05 }),
-    'p-bowl': outline(['stemTop', [W + 2, -2], [W + 2, H + 2], 'stemBottom'], pPoint, { 'stemTop-stemBottom': 0.05 }),
-  }
-  const letterOf = (name) => (name.startsWith('p-') ? 'p' : 's')
-  const centreOf = (points) => points.reduce(([x, y], [px, py]) => [x + px / points.length, y + py / points.length], [0, 0])
-  const word = [W / 2, H / 2]
-  const homeAt = (letter) => SWIRL_MS + Math.max(...ARRIVALS.filter((arrival) => letterOf(arrival.name) === letter).map((arrival) => arrival.delay))
+  const sx = W / TRACED.width
+  const sy = H / TRACED.height
+  const scaleD = (d) => d.replace(/([MLHVC])([^MLHVC]*)/g, (_, command, args) => {
+    const numbers = args.trim().split(/[\s,]+/).filter(Boolean).map(Number)
+    const scaled = numbers.map((value, i) => (command === 'H' ? value * sx : command === 'V' ? value * sy : i % 2 === 0 ? value * sx : value * sy))
+    return command + scaled.map(f).join(' ')
+  })
+
+  const styles = []
+  const trails = []
+  const pieces = PIECES.map(({ name, d, width, pivot: [px0, py0], from: [fx, fy], swirl, turn, delay, trail }) => {
+    const [px, py] = [px0 * sx, py0 * sy]
+    // The journey, measured from home: a cubic Bézier from the start, swinging round, to (0, 0).
+    const start = [fx * H, fy * H]
+    const across = [-start[1] * swirl, start[0] * swirl] // at right angles to the way in: the swirl
+    const c1 = [start[0] * 0.9 + across[0] * 0.55, start[1] * 0.9 + across[1] * 0.55]
+    const c2 = [start[0] * 0.12 + across[0] * 0.18, start[1] * 0.12 + across[1] * 0.18]
+    const at = (s) => [0, 1].map((k) => (1 - s) ** 3 * start[k] + 3 * (1 - s) ** 2 * s * c1[k] + 3 * (1 - s) * s ** 2 * c2[k])
+
+    const frames = Array.from({ length: SAMPLES + 1 }, (_, i) => {
+      const progress = ease(i / SAMPLES)
+      const [x, y] = at(progress)
+      const angle = turn * (1 - progress) ** 2 // turning less and less as it nears home
+      return `${f((i / SAMPLES) * 100)}%{transform:translate(${f(x)}px,${f(y)}px) rotate(${f(angle)}deg)}`
+    })
+    styles.push(`@keyframes intro-path-${name}{${frames.join('')}}`)
+
+    if (trail) {
+      const trailFrames = Array.from({ length: SAMPLES + 1 }, (_, i) => {
+        const progress = ease(i / SAMPLES)
+        const fade = Math.max(0, 1 - progress / 0.7)
+        return `${f((i / SAMPLES) * 100)}%{stroke-dashoffset:${f(0.24 - progress)};opacity:${f(Math.min(1, progress * 8) * fade)}}`
+      })
+      styles.push(`@keyframes intro-trail-${name}{${trailFrames.join('')}}`)
+      const abs = (point) => `${f(px + point[0])} ${f(py + point[1])}`
+      trails.push(
+        `<path class="intro-swirl-trail" pathLength="1" d="M${abs(start)}C${abs(c1)} ${abs(c2)} ${abs([0, 0])}" style="animation:intro-trail-${name} ${TRAVEL_MS}ms linear ${delay}ms both"/>`,
+      )
+    }
+
+    return `<g class="intro-piece" style="transform-origin:${f(px)}px ${f(py)}px;animation:intro-path-${name} ${TRAVEL_MS}ms linear ${delay}ms both,intro-appear 160ms ease-out ${delay}ms both,intro-fade-out ${PIECES_OUT_MS}ms linear ${HANDOFF_MS + CROSSFADE_MS}ms forwards"><path d="${scaleD(d)}" stroke-width="${f(width * sy)}"/></g>`
+  }).join('')
+
   const letterBox = { s: [[-2, -2], [split, -2], [split, H + 2], [-2, H + 2]], p: [[split, -2], [W + 2, -2], [W + 2, H + 2], [split, H + 2]] }
-
   const polygon = (points) => `<polygon points="${points.map(([x, y]) => `${f(x)},${f(y)}`).join(' ')}"/>`
-  const clips = [
-    ...Object.entries(shapes).map(([name, points]) => `<clipPath id="intro-cut-${name}">${polygon(grown(points, 1.5))}</clipPath>`),
-    ...['s', 'p'].map((letter) => `<clipPath id="intro-cut-${letter}">${polygon(letterBox[letter])}</clipPath>`),
-  ].join('')
+  const clips = ['s', 'p'].map((letter) => `<clipPath id="intro-cut-${letter}">${polygon(letterBox[letter])}</clipPath>`).join('')
   const letters = `width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)"`
+  const wholes = ['s', 'p'].map((letter) => `<rect class="intro-whole" style="animation:intro-fade-in ${CROSSFADE_MS}ms linear ${HANDOFF_MS}ms both" ${letters} clip-path="url(#intro-cut-${letter})"/>`).join('')
 
-  const piece = ({ name, delay, a, out, r, from }, className, extra = '') => {
-    const [px, py] = centreOf(shapes[name])
-    let [ux, uy] = from ?? [px - word[0], py - word[1]]
-    const length = Math.hypot(ux, uy) || 1
-    ;[ux, uy] = [ux / length, uy / length]
-    return `<g class="intro-orbit" style="--delay:${delay}ms;--a:${a}deg"><g class="${className}" style="--delay:${delay}ms;--home:${homeAt(letterOf(name))}ms;--dx:${f(ux * out * H)}px;--dy:${f(uy * out * H)}px;--r:${r}deg;--ox:${f(px)}px;--oy:${f(py)}px${extra}"><rect ${letters} clip-path="url(#intro-cut-${name})"/></g></g>`
-  }
-  const trails = TRAIL.flatMap(({ lag, peak }) => ARRIVALS.map((arrival) => piece({ ...arrival, delay: arrival.delay + lag }, 'intro-piece intro-echo', `;--peak:${peak}`))).join('')
-  const pieces = ARRIVALS.map((arrival) => piece(arrival, 'intro-piece')).join('')
-  const wholes = ['s', 'p'].map((letter) => `<rect class="intro-whole" style="--home:${homeAt(letter)}ms" ${letters} clip-path="url(#intro-cut-${letter})"/>`).join('')
-
-  // Three thin arcs of light that swirl round the word with the pieces, then fade.
-  const arc = (from, to, rx, ry) => {
-    const at = (deg) => [word[0] + rx * Math.cos((deg * Math.PI) / 180), word[1] + ry * Math.sin((deg * Math.PI) / 180)]
-    const [x0, y0] = at(from)
-    const [x1, y1] = at(to)
-    return `<path pathLength="1" d="M${f(x0)} ${f(y0)}A${f(rx)} ${f(ry)} 0 0 1 ${f(x1)} ${f(y1)}"/>`
-  }
-  const arcs = `<g class="intro-arcs" style="--cx:${f(word[0])}px;--cy:${f(word[1])}px">${arc(195, 250, W * 0.6, H * 0.78)}${arc(15, 70, W * 0.62, H * 0.8)}${arc(100, 140, W * 0.55, H * 0.72)}</g>`
-
-  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="--cx:${f(word[0])}px;--cy:${f(word[1])}px"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${arcs}${trails}${pieces}${wholes}</svg>`
+  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><style>${styles.join('')}</style><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${trails.join('')}${pieces}${wholes}</svg>`
 }
 
 {
