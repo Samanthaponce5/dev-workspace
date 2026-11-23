@@ -238,6 +238,31 @@ const MEASURE_LOGO = `(async () => {
     const ink = columnInk(x)
     if (ink < least) { least = ink; gapLeft = gapRight = x } else if (ink === least && x === gapRight + 1) gapRight = x
   }
+  // The S is cut once across the middle of its spine, at right angles to it, with the cut running out
+  // level through the letter's two counters, so each half is a clean hook and no curve is clipped.
+  const split = Math.round((gapLeft + gapRight + 1) / 2)
+  let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0
+  for (let y = Math.round(H * 0.44); y < Math.round(H * 0.6); y += 1) {
+    for (let x = 0; x < split; x += 1) {
+      if (!inked(x, y)) continue
+      n += 1; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y
+    }
+  }
+  const cx = sx / n, cy = sy / n
+  const angle = 0.5 * Math.atan2(2 * (sxy / n - cx * cy), sxx / n - cx * cx - (syy / n - cy * cy)) // the spine's direction
+  let across = { x: -Math.sin(angle), y: Math.cos(angle) } // at right angles to it, pointing down
+  if (across.y < 0) across = { x: -across.x, y: -across.y }
+  const clearRow = (y, from, to) => { for (let x = Math.max(0, Math.floor(from)); x <= Math.min(split - 1, Math.ceil(to)); x += 1) if (inked(x, Math.round(y))) return false; return true }
+  let sCut = null
+  for (let reach = 4; reach < H * 0.4 && !sCut; reach += 0.5) {
+    const upper = [cx - across.x * reach, cy - across.y * reach] // where the cut leaves the spine's top edge
+    const lower = [cx + across.x * reach, cy + across.y * reach] // ...and its bottom edge
+    const upperRight = upper[0] > lower[0] // which counter each side opens into
+    const upperClear = upperRight ? clearRow(upper[1], upper[0], split) : clearRow(upper[1], 0, upper[0])
+    const lowerClear = upperRight ? clearRow(lower[1], 0, lower[0]) : clearRow(lower[1], lower[0], split)
+    if (upperClear && lowerClear) sCut = { upper, lower, upperRight }
+  }
+
   const stemRow = Math.round(H * 0.88)
   let x = gapRight + 1
   while (x < W && !inked(x, stemRow)) x += 1
@@ -246,7 +271,7 @@ const MEASURE_LOGO = `(async () => {
   const stemRight = x
 
   return {
-    letters: { src: canvas.toDataURL('image/png'), width: W, height: H, gapLeft, gapRight, pLeft, stemRight },
+    letters: { src: canvas.toDataURL('image/png'), width: W, height: H, gapLeft, gapRight, pLeft, stemRight, sCut },
     // All relative to the height of the letters.
     dotRatio: dot.width / ink.height,
     gapRatio: (dot.left - (ink.left + ink.width)) / ink.height,
@@ -267,29 +292,58 @@ const ISOLATE_DUCK = `(() => {
 const round = (value) => Math.round(value * 10000) / 10000
 
 /*
- * The intro's letters as an SVG: the picture of the letters is an alpha
- * mask, filled with the text colour (so it suits every theme), and cut by
- * clip paths into four pieces, each with where it flies in from (dx, dy,
- * r) and the point it turns about (ox, oy). The pieces' clips overlap by
- * half a pixel, so no seam shows when they meet. They sit in one group,
- * which gives the finished word its little pop.
+ * The intro's letters as an SVG. The picture of the letters is an alpha
+ * mask, filled with the text colour, so it suits every theme. Clip paths
+ * cut it into four clean pieces: the S once across its spine, the P into
+ * its stem and its bowl. Each piece carries where it starts from (dx, dy,
+ * r: a short way off, turned a little) and when it moves (delay): the S
+ * first, the P close behind. The clips overlap a little, and each letter
+ * is replaced by its whole self once its pieces are home, so no join shows.
  */
-function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, pLeft, stemRight }) {
+
+function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, stemRight, sCut }) {
   const f = (value) => Math.round(value * 100) / 100
   const split = (gapLeft + gapRight + 1) / 2
-  const waist = H * 0.5
+  const rect = (x, y, w, h) => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]
+  // The S's two halves: above and below its cut (see MEASURE_LOGO), or a level cut if none was found.
+  const sHalves = (shift) => {
+    if (!sCut) return [rect(-1, -1, split + 1, H / 2 + 1 + shift), rect(-1, H / 2 - shift, split + 1, H / 2 + 1 + shift)]
+    const { upper, lower, upperRight } = sCut
+    const up = [upper[0], upper[1] + shift]
+    const down = [lower[0], lower[1] + shift]
+    const top = upperRight ? [[-1, -1], [split, -1], [split, up[1]], up, down, [-1, down[1]]] : [[-1, -1], [split, -1], [split, down[1]], down, up, [-1, up[1]]]
+    const upB = [upper[0], upper[1] - shift]
+    const downB = [lower[0], lower[1] - shift]
+    const bottom = upperRight ? [[-1, downB[1]], downB, upB, [split, upB[1]], [split, H + 1], [-1, H + 1]] : [[-1, upB[1]], upB, downB, [split, downB[1]], [split, H + 1], [-1, H + 1]]
+    return [top, bottom]
+  }
+  const OVERLAP = 1.5 // px each piece reaches past its cut, so pieces a hair from home still look joined
+  const [sTop, sBottom] = sHalves(OVERLAP)
   const pieces = [
-    { name: 's-top', box: [0, 0, split, waist + 0.5], from: [-0.55, -0.5, -38] },
-    { name: 'p-bowl', box: [stemRight - 0.5, 0, W - stemRight + 0.5, H], from: [0.6, -0.45, 42] },
-    { name: 's-bottom', box: [0, waist - 0.5, split, H - waist + 0.5], from: [-0.35, 0.55, 30] },
-    { name: 'p-stem', box: [split, 0, stemRight - split, H], from: [0.25, 0.65, -24] },
+    { name: 's-top', letter: 's', shape: sTop, from: [-0.08, -0.16, -8], delay: 0 },
+    { name: 's-bottom', letter: 's', shape: sBottom, from: [-0.1, 0.16, 7], delay: 40 },
+    { name: 'p-stem', letter: 'p', shape: rect(split - 0.5, -1, stemRight - split + 0.5 + OVERLAP, H + 2), from: [0.03, 0.2, -5], delay: 110 },
+    { name: 'p-bowl', letter: 'p', shape: rect(stemRight - OVERLAP, -1, W - stemRight + 1 + OVERLAP, H + 2), from: [0.12, -0.14, 10], delay: 150 },
   ]
-  const clips = pieces.map(({ name, box: [x, y, w, h] }) => `<clipPath id="intro-cut-${name}"><rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}"/></clipPath>`).join('')
+  // Each letter is swapped for its whole self the moment its last piece is home (see .intro-piece in index.html).
+  const ASSEMBLE_MS = 440
+  const START_MS = 30
+  const homeAt = (letter) => START_MS + ASSEMBLE_MS + Math.max(...pieces.filter((piece) => piece.letter === letter).map((piece) => piece.delay))
+  const letterBox = { s: rect(-1, -1, split + 1, H + 2), p: rect(split, -1, W - split + 1, H + 2) }
+  const centre = (shape) => shape.reduce(([x, y], [px, py]) => [x + px / shape.length, y + py / shape.length], [0, 0])
+  const polygon = (shape) => `<polygon points="${shape.map(([x, y]) => `${f(x)},${f(y)}`).join(' ')}"/>`
+  const clips = [...pieces.map(({ name, shape }) => `<clipPath id="intro-cut-${name}">${polygon(shape)}</clipPath>`), ...['s', 'p'].map((letter) => `<clipPath id="intro-cut-${letter}">${polygon(letterBox[letter])}</clipPath>`)].join('')
+  const letters = `width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)"`
   const groups = pieces
-    .map(({ name, box: [x, y, w, h], from: [dx, dy, r] }, i) => `<g class="intro-piece" style="--i:${i};--dx:${f(dx * H)}px;--dy:${f(dy * H)}px;--r:${r}deg;--ox:${f(x + w / 2)}px;--oy:${f(y + h / 2)}px"><rect width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)" clip-path="url(#intro-cut-${name})"/></g>`)
+    .map(({ name, letter, shape, from: [dx, dy, r], delay }) => {
+      const [ox, oy] = centre(shape)
+      return `<g class="intro-piece" style="--delay:${delay}ms;--home:${homeAt(letter)}ms;--dx:${f(dx * H)}px;--dy:${f(dy * H)}px;--r:${r}deg;--ox:${f(ox)}px;--oy:${f(oy)}px"><rect ${letters} clip-path="url(#intro-cut-${name})"/></g>`
+    })
     .join('')
-  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs><g class="intro-word">${groups}</g></svg>`
+  const wholes = ['s', 'p'].map((letter) => `<rect class="intro-whole" style="--home:${homeAt(letter)}ms" ${letters} clip-path="url(#intro-cut-${letter})"/>`).join('')
+  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${groups}${wholes}</svg>`
 }
+
 {
   const site = await openSite({ width: 1440, height: 900, scale: INTRO_SCALE, mobile: false })
   const logo = await site.evaluate(MEASURE_LOGO)

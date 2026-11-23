@@ -11,7 +11,8 @@ import styles from './Section.module.css'
  * that the nav links scroll to.
  *
  * `intro` is an optional sentence or two under the title and `actions`
- * optional buttons under that. With `split`, the heading sits beside the
+ * optional buttons under that. `headerExtra` is anything else that belongs
+ * with the heading, placed between the title and the intro. With `split`, the heading sits beside the
  * content on wide screens instead of above it.
  *
  * The section also runs the scroll reveal: it sets data-reveal to
@@ -19,7 +20,7 @@ import styles from './Section.module.css'
  * scrolls into view. Anything inside marked data-rise fades up then (see
  * global.css). Prerendered and no-JavaScript pages never hide anything.
  */
-export function Section({ id, eyebrow, title, intro, actions, split = false, className, children }) {
+export function Section({ id, eyebrow, title, intro, actions, headerExtra, split = false, className, children }) {
   const headingId = `${id}-heading`
   const hydrated = useHydrated()
   const [ref, inView] = useInView({ once: true, rootMargin: '0px 0px -18% 0px' })
@@ -40,6 +41,7 @@ export function Section({ id, eyebrow, title, intro, actions, split = false, cla
             <Heading level={2} size={split ? 'xxl' : undefined} id={headingId} className={styles.title}>
               {title}
             </Heading>
+            {headerExtra}
             {intro && <p className={styles.intro}>{intro}</p>}
             {actions && <div className={styles.actions}>{actions}</div>}
           </header>

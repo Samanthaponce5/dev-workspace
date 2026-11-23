@@ -116,6 +116,25 @@ export function CodeIcon(props) {
   )
 }
 
+export function DatabaseIcon(props) {
+  return (
+    <svg {...fineProps} {...props}>
+      <ellipse cx="10" cy="4.6" rx="6.2" ry="2.2" />
+      <path d="M3.8 4.6v10.8c0 1.2 2.8 2.2 6.2 2.2s6.2-1 6.2-2.2V4.6M3.8 10c0 1.2 2.8 2.2 6.2 2.2s6.2-1 6.2-2.2" />
+    </svg>
+  )
+}
+
+export function GearIcon(props) {
+  return (
+    <svg {...fineProps} {...props}>
+      <circle cx="10" cy="10" r="2.6" />
+      <path d="M10 1.8v2.1M10 16.1v2.1M18.2 10h-2.1M3.9 10H1.8M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5M15.8 15.8l-1.5-1.5M5.7 5.7 4.2 4.2" />
+      <circle cx="10" cy="10" r="5.6" />
+    </svg>
+  )
+}
+
 export function MailIcon(props) {
   return (
     <svg {...fineProps} {...props}>
@@ -157,6 +176,8 @@ export function GitHubIcon(props) {
 const GLYPHS = {
   atom: AtomIcon,
   code: CodeIcon,
+  database: DatabaseIcon,
+  gear: GearIcon,
   github: GitHubIcon,
   layers: LayersIcon,
   linkedin: LinkedInIcon,

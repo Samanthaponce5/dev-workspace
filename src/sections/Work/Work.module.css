@@ -1,40 +1,424 @@
-.grid {
-  display: grid;
-  gap: var(--space-5);
+/*
+ * "What I do". Three layouts, matched by the line shapes in flowLayout.js:
+ *   - phones: heading, intro, the code circle, then the three skills stacked
+ *     to the right of a line running down the side;
+ *   - from 37.5rem: the skills side by side under the code circle;
+ *   - from 60rem: heading and intro on the left with the code circle
+ *     between them, skills stacked on the right.
+ */
+
+.section {
+  --ring: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  --ring-glow: color-mix(in srgb, var(--color-aqua) 22%, transparent);
+  --wire: color-mix(in srgb, var(--color-accent) 72%, transparent);
+  --lime: var(--color-lime);
 }
 
-.card {
+/* --------------------------------------------------------------- The code circle */
+
+.source {
+  position: relative;
   display: grid;
-  align-content: start;
-  gap: var(--space-4);
+  justify-items: center;
+  gap: var(--space-2);
+  order: 3; /* after the intro, until the wide layout puts it under the heading */
+  margin-top: var(--space-4);
 }
 
-.index {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--color-aqua);
+.sourceRing,
+.node {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3.25rem;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--ring);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+  color: var(--color-text);
+  box-shadow:
+    0 0 18px -2px var(--ring-glow),
+    inset 0 0 12px -4px var(--ring-glow);
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+
+/* Three small lime chevrons leading into the code circle: pointing down above it, or across beside it on wide screens. */
+.chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.chevrons span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid var(--lime);
+  border-bottom: 2px solid var(--lime);
+  rotate: 45deg;
+  opacity: 0.85;
+}
+
+.chevrons span:nth-child(2) {
+  opacity: 0.6;
+}
+
+.chevrons span:first-child {
+  opacity: 0.35;
+}
+
+/* --------------------------------------------------------------- Lines */
+
+.flow {
+  position: relative;
+}
+
+.lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.line {
+  stroke: var(--wire);
+  stroke-width: 1.75;
+}
+
+.glow {
+  stroke: color-mix(in srgb, var(--color-aqua) 16%, transparent);
+  stroke-width: 7;
+}
+
+/* The pulse: a short bright dash that runs the line once. */
+.pulse {
+  stroke: var(--lime);
+  stroke-width: 2.5;
+  stroke-dasharray: 0.07 2;
+  stroke-dashoffset: 0.07;
+  opacity: 0;
+}
+
+.end {
+  fill: var(--lime);
+  stroke: color-mix(in srgb, var(--lime) 35%, transparent);
+  stroke-width: 4;
+  paint-order: stroke;
+}
+
+.branchLines {
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+/* --------------------------------------------------------------- Skills */
+
+.branches {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.branch {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  column-gap: var(--space-4);
+  row-gap: var(--space-3);
+  align-items: start;
+  padding-left: 3.75rem; /* room for the line running down the side */
+  border-radius: var(--radius-md);
+  outline: none;
+  cursor: default;
+  transition: opacity var(--duration-base) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.branch:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* On phones the words join the branch's grid: the title beside the circle, the rest full width below it. */
+.text {
+  display: contents;
+}
+
+.title {
+  grid-column: 2;
+  align-self: center;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.description,
+.tags {
+  grid-column: 1 / -1;
 }
 
 .description {
   color: var(--color-text-muted);
   text-wrap: pretty;
+  transition: color var(--duration-base) var(--ease-out);
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-top: var(--space-2);
 }
 
-@media (min-width: 48rem) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* --------------------------------------------------------------- Picking a branch out */
+
+.flow[data-active] .branch:not([data-on]),
+.flow[data-active] .branchLines:not([data-on]) {
+  opacity: 0.4;
+}
+
+.branch[data-on] .node {
+  border-color: var(--color-accent-strong);
+  color: var(--color-accent-strong);
+  box-shadow:
+    0 0 26px 0 color-mix(in srgb, var(--color-aqua) 40%, transparent),
+    inset 0 0 14px -4px var(--ring-glow);
+}
+
+.branch[data-on] .title {
+  color: var(--color-accent-strong);
+}
+
+.branch[data-on] .description {
+  color: var(--color-text);
+}
+
+.branchLines[data-on] .line {
+  stroke: var(--color-accent-strong);
+}
+
+.branchLines[data-on] .glow {
+  stroke: color-mix(in srgb, var(--color-aqua) 34%, transparent);
+}
+
+/* --------------------------------------------------------------- Appearing (see Section.jsx for data-reveal) */
+
+/* Until the section comes into view, lines are undrawn and skills hidden. */
+:global([data-reveal='pending']) .line,
+:global([data-reveal='pending']) .glow {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+:global([data-reveal='pending']) .end,
+:global([data-reveal='pending']) .node,
+:global([data-reveal='pending']) .text > *,
+:global([data-reveal='pending']) .sourceRing,
+:global([data-reveal='pending']) .chevrons {
+  opacity: 0;
+}
+
+/*
+ * Then: the code circle lights, the trunk draws with the pulse running
+ * ahead of it, and each branch follows in turn, its circle and words
+ * appearing as the pulse arrives. Timings are from the moment the section
+ * comes into view; --i staggers the branches.
+ */
+:global([data-reveal='in']) .sourceRing,
+:global([data-reveal='in']) .chevrons {
+  animation: flow-light 500ms var(--ease-out) 150ms both;
+}
+
+:global([data-reveal='in']) .line,
+:global([data-reveal='in']) .glow {
+  stroke-dasharray: 1 1;
+  animation: flow-draw 450ms cubic-bezier(0.45, 0, 0.55, 1) 350ms both;
+}
+
+:global([data-reveal='in']) .pulse {
+  animation: flow-pulse 450ms cubic-bezier(0.45, 0, 0.55, 1) 350ms both;
+}
+
+:global([data-reveal='in']) .branchLines .line,
+:global([data-reveal='in']) .branchLines .glow {
+  animation: flow-draw 560ms cubic-bezier(0.3, 0, 0.3, 1) calc(760ms + var(--i) * 110ms) both;
+}
+
+:global([data-reveal='in']) .branchLines .pulse {
+  animation: flow-pulse 560ms cubic-bezier(0.3, 0, 0.3, 1) calc(760ms + var(--i) * 110ms) both;
+}
+
+:global([data-reveal='in']) .end {
+  animation: flow-light 300ms var(--ease-out) calc(1260ms + var(--i) * 110ms) both;
+}
+
+:global([data-reveal='in']) .node {
+  animation: flow-node 520ms var(--ease-out) calc(1280ms + var(--i) * 110ms) both;
+}
+
+:global([data-reveal='in']) .text > * {
+  animation: flow-text 600ms var(--ease-out) calc(1340ms + var(--i) * 110ms) both;
+}
+
+@keyframes flow-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
-@media (min-width: 64rem) {
-  .grid {
+@keyframes flow-pulse {
+  from {
+    stroke-dashoffset: 0.07;
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    stroke-dashoffset: -1;
+    opacity: 0;
+  }
+}
+
+@keyframes flow-light {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes flow-node {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+  60% {
+    box-shadow: 0 0 30px 2px color-mix(in srgb, var(--color-aqua) 45%, transparent);
+  }
+}
+
+@keyframes flow-text {
+  from {
+    opacity: 0;
+    translate: 0.75rem 0;
+  }
+}
+
+/* --------------------------------------------------------------- Tablets: side by side under the code circle */
+
+@media (min-width: 37.5rem) {
+  .source {
+    justify-self: center;
+  }
+
+  .branches {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-9); /* room for the line to run down and branch */
+  }
+
+  .branch {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-4);
+    padding-left: 0;
+  }
+
+  .text {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    min-width: 0;
+  }
+
+  .node {
+    justify-self: center;
+    width: 3.75rem;
+  }
+
+  .title,
+  .description,
+  .tags {
+    grid-column: auto;
+    align-self: auto;
+  }
+
+  @keyframes flow-text {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+}
+
+/* --------------------------------------------------------------- Wide screens: skills on the right */
+
+@media (min-width: 60rem) {
+  /* Wrapped as "Front-end first, / comfortable / across the stack.", leaving the lines room to branch. */
+  .section h2 {
+    max-width: 8.6em;
+  }
+
+  /* The intro, as narrow as in the reference, so the lower branch always curves clear of it. */
+  .section header > p:last-child {
+    max-width: 22.5rem;
+  }
+
+  .source {
+    order: 0;
+    justify-self: start;
+    grid-auto-flow: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin-block: var(--space-6);
+    margin-left: clamp(var(--space-6), 10vw, 9rem);
+  }
+
+  .chevrons {
+    flex-direction: row;
+  }
+
+  .chevrons span {
+    rotate: -45deg;
+  }
+
+  .sourceRing {
+    width: 4.5rem;
+  }
+
+  .sourceRing svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .branches {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(var(--space-6), 5vh, var(--space-8));
+    margin-top: 0;
+  }
+
+  .branch {
+    grid-template-columns: 4.25rem minmax(0, 1fr);
+    column-gap: var(--space-5);
+    align-items: center;
+  }
+
+  .node {
+    width: 4.25rem;
+  }
+
+  .node svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  @keyframes flow-text {
+    from {
+      opacity: 0;
+      translate: 0.75rem 0;
+    }
   }
 }

@@ -36,8 +36,8 @@ Vite prints a local URL, usually <http://localhost:5173>.
 
 All text on the site lives in [`src/content/content.js`](src/content/content.js),
 including what the characters say and the text on the monitor and laptop.
-Anything marked `PLACEHOLDER` there is stand-in copy waiting to be replaced
-(currently the skill descriptions in the Work section).
+Anything marked `PLACEHOLDER` there is stand-in content waiting to be
+replaced (currently only the résumé link, see below).
 
 The two résumé links point at `/resume.pdf`. Add the file as
 `public/resume.pdf`, or change the path in `content.js`.
@@ -71,8 +71,8 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 ## How the page loads
 
 1. **Intro.** `index.html` carries a small overlay with its styles inline:
-   the SP logo assembles from four pieces and gives a small pop, the lime dot
-   bounces in beside it with a few sparks, and a tiny duck reacts. It is all CSS, so it plays from the first frame
+   the SP logo assembles from four clean pieces (the S, then the P), the lime
+   dot drops in beside it with one soft glow, and a tiny duck hops in reply. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
 2. **Prerendered page.** `npm run build` renders the React app once and writes
    the result into `dist/index.html`, so the text is in the HTML for search

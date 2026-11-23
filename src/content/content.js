@@ -95,28 +95,28 @@ export const about = {
 export const skills = {
   eyebrow: 'What I do',
   title: 'Front-end first, comfortable across the stack.',
-  /* PLACEHOLDER descriptions: edit to match how you talk about your work. */
+  intro: 'I build user-focused products, connect front-ends to the right data, and use AI tooling to ship faster and smarter.',
   groups: [
     {
       id: 'front-end',
+      icon: 'layers',
       title: 'Front-end',
-      description:
-        'Interfaces that stay fast and understandable as they grow, built from components other developers enjoy working with.',
-      tags: ['React', 'Complex UI', 'Performance', 'Accessibility', 'Component architecture'],
+      description: 'Fast, accessible interfaces that scale and feel great to use.',
+      tags: ['React', 'Redux-Saga', 'Complex UI', 'Accessibility', 'Performance'],
     },
     {
       id: 'back-end',
+      icon: 'database',
       title: 'APIs and back-end',
-      description:
-        'The services behind the screen: designing endpoints, handling payments, and keeping search and data access quick.',
-      tags: ['Laravel', 'REST APIs', 'Billing flows', 'Elasticsearch', 'Caching'],
+      description: 'The services behind the UI: designing endpoints, integrating data, and keeping it reliable.',
+      tags: ['REST APIs', 'Laravel', 'Integrations', 'Data access', 'Caching'],
     },
     {
       id: 'ai-tooling',
+      icon: 'gear',
       title: 'AI and tooling',
-      description:
-        'Turning promising AI experiments into features that are reliable enough to ship, and using AI tools to build faster.',
-      tags: ['AI prototypes to production', 'AI-assisted development'],
+      description: 'Turning AI experiments into useful, reliable features and better workflows.',
+      tags: ['AI-assisted development', 'Prototyping', 'Developer workflows', 'AI features'],
     },
   ],
 }
