@@ -76,19 +76,49 @@ export const scene = {
 }
 
 export const about = {
-  eyebrow: 'About',
-  title: 'Hi, I’m Samantha.',
-  intro:
-    'I’ve spent five years building production interfaces. Lately I’ve been taking on more of the APIs and backend logic those interfaces depend on.',
-  actions: {
-    work: { label: 'See my work', href: '#work' },
-    contact: { label: 'Get in touch', href: '#contact' },
+  eyebrow: 'About me',
+  /* The highlight is shown in the accent colour. */
+  title: {
+    lead: 'Software engineer who turns complex problems into',
+    highlight: 'reliable, user-focused products.',
   },
+  intro:
+    'I’m a software engineer with 5+ years of experience building and shipping production features at scale. I enjoy solving real user problems, improving existing systems, and turning complex requirements into clean, maintainable solutions.',
   /* `icon` names one in components/ui/icons.jsx. */
-  points: [
-    { id: 'bring', icon: 'code', label: 'What I bring:', text: 'React and complex UI.' },
-    { id: 'toward', icon: 'layers', label: 'What I’m building toward:', text: 'end-to-end feature ownership.' },
-    { id: 'ai', icon: 'sparkles', label: 'How I use AI:', text: 'explore faster, review and test the result.' },
+  toolsLabel: 'Tools I use most',
+  tools: [
+    { label: 'React', icon: 'atom' },
+    { label: 'Redux-Saga', icon: 'cycle' },
+    { label: 'TypeScript', icon: 'code' },
+    { label: 'Node.js', icon: 'server' },
+    { label: 'AI-assisted', icon: 'sparkles' },
+  ],
+  statsLabel: 'At a glance',
+  stats: [
+    { id: 'years', icon: 'code', value: '5+', label: 'Years of experience' },
+    { id: 'features', icon: 'layers', value: '100+', label: 'Features shipped' },
+    { id: 'teams', icon: 'users', value: '3+', label: 'Cross-functional teams' },
+    { id: 'delivery', icon: 'trend', value: '95%+', label: 'Delivery on core projects' },
+  ],
+  notes: [
+    {
+      id: 'bring',
+      icon: 'target',
+      title: 'What I bring',
+      text: 'End-to-end delivery, a user-focused mindset, and a bias for practical solutions with real impact.',
+    },
+    {
+      id: 'growing',
+      icon: 'chart',
+      title: 'What I’m growing into',
+      text: 'Deeper system design, architecture and product thinking, with broader ownership of what I build.',
+    },
+    {
+      id: 'how',
+      icon: 'compass',
+      title: 'How I work',
+      text: 'Clear requirements, thoughtful iteration, and code that stays easy to change. AI tools speed up exploration; review and testing stay with me.',
+    },
   ],
 }
 

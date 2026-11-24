@@ -1,40 +1,60 @@
-import { Button, IconTile, Section } from '../../components/ui'
-import { ArrowRightIcon, ArrowUpRightIcon } from '../../components/ui/icons'
+import { Card, IconTile, Section, Tag } from '../../components/ui'
+import { Icon } from '../../components/ui/icons'
 import { about } from '../../content/content'
 import styles from './About.module.css'
 
-/** A short introduction beside three one-line answers a hiring manager looks for. */
+/**
+ * Who I am professionally: a headline with a short introduction and the
+ * tools I use most beside it, a row of numbers at a glance, and three
+ * short notes on what I bring, where I'm growing and how I work.
+ */
 export function About() {
-  const { work, contact } = about.actions
-
   return (
     <Section
       id="about"
-      split
       eyebrow={about.eyebrow}
-      title={about.title}
-      intro={about.intro}
-      actions={
+      title={
         <>
-          <Button href={work.href} iconEnd={<ArrowRightIcon />}>
-            {work.label}
-          </Button>
-          <Button href={contact.href} variant="ghost" iconEnd={<ArrowUpRightIcon />}>
-            {contact.label}
-          </Button>
+          {about.title.lead} <span className={styles.highlight}>{about.title.highlight}</span>
+        </>
+      }
+      aside={
+        <>
+          <p className={styles.intro}>{about.intro}</p>
+          <ul className={styles.tools} aria-label={about.toolsLabel}>
+            {about.tools.map((tool) => (
+              <Tag key={tool.label} className={styles.tool}>
+                <Icon name={tool.icon} width={15} height={15} />
+                {tool.label}
+              </Tag>
+            ))}
+          </ul>
         </>
       }
     >
-      <ul className={styles.points}>
-        {about.points.map((point, index) => (
-          <li key={point.id} className={styles.point} style={{ '--i': index + 1 }} data-rise>
-            <IconTile name={point.icon} tone="soft" />
-            <p className={styles.text}>
-              <strong className={styles.label}>{point.label}</strong> {point.text}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <div className={styles.stack}>
+        <dl className={styles.stats} aria-label={about.statsLabel} data-rise style={{ '--i': 1 }}>
+          {about.stats.map((stat) => (
+            <div key={stat.id} className={styles.stat}>
+              <Icon name={stat.icon} className={styles.statIcon} width={22} height={22} />
+              <dt className={styles.statLabel}>{stat.label}</dt>
+              <dd className={styles.statValue}>{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <ul className={styles.notes}>
+          {about.notes.map((note, index) => (
+            <Card as="li" key={note.id} className={styles.note} style={{ '--i': index + 2 }} data-rise>
+              <IconTile name={note.icon} tone="soft" size="sm" />
+              <div>
+                <h3 className={styles.noteTitle}>{note.title}</h3>
+                <p className={styles.noteText}>{note.text}</p>
+              </div>
+            </Card>
+          ))}
+        </ul>
+      </div>
     </Section>
   )
 }

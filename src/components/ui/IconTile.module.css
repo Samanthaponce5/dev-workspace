@@ -7,6 +7,12 @@
   border-radius: var(--radius-md);
 }
 
+.small {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+}
+
 .solid {
   background: var(--color-accent);
   color: var(--color-on-accent);

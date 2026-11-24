@@ -1,33 +1,168 @@
-.points {
-  display: grid;
+/* The end of the headline, in the LED teal. */
+.highlight {
+  color: var(--color-aqua);
 }
 
-.point {
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-  padding-block: var(--space-5);
-  border-bottom: 1px solid var(--color-border-strong);
-}
-
-.point:first-child {
-  padding-top: 0;
-}
-
-.point:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.text {
-  font-size: var(--text-lg);
-  line-height: 1.45;
-  color: var(--color-text);
+.intro {
+  max-width: 34rem;
+  font-size: var(--text-base);
+  line-height: 1.65;
+  color: var(--color-text-muted);
   text-wrap: pretty;
 }
 
-/* The label takes its own line, with the answer under it. */
-.label {
-  display: block;
-  font-weight: var(--weight-bold);
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.tool {
+  gap: var(--space-2);
+  padding-inline: var(--space-3);
+  color: var(--color-text);
+}
+
+.tool svg {
+  flex-shrink: 0;
+  color: var(--color-aqua);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/*
+ * The numbers: one panel, lit faintly from its top-left corner, split
+ * into cells by thin rules. Two by two on phones, one row from tablets up.
+ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-block: var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--color-aqua) 30%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 160% at 0% 0%, color-mix(in srgb, var(--color-aqua) 11%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--color-surface), var(--color-bg-raised));
+  box-shadow:
+    var(--shadow-card),
+    0 0 56px -30px color-mix(in srgb, var(--color-aqua) 70%, transparent);
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'icon value'
+    'icon label';
+  column-gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-3) var(--space-4);
+}
+
+.stat:nth-child(2n) {
+  border-left: 1px solid var(--color-border);
+}
+
+.stat:nth-child(n + 3) {
+  border-top: 1px solid var(--color-border);
+}
+
+.statIcon {
+  grid-area: icon;
+  margin-top: 0.35em;
+  color: var(--color-aqua);
+}
+
+.statValue {
+  grid-area: value;
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.statLabel {
+  grid-area: label;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-block: var(--space-5);
+  }
+
+  .stat {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'icon'
+      'value'
+      'label';
+    row-gap: var(--space-2);
+    padding: var(--space-1) clamp(var(--space-4), 2.5vw, var(--space-6));
+  }
+
+  .stat:nth-child(n + 3) {
+    border-top: 0;
+  }
+
+  .stat + .stat {
+    border-left: 1px solid var(--color-border);
+  }
+
+  .statIcon {
+    margin-top: 0;
+    margin-bottom: var(--space-1);
+  }
+
+  .statValue {
+    font-size: var(--text-2xl);
+  }
+
+  .statLabel {
+    font-size: var(--text-sm);
+  }
+}
+
+/* Three short notes, side by side on wide screens. */
+.notes {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.noteTitle {
+  margin-bottom: var(--space-1);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+.noteText {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}
+
+@media (min-width: 56rem) {
+  .notes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }

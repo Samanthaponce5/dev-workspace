@@ -63,3 +63,22 @@
     gap: clamp(var(--space-7), 6vw, var(--space-9));
   }
 }
+
+/* Aside: a short block beside the heading on wide screens, set off by a thin rule. */
+.lead {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 60rem) {
+  .lead {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(var(--space-6), 4vw, var(--space-8));
+  }
+
+  .aside {
+    padding-left: clamp(var(--space-5), 3vw, var(--space-7));
+    border-left: 1px solid var(--color-border);
+  }
+}

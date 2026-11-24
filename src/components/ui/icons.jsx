@@ -173,16 +173,92 @@ export function GitHubIcon(props) {
   )
 }
 
+/* People: teams and collaboration. */
+export function UsersIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <circle cx="7.5" cy="7" r="3" />
+      <path d="M2 16.5c0-3 2.4-5 5.5-5s5.5 2 5.5 5M13 4.2a3 3 0 0 1 0 5.6M15 11.8c1.9.6 3 2.3 3 4.7" />
+    </svg>
+  )
+}
+
+/* A rising line: progress and delivery. */
+export function TrendIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <path d="M2.5 14.5l5-5 3.5 3.5 6.5-6.5M12.5 6.5h5v5" />
+    </svg>
+  )
+}
+
+/* A target: focus on outcomes. */
+export function TargetIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <circle cx="10" cy="10" r="7.25" />
+      <circle cx="10" cy="10" r="3.75" />
+      <circle cx="10" cy="10" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/* Three rising bars: growth. */
+export function ChartIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <path d="M4.5 16.5V11.5M10 16.5V7.5M15.5 16.5V3.5" />
+    </svg>
+  )
+}
+
+/* A compass: how I find my way through work. */
+export function CompassIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <circle cx="10" cy="10" r="7.25" />
+      <path d="M13 7l-1.75 4.25L7 13l1.75-4.25L13 7z" />
+    </svg>
+  )
+}
+
+/* Two arrows chasing each other: side effects and data flow (Redux-Saga). */
+export function CycleIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <path d="M15.6 7.4A6 6 0 0 0 4.7 6.2M4.4 12.6a6 6 0 0 0 10.9 1.2M4.5 2.8v3.6h3.6M15.5 17.2v-3.6h-3.6" />
+    </svg>
+  )
+}
+
+/* A server: Node.js and the back end. */
+export function ServerIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <rect x="3" y="3.5" width="14" height="5.5" rx="1.5" />
+      <rect x="3" y="11" width="14" height="5.5" rx="1.5" />
+      <path d="M6.5 6.25h.01M6.5 13.75h.01" />
+    </svg>
+  )
+}
+
 const GLYPHS = {
   atom: AtomIcon,
+  chart: ChartIcon,
   code: CodeIcon,
+  compass: CompassIcon,
+  cycle: CycleIcon,
   database: DatabaseIcon,
   gear: GearIcon,
   github: GitHubIcon,
   layers: LayersIcon,
   linkedin: LinkedInIcon,
   mail: MailIcon,
+  server: ServerIcon,
   sparkles: SparklesIcon,
+  target: TargetIcon,
+  trend: TrendIcon,
+  users: UsersIcon,
 }
 
 /** Picks an icon by the name used for it in content.js. */
