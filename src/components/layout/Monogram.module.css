@@ -12,6 +12,14 @@
   text-decoration: none;
 }
 
+/* As tall as the font's capitals, so the logo keeps its size; the dot sits on the same baseline. */
+.letters {
+  display: block;
+  height: 0.71em;
+  width: auto;
+  overflow: visible;
+}
+
 .dot {
   width: 0.32em;
   height: 0.32em;

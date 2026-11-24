@@ -32,24 +32,6 @@ const centreOf = (rect) => ({ x: rect.left + rect.width / 2, y: rect.top + rect.
 
 let started = false
 
-/* The navbar logo's letters as drawn: the ink of the glyphs, not their line box. */
-function inkRect(span) {
-  const style = getComputedStyle(span)
-  const context = document.createElement('canvas').getContext('2d')
-  context.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
-  context.letterSpacing = style.letterSpacing
-  const metrics = context.measureText(span.textContent)
-  const box = span.getBoundingClientRect()
-  const contentHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
-  const baseline = box.top + (box.height - contentHeight) / 2 + metrics.fontBoundingBoxAscent
-  return {
-    left: box.left - metrics.actualBoundingBoxLeft,
-    top: baseline - metrics.actualBoundingBoxAscent,
-    width: metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight,
-    height: metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
-  }
-}
-
 const isOnScreen = (rect) => rect && rect.width > 1 && rect.left >= 0 && rect.top >= 0 && rect.left + rect.width <= window.innerWidth && rect.top + rect.height <= window.innerHeight
 
 /* A point on a quadratic curve. */
@@ -189,7 +171,7 @@ function play(overlay, toShelf) {
   overlay.dataset.state = 'revealing'
   const from = { letters: letters.getBoundingClientRect(), dot: dot.getBoundingClientRect(), duck: duck.getBoundingClientRect() }
   const to = {
-    letters: navLetters ? inkRect(navLetters) : from.letters,
+    letters: navLetters ? navLetters.getBoundingClientRect() : from.letters, // the letters' box is their ink (see logoShape.js)
     dot: navDot ? navDot.getBoundingClientRect() : from.dot,
   }
 

@@ -30,6 +30,7 @@
 import { spawn } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { LOGO_HEIGHT, LOGO_LETTERS, LOGO_PIECES, LOGO_WIDTH, STROKE, samplePiece } from '../src/components/layout/logoShape.js'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const url = process.argv[2] ?? 'http://localhost:5173/'
@@ -194,67 +195,14 @@ console.log('Wrote src/sections/Hero/scenePoster.json')
 // 2. The intro's pictures and proportions, embedded in index.html.
 const INTRO_SCALE = 5 // the duck is tiny on screen, so capture it enlarged
 
-/* Runs in the page. Draws the navbar logo's letters to a picture and measures how the dot sits beside them. */
-const MEASURE_LOGO = `(async () => {
-  const span = document.querySelector('[data-site-logo-letters]')
+/* Runs in the page. Measures how the navbar logo's dot sits beside its letters (whose box is their ink: see logoShape.js). */
+const MEASURE_LOGO = `(() => {
+  const ink = document.querySelector('[data-site-logo-letters]').getBoundingClientRect()
   const dot = document.querySelector('[data-site-logo-dot]').getBoundingClientRect()
-  const style = getComputedStyle(span)
-  const fontSize = parseFloat(style.fontSize)
-  const spacing = (parseFloat(style.letterSpacing) || 0) / fontSize
-  const font = (size) => style.fontStyle + ' ' + style.fontWeight + ' ' + size + 'px ' + style.fontFamily
-  await document.fonts.load(font(fontSize), span.textContent)
-
-  // Where the letters' ink is on the page (see inkRect in src/intro/reveal.js).
-  let context = document.createElement('canvas').getContext('2d')
-  context.font = font(fontSize)
-  context.letterSpacing = style.letterSpacing
-  let m = context.measureText(span.textContent)
-  const box = span.getBoundingClientRect()
-  const baseline = box.top + (box.height - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent
-  const ink = { left: box.left - m.actualBoundingBoxLeft, top: baseline - m.actualBoundingBoxAscent, width: m.actualBoundingBoxLeft + m.actualBoundingBoxRight, height: m.actualBoundingBoxAscent + m.actualBoundingBoxDescent }
-
-  // The same letters, drawn large and trimmed to their ink.
-  const SIZE = 128
-  const canvas = document.createElement('canvas')
-  context = canvas.getContext('2d')
-  context.font = font(SIZE)
-  context.letterSpacing = spacing * SIZE + 'px'
-  m = context.measureText(span.textContent)
-  canvas.width = Math.ceil(m.actualBoundingBoxLeft + m.actualBoundingBoxRight)
-  canvas.height = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
-  context = canvas.getContext('2d')
-  context.font = font(SIZE)
-  context.letterSpacing = spacing * SIZE + 'px'
-  context.fillStyle = style.color
-  context.fillText(span.textContent, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent)
-
-  // Where to cut the letters into pieces: the gap between S and P, and the right edge of the P's stem.
-  const { width: W, height: H } = canvas
-  const alpha = context.getImageData(0, 0, W, H).data
-  const inked = (x, y) => alpha[(y * W + x) * 4 + 3] > 24
-  const columnInk = (x) => { let sum = 0; for (let y = 0; y < H; y += 1) sum += inked(x, y) ? 1 : 0; return sum }
-  let gapLeft = Math.round(W * 0.5), gapRight = gapLeft, least = Infinity
-  for (let x = Math.round(W * 0.3); x < Math.round(W * 0.7); x += 1) {
-    const ink = columnInk(x)
-    if (ink < least) { least = ink; gapLeft = gapRight = x } else if (ink === least && x === gapRight + 1) gapRight = x
-  }
-  const stemRow = Math.round(H * 0.88)
-  let x = gapRight + 1
-  while (x < W && !inked(x, stemRow)) x += 1
-  const pLeft = x
-  while (x < W && inked(x, stemRow)) x += 1
-  const stemRight = x
-
-  return {
-    letters: { src: canvas.toDataURL('image/png'), width: W, height: H, gapLeft, gapRight, pLeft, stemRight },
-    // All relative to the height of the letters.
-    dotRatio: dot.width / ink.height,
-    gapRatio: (dot.left - (ink.left + ink.width)) / ink.height,
-    dropRatio: (ink.top + ink.height - dot.bottom) / ink.height,
-  }
+  // All relative to the height of the letters.
+  return { dotRatio: dot.width / ink.height, gapRatio: (dot.left - ink.right) / ink.height, dropRatio: (ink.bottom - dot.bottom) / ink.height }
 })()`
 
-/* Runs in the page. Hides everything in the scene except the duck, and reports where it is. */
 const ISOLATE_DUCK = `(() => {
   const { scene, getDuckRect } = window.__scene
   const duck = scene.getObjectByName('rubber-duck')
@@ -269,77 +217,50 @@ const round = (value) => Math.round(value * 10000) / 10000
 /*
  * The intro's letters as an SVG.
  *
- * Five pieces of the real letters come together: the S's top arc, middle
- * sweep and bottom arc, and the P's bowl (the loop, with the top of the
- * stem) and the short foot of its stem. Each piece is cut from the exact
- * logo (the picture of the letters, used as an alpha mask and filled with
- * the text colour), so its outer edges are the font's own and the
- * assembled word is the real logo, pixel for pixel. Where two pieces meet,
- * each ends in a smooth round cap as wide as the stroke; the caps overlap,
- * and since both show the same pixels of the same letter, the overlap is
- * invisible once they are home.
+ * The letters are the rounded, drawn SP of the navbar logo (see
+ * src/components/layout/logoShape.js), and five of its pieces come
+ * together: the S's top arc, middle sweep and bottom arc, the P's bowl and
+ * stem. Each piece is a stretch of the same centre line, drawn with the
+ * same round-ended stroke, so it keeps its shape all the way in and the
+ * pieces put together are the letters exactly.
  *
- * (The P used to be cut into its whole stem and its bowl, which left a
- * long bare bar floating on its own. It is now cut across the stem just
- * below the bowl, so both pieces read as parts of a P.)
- *
- * The S's cut points were traced from the Geist letters at the size this
- * script draws them (159 × 95) and are scaled if that size changes; the
- * P's are measured from the letters themselves.
- *
- * Motion: one movement for every piece. At first the word is shown a
- * little larger and turned back round its centre, already in its pieces;
- * then it winds forward, every piece gliding in along the same spiral
- * (a curve round the word's centre, closing in) and turning gently; once
- * they are square, each slides straight along its stroke into its
- * neighbour and eases to a stop: the S home first, the P just after.
- * Each piece's journey is sampled into its own keyframes, so the assembly
- * is one CSS timeline in viewBox units, the same at every size. Faint teal trails follow three
- * pieces and fade well before they land. As each letter's last piece
- * arrives, the whole letter takes over in a single frame (identical, so
- * nothing visibly changes), and the word gives one tiny, soft settle.
+ * Motion, after the storyboard: the pieces appear in a loose ring round
+ * the centre (the S's on the left, the P's on the right), each turned a
+ * little, with faint teal orbit lines round them. They swirl inward
+ * together, all the same way round, along curves (each closes in on the
+ * centre while it circles it), turning square as they come; then each
+ * slides straight along its stroke into its neighbour, so the round ends
+ * meet cleanly, and eases to a stop: the S home first, the P just after.
+ * Each journey is sampled into its own keyframes, so the assembly is one
+ * CSS timeline, in viewBox units, the same at every size. Short trails
+ * follow three pieces and fade early. As each letter's last piece lands,
+ * its whole line takes over in a single frame (identical, so nothing
+ * visibly changes), and the word gives one small, soft settle.
  */
-
-const TRACED = { width: 159, height: 95 }
 
 /*
- * Where the S is cut (traced units): straight across its stroke at the two
- * places it runs straight up and down, the left side of the upper curve
- * and the right side of the lower one. So its pieces are the top arc, the
- * middle sweep and the bottom arc, and each join slides straight together.
- * Each cut runs from the outside edge across the stroke at `y`, then round
- * through the counter (`via`) to clear the other parts of the letter.
+ * How each piece arrives: how far round the ring it starts from home
+ * (degrees; all the same way, so they swirl as one), how far it is turned
+ * at the start (degrees), how far apart from its neighbour along their
+ * shared stroke it starts its final slide (the stroke's direction where
+ * they meet, from logoShape.js), when it sets off and when it is home
+ * (ms), and whether a trail follows it.
  */
-const S_CUTS = {
-  upper: { joint: [12.5, 29], y: 29, via: [32, 32.5] }, // the left side of the upper curve; the top arc keeps its end (the terminal, down to y 31)
-  lower: { joint: [64, 65], y: 65, via: [42, 58] }, // the right side of the lower curve; the bottom arc keeps its end (the terminal, up from y 61)
+const ARRIVALS = {
+  's-top': { swirl: 41, turn: -12, apart: [-10.3, -19.4], delay: 0, home: 800, trail: true },
+  's-middle': { swirl: 18, turn: 22, apart: [0, 0], delay: 20, home: 780 },
+  's-bottom': { swirl: 9, turn: -14, apart: [9.5, 19.8], delay: 40, home: 820, trail: true },
+  'p-bowl': { swirl: 13, turn: -10, apart: [20, 0], delay: 30, home: 930, trail: true },
+  'p-stem': { swirl: 55, turn: 14, apart: [0, 0], delay: 60, home: 950 },
 }
-const S_JOINT_RADIUS = 11.8 // a touch over half the S's stroke there (23), so a cap spans it, soft edges and all
-const P_STEM_CUT = 0.695 // where the P's stem is cut, as a share of the letters' height: just below the bowl
-
-/*
- * The pieces: the point each turns about (traced units), how far it also
- * starts from its neighbour along the stroke they share (traced units, so
- * no two pieces touch at first, and the last of the way in is a straight
- * slide down the stroke: the ends meet cleanly, never askew), when it sets
- * off and when it is home (ms), and whether a trail follows it. The S's
- * pieces land first; the P's take a little longer, so they are still
- * closing in as the S joins up.
- */
-const PIECES = [
-  { name: 's-upper', pivot: [36, 15], apart: [0, -24], delay: 0, home: 820, trail: true }, // up, off the middle sweep
-  { name: 's-spine', pivot: [38, 46], apart: [0, 0], delay: 20, home: 800 },
-  { name: 's-lower', pivot: [40, 79], apart: [0, 24], delay: 40, home: 840, trail: true }, // down, off the middle sweep
-  { name: 'p-bowl', pivot: [122, 31], apart: [0, -7], delay: 30, home: 930, trail: true },
-  { name: 'p-stem', pivot: [97, 80], apart: [0, 21], delay: 60, home: 950 }, // down the stem, away from the bowl
-]
-const SETTLED = 0.62 // the share of each journey by which the swirl and turn are done...
-const SLIDE = 0.3 // ...and the share before the straight slide begins, so the ends only meet once the pieces are square
-const WIND = 34 // how far back round the word's centre the pieces start (degrees)
-const SPREAD = 1.28 // how much further out from the centre they start
-const LEAN = 0.4 // how much of the wind each piece also turns on its own
+const RING = 0.92 // how far out the pieces start (their middles, from the word's centre), as a share of the letters' height
+const SETTLED = 0.74 // the share of each journey by which the swirl and turn are done...
+const SLIDE = 0.36 // ...and the share before the straight slide begins, so the ends only meet once the pieces are square
 const APPEAR_MS = 200
 const SAMPLES = 32
+/* The faint orbit lines: arcs of a ring round the pieces (degrees, clockwise from 3 o'clock), each with a bright end. */
+const ORBITS = [[198, 250], [290, 336], [24, 74]]
+const ORBIT_RING = [1.28, 1.06] // the ring's radii, as shares of the letters' height
 
 /* A cubic-bezier() easing, solved for x. */
 function bezierEasing(x1, y1, x2, y2) {
@@ -355,8 +276,8 @@ function bezierEasing(x1, y1, x2, y2) {
     return coord(y1, y2, (lo + hi) / 2)
   }
 }
-const glide = bezierEasing(0.55, 0.05, 0.35, 1) // almost still as the pieces appear, a smooth glide, then a long gentle stop
-const swirl = bezierEasing(0.5, 0.05, 0.3, 1)
+const glide = bezierEasing(0.55, 0.05, 0.35, 1) // the slide: smooth, then a long gentle stop
+const swirl = bezierEasing(0.42, 0.05, 0.32, 1) // the swirl in
 
 /* A smooth path through points (Catmull-Rom, written as cubic Béziers). */
 function smoothPath(points, f) {
@@ -370,99 +291,76 @@ function smoothPath(points, f) {
   return d
 }
 
-function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, pLeft, stemRight }) {
+function lettersSvg() {
+  const [W, H] = [LOGO_WIDTH, LOGO_HEIGHT]
   const f = (value) => Math.round(value * 100) / 100
-  const split = (gapLeft + gapRight + 1) / 2
-  const sx = W / TRACED.width
-  const sy = H / TRACED.height
-  const at = ([x, y]) => [x * sx, y * sy]
-
-  // Each piece's region: a polygon (its share of the letter, bounded by cuts that run through the
-  // counters or straight across a stroke), plus a round cap at each joint it has.
-  const j1 = at(S_CUTS.upper.joint)
-  const j2 = at(S_CUTS.lower.joint)
-  const top = -2
-  const bottom = H + 2
-  const right = W + 2
-  const sCap = S_JOINT_RADIUS * sy
-  const [upperY, lowerY] = [S_CUTS.upper.y * sy, S_CUTS.lower.y * sy]
-  const [upperVia, lowerVia] = [at(S_CUTS.upper.via), at(S_CUTS.lower.via)]
-  const stemJoint = [(pLeft + stemRight) / 2, P_STEM_CUT * H]
-  const stemCap = (stemRight - pLeft) / 2 + 0.3 // just wider than the stem, soft edges included
-  const regions = {
-    's-upper': { polygon: [[-2, top], [split, top], [split, upperVia[1]], upperVia, [upperVia[0], upperY], [-2, upperY]], caps: [j1], radius: sCap },
-    's-spine': { polygon: [[-2, upperY], [upperVia[0], upperY], upperVia, [split, upperVia[1]], [split, lowerY], [lowerVia[0], lowerY], lowerVia, [-2, lowerVia[1]]], caps: [j1, j2], radius: sCap },
-    's-lower': { polygon: [[-2, lowerVia[1]], lowerVia, [lowerVia[0], lowerY], [split, lowerY], [split, bottom], [-2, bottom]], caps: [j2], radius: sCap },
-    'p-bowl': { polygon: [[split, top], [right, top], [right, stemJoint[1]], [split, stemJoint[1]]], caps: [stemJoint], radius: stemCap },
-    'p-stem': { polygon: [[split, stemJoint[1]], [right, stemJoint[1]], [right, bottom], [split, bottom]], caps: [stemJoint], radius: stemCap },
-    // The whole letters, for the hand-over.
-    s: { polygon: [[-2, top], [split, top], [split, bottom], [-2, bottom]], caps: [] },
-    p: { polygon: [[split, top], [right, top], [right, bottom], [split, bottom]], caps: [] },
-  }
-  const clips = Object.entries(regions)
-    .map(([name, { polygon, caps, radius }]) => {
-      const shape = `<polygon points="${polygon.map(([x, y]) => `${f(x)},${f(y)}`).join(' ')}"/>`
-      const discs = caps.map(([x, y]) => `<circle cx="${f(x)}" cy="${f(y)}" r="${f(radius)}"/>`).join('')
-      return `<clipPath id="intro-cut-${name}">${shape}${discs}</clipPath>`
-    })
-    .join('')
-
-  const letters = `width="${W}" height="${H}" fill="currentColor" mask="url(#intro-sp)"`
   const centre = [W / 2, H / 2]
-  const letterOf = (name) => name[0]
-  const homeOf = (letter) => Math.max(...PIECES.filter((piece) => letterOf(piece.name) === letter).map((piece) => piece.home))
+  const homeOf = (letter) => Math.max(...LOGO_PIECES.filter((piece) => piece.letter === letter).map((piece) => ARRIVALS[piece.name].home))
   const styles = []
   const trails = []
 
-  const pieces = PIECES.map(({ name, pivot, apart, delay, home, trail }) => {
-    const [px, py] = at(pivot)
+  const pieces = LOGO_PIECES.map(({ name, letter, segments, d }) => {
+    const { swirl: around, turn, apart, delay, home, trail } = ARRIVALS[name]
     const travel = home - delay
-    // Where the pivot is: wound back round the word's centre and spread out (easing to nothing by
-    // w = 1), and slid apart along its stroke (easing to nothing by a = 1).
-    const place = (w, a) => {
-      const angle = (-WIND * (1 - w) * Math.PI) / 180
-      const scale = 1 + (SPREAD - 1) * (1 - w)
-      const [dx, dy] = [px - centre[0], py - centre[1]]
-      const wound = [centre[0] + scale * (dx * Math.cos(angle) - dy * Math.sin(angle)) - px, centre[1] + scale * (dx * Math.sin(angle) + dy * Math.cos(angle)) - py]
-      return [wound[0] + apart[0] * sx * (1 - a), wound[1] + apart[1] * sy * (1 - a)]
+    const points = samplePiece(segments)
+    const [px, py] = points.reduce(([x, y], [qx, qy]) => [x + qx / points.length, y + qy / points.length], [0, 0])
+    const marker = points[Math.floor(points.length / 2)] // a point on the stroke, for the trail to follow
+    const homeAngle = Math.atan2(py - centre[1], px - centre[0])
+    const homeRadius = Math.hypot(px - centre[0], py - centre[1])
+
+    // Where the piece is: swung round the centre and out on the ring (easing to nothing by w = 1),
+    // turned (likewise), and slid apart along its stroke (easing to nothing by a = 1).
+    const offsetAt = (w, a) => {
+      const angle = homeAngle + ((around * Math.PI) / 180) * (1 - w)
+      const radius = homeRadius + (RING * H - homeRadius) * (1 - w)
+      return [centre[0] + radius * Math.cos(angle) - px + apart[0] * (1 - a), centre[1] + radius * Math.sin(angle) - py + apart[1] * (1 - a)]
     }
     const frames = []
-    const trailFrames = []
     const route = []
     for (let i = 0; i <= SAMPLES; i += 1) {
       const t = i / SAMPLES
-      const e = glide(Math.max(0, (t - SLIDE) / (1 - SLIDE)))
       const w = swirl(Math.min(1, t / SETTLED))
-      const [x, y] = place(w, e)
-      const key = `${f(t * 100)}%`
-      frames.push(`${key}{transform:translate(${f(x)}px,${f(y)}px) rotate(${f(-WIND * LEAN * (1 - w))}deg)}`)
-      route.push([px + x, py + y])
+      const a = glide(Math.max(0, (t - SLIDE) / (1 - SLIDE)))
+      const [x, y] = offsetAt(w, a)
+      const angle = turn * (1 - w)
+      frames.push(`${f(t * 100)}%{transform:translate(${f(x)}px,${f(y)}px) rotate(${f(angle)}deg)}`)
+      const radians = (angle * Math.PI) / 180
+      const [mx, my] = [marker[0] - px, marker[1] - py]
+      route.push([px + x + mx * Math.cos(radians) - my * Math.sin(radians), py + y + mx * Math.sin(radians) + my * Math.cos(radians)])
     }
-    // The trail's bright end keeps pace with the piece (by distance along its route); it is faint, and
-    // gone by the time the piece is most of the way home.
-    const lengths = route.map((point, i) => (i === 0 ? 0 : Math.hypot(point[0] - route[i - 1][0], point[1] - route[i - 1][1])))
-    const total = lengths.reduce((sum, length) => sum + length, 0)
-    let travelled = 0
-    route.forEach((_, i) => {
-      travelled += lengths[i]
-      const along = travelled / total
-      const fade = Math.min(1, along / 0.1) * Math.max(0, 1 - along / 0.7)
-      trailFrames.push(`${f((i / SAMPLES) * 100)}%{stroke-dashoffset:${f(0.34 - along)};opacity:${f(fade)}}`)
-    })
     styles.push(`@keyframes intro-path-${name}{${frames.join('')}}`)
+
     if (trail) {
+      // The trail's bright end keeps pace with the piece (by distance along its route); it is faint,
+      // and gone by the time the piece is most of the way home.
+      const lengths = route.map((point, i) => (i === 0 ? 0 : Math.hypot(point[0] - route[i - 1][0], point[1] - route[i - 1][1])))
+      const total = lengths.reduce((sum, length) => sum + length, 0)
+      let travelled = 0
+      const trailFrames = route.map((_, i) => {
+        travelled += lengths[i]
+        const along = travelled / total
+        const fade = Math.min(1, along / 0.1) * Math.max(0, 1 - along / 0.7)
+        return `${f((i / SAMPLES) * 100)}%{stroke-dashoffset:${f(0.34 - along)};opacity:${f(fade)}}`
+      })
       styles.push(`@keyframes intro-trail-${name}{${trailFrames.join('')}}`)
       trails.push(`<path class="intro-swirl-trail" pathLength="1" d="${smoothPath(route.filter((_, i) => i % 2 === 0 || i === SAMPLES), f)}" style="animation:intro-trail-${name} ${travel}ms linear ${delay}ms both"/>`)
     }
-    const handOver = homeOf(letterOf(name))
-    return `<g class="intro-piece" style="transform-origin:${f(px)}px ${f(py)}px;animation:intro-path-${name} ${travel}ms linear ${delay}ms both,intro-appear ${APPEAR_MS}ms ease-out both,intro-hand-over 1ms linear ${handOver}ms forwards"><rect ${letters} clip-path="url(#intro-cut-${name})"/></g>`
+    return `<path class="intro-piece" d="${d}" style="transform-origin:${f(px)}px ${f(py)}px;animation:intro-path-${name} ${travel}ms linear ${delay}ms both,intro-appear ${APPEAR_MS}ms ease-out both,intro-hand-over 1ms linear ${homeOf(letter)}ms forwards"/>`
   }).join('')
 
-  const wholes = ['s', 'p'].map((letter) => `<rect class="intro-whole" style="animation:intro-hand-over 1ms linear ${homeOf(letter)}ms reverse forwards" ${letters} clip-path="url(#intro-cut-${letter})"/>`).join('')
+  const wholes = ['s', 'p'].map((letter) => `<path class="intro-whole" d="${LOGO_LETTERS[letter]}" style="animation:intro-hand-over 1ms linear ${homeOf(letter)}ms reverse forwards"/>`).join('')
   const done = Math.max(homeOf('s'), homeOf('p'))
-  const word = `<g class="intro-word" style="animation:intro-settle 300ms cubic-bezier(0.3, 0, 0.3, 1) ${done - 30}ms">${pieces}${wholes}</g>`
+  const word = `<g class="intro-word" fill="none" stroke="currentColor" stroke-width="${STROKE}" stroke-linecap="round" stroke-linejoin="round" style="animation:intro-settle 300ms cubic-bezier(0.3, 0, 0.3, 1) ${done - 30}ms">${pieces}${wholes}</g>`
 
-  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><style>${styles.join('')}</style><defs><mask id="intro-sp" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}" style="mask-type:alpha"><image href="${src}" width="${W}" height="${H}"/></mask>${clips}</defs>${trails.join('')}${word}</svg>`
+  const [rx, ry] = ORBIT_RING.map((share) => share * H)
+  const onRing = (degrees) => [centre[0] + rx * Math.cos((degrees * Math.PI) / 180), centre[1] + ry * Math.sin((degrees * Math.PI) / 180)]
+  const orbits = ORBITS.map(([from, to]) => {
+    const [[x0, y0], [x1, y1]] = [onRing(from), onRing(to)]
+    return `<path d="M${f(x0)} ${f(y0)}A${f(rx)} ${f(ry)} 0 0 1 ${f(x1)} ${f(y1)}"/><circle cx="${f(x0)}" cy="${f(y0)}" r="1.6"/>`
+  }).join('')
+  const orbit = `<g class="intro-orbits" style="transform-origin:${f(centre[0])}px ${f(centre[1])}px">${orbits}</g>`
+
+  return `<svg class="intro-letters" data-intro-letters viewBox="0 0 ${f(W)} ${H}" width="${f(W)}" height="${H}"><style>${styles.join('')}</style>${orbit}${trails.join('')}${word}</svg>`
 }
 
 {
@@ -476,11 +374,11 @@ function lettersSvg({ src, width: W, height: H, gapLeft, gapRight, pLeft, stemRi
 
   const htmlPath = `${root}index.html`
   const html = readFileSync(htmlPath, 'utf8')
-    .replace(/<!-- intro-letters -->.*?<!-- \/intro-letters -->/s, () => `<!-- intro-letters -->${lettersSvg(logo.letters)}<!-- /intro-letters -->`)
+    .replace(/<!-- intro-letters -->.*?<!-- \/intro-letters -->/s, () => `<!-- intro-letters -->${lettersSvg()}<!-- /intro-letters -->`)
     .replace(/(<img class="intro-duck" data-intro-duck )src="[^"]*" width="\d+" height="\d+"/, `$1src="data:image/webp;base64,${webp}" width="${box.width}" height="${box.height}"`)
     .replace(/\/\* intro-geometry \*\/.*?\/\* \/intro-geometry \*\//, `/* intro-geometry */ --dot-ratio: ${round(logo.dotRatio)}; --gap-ratio: ${round(logo.gapRatio)}; --drop-ratio: ${round(logo.dropRatio)}; /* /intro-geometry */`)
   writeFileSync(htmlPath, html)
-  console.log(`index.html: letters ${logo.letters.width}x${logo.letters.height}px, duck ${box.width}x${box.height}px (${(Buffer.from(webp, 'base64').length / 1024).toFixed(1)} kB), dot ${round(logo.dotRatio)} / gap ${round(logo.gapRatio)} / drop ${round(logo.dropRatio)}`)
+  console.log(`index.html: letters ${LOGO_WIDTH}x${LOGO_HEIGHT}, duck ${box.width}x${box.height}px (${(Buffer.from(webp, 'base64').length / 1024).toFixed(1)} kB), dot ${round(logo.dotRatio)} / gap ${round(logo.gapRatio)} / drop ${round(logo.dropRatio)}`)
 }
 
 socket.close()

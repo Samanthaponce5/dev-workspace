@@ -71,11 +71,12 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 ## How the page loads
 
 1. **Intro.** `index.html` carries a small overlay with its styles inline:
-   five pieces cut from the real SP letters (the S's top arc, middle sweep
-   and bottom arc; the P's bowl and the foot of its stem), with rounded
-   joins so they never change shape, wind in together on one spiral, then
-   slide straight together along their strokes, S first and then P, with one
-   soft settle. The
+   five rounded pieces of the SP logo (the S's top arc, middle sweep and
+   bottom arc; the P's bowl and stem) start in a loose ring with faint orbit
+   lines, swirl in together, then slide straight together along their
+   strokes, S first and then P, with one soft settle. The letters are drawn
+   lines, defined once in `src/components/layout/logoShape.js` and shared
+   with the navbar logo, so the intro lands on exactly the same shapes. The
    lime dot lands beside them with one soft glow and a few sparks, and a
    tiny duck hops in reply. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
