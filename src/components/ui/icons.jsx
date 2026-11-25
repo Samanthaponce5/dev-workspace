@@ -173,6 +173,15 @@ export function GitHubIcon(props) {
   )
 }
 
+/* A lab flask: testing. */
+export function FlaskIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <path d="M8 2.5h4M8.5 2.5v5L3.8 15.4A1.4 1.4 0 0 0 5 17.5h10a1.4 1.4 0 0 0 1.2-2.1L11.5 7.5v-5M6 12.5h8" />
+    </svg>
+  )
+}
+
 /* A target: focus on outcomes. */
 export function TargetIcon(props) {
   return (
@@ -228,6 +237,7 @@ const GLYPHS = {
   chart: ChartIcon,
   code: CodeIcon,
   compass: CompassIcon,
+  flask: FlaskIcon,
   cycle: CycleIcon,
   database: DatabaseIcon,
   gear: GearIcon,

@@ -89,7 +89,7 @@ export const about = {
   tools: [
     { label: 'React', icon: 'atom' },
     { label: 'Redux-Saga', icon: 'cycle' },
-    { label: 'TypeScript', icon: 'code' },
+    { label: 'Jest', icon: 'flask' },
     { label: 'Node.js', icon: 'server' },
     { label: 'AI-assisted', icon: 'sparkles' },
   ],
