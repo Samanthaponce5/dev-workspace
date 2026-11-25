@@ -205,7 +205,7 @@ const ready = await site.evaluate(`(async () => {
   return true
 })()`)
 if (!ready) throw new Error(`The home page never finished loading at ${url}. Is the site being served (npm run build && npm run preview)?`)
-await sleep(2500) // the page's rise-in and the scene's first moments
+await sleep(9000) // the page's rise-in, and the duck's hello has come and gone, so no speech bubble is caught mid-fade
 // The floating Display settings button is a control, not part of the view: leave it out of the picture.
 await site.evaluate(`document.querySelectorAll('button[aria-haspopup="dialog"]').forEach((button) => (button.style.visibility = 'hidden'))`)
 await sleep(100)

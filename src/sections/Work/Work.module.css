@@ -11,7 +11,7 @@
   --ring: color-mix(in srgb, var(--color-accent) 55%, transparent);
   --ring-glow: color-mix(in srgb, var(--color-aqua) 22%, transparent);
   --wire: color-mix(in srgb, var(--color-accent) 72%, transparent);
-  --lime: var(--color-lime);
+  --mint: var(--color-accent); /* the theme's mint (deep teal in Light), like the logo's dot */
 }
 
 /* --------------------------------------------------------------- The code circle */
@@ -46,7 +46,7 @@
     color var(--duration-base) var(--ease-out);
 }
 
-/* Three small lime chevrons leading into the code circle: pointing down above it, or across beside it on wide screens. */
+/* Three small mint chevrons leading into the code circle: pointing down above it, or across beside it on wide screens. */
 .chevrons {
   display: flex;
   flex-direction: column;
@@ -57,8 +57,8 @@
 .chevrons span {
   width: 0.55rem;
   height: 0.55rem;
-  border-right: 2px solid var(--lime);
-  border-bottom: 2px solid var(--lime);
+  border-right: 2px solid var(--mint);
+  border-bottom: 2px solid var(--mint);
   rotate: 45deg;
   opacity: 0.85;
 }
@@ -101,7 +101,7 @@
 
 /* The pulse: a short bright dash that runs the line once. */
 .pulse {
-  stroke: var(--lime);
+  stroke: var(--mint);
   stroke-width: 2.5;
   stroke-dasharray: 0.07 2;
   stroke-dashoffset: 0.07;
@@ -109,8 +109,8 @@
 }
 
 .end {
-  fill: var(--lime);
-  stroke: color-mix(in srgb, var(--lime) 35%, transparent);
+  fill: var(--mint);
+  stroke: color-mix(in srgb, var(--mint) 35%, transparent);
   stroke-width: 4;
   paint-order: stroke;
 }
@@ -222,8 +222,8 @@
 
 /*
  * Then: the code circle lights, the trunk draws with the pulse running
- * ahead of it, and each branch follows in turn, its circle and words
- * appearing as the pulse arrives. Timings are from the moment the section
+ * along it, and each branch follows in turn as the trunk reaches it, its
+ * circle and words appearing as its line arrives. Timings are from the moment the section
  * comes into view; --i staggers the branches.
  */
 :global([data-reveal='in']) .sourceRing,
@@ -234,7 +234,7 @@
 :global([data-reveal='in']) .line,
 :global([data-reveal='in']) .glow {
   stroke-dasharray: 1 1;
-  animation: flow-draw 450ms cubic-bezier(0.45, 0, 0.55, 1) 350ms both;
+  animation: flow-draw 240ms cubic-bezier(0.45, 0, 0.55, 1) 350ms both;
 }
 
 :global([data-reveal='in']) .pulse {
@@ -243,23 +243,23 @@
 
 :global([data-reveal='in']) .branchLines .line,
 :global([data-reveal='in']) .branchLines .glow {
-  animation: flow-draw 560ms cubic-bezier(0.3, 0, 0.3, 1) calc(760ms + var(--i) * 110ms) both;
+  animation: flow-draw 300ms cubic-bezier(0.3, 0, 0.3, 1) calc(550ms + var(--i) * 90ms) both;
 }
 
 :global([data-reveal='in']) .branchLines .pulse {
-  animation: flow-pulse 560ms cubic-bezier(0.3, 0, 0.3, 1) calc(760ms + var(--i) * 110ms) both;
+  animation: flow-pulse 560ms cubic-bezier(0.3, 0, 0.3, 1) calc(550ms + var(--i) * 90ms) both;
 }
 
 :global([data-reveal='in']) .end {
-  animation: flow-light 300ms var(--ease-out) calc(1260ms + var(--i) * 110ms) both;
+  animation: flow-light 300ms var(--ease-out) calc(850ms + var(--i) * 90ms) both;
 }
 
 :global([data-reveal='in']) .node {
-  animation: flow-node 520ms var(--ease-out) calc(1280ms + var(--i) * 110ms) both;
+  animation: flow-node 520ms var(--ease-out) calc(860ms + var(--i) * 90ms) both;
 }
 
 :global([data-reveal='in']) .text > * {
-  animation: flow-text 600ms var(--ease-out) calc(1340ms + var(--i) * 110ms) both;
+  animation: flow-text 600ms var(--ease-out) calc(920ms + var(--i) * 90ms) both;
 }
 
 @keyframes flow-draw {

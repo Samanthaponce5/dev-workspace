@@ -75,6 +75,32 @@
   display: none;
 }
 
+/*
+ * The core tools, as small pills under the tagline: on phones too, since
+ * this is the only place they're listed. Sized in their own em, so the
+ * rows scale with the text size: three rows of two on phones, two rows of
+ * three from tablets up.
+ */
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-width: 22em;
+  margin-top: var(--space-4);
+  font-size: var(--text-xs);
+}
+
+.tool {
+  gap: var(--space-2);
+  padding-inline: var(--space-3);
+  color: var(--color-text);
+}
+
+.tool svg {
+  flex-shrink: 0;
+  color: var(--color-aqua);
+}
+
 .actions {
   margin-top: var(--space-5);
 }
@@ -104,6 +130,11 @@
   .role {
     max-width: none;
     font-weight: var(--weight-bold);
+  }
+
+  .tools {
+    max-width: 30em;
+    margin-top: var(--space-5);
   }
 
   .actions {

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import { Button, Container } from '../../components/ui'
-import { ArrowRightIcon } from '../../components/ui/icons'
+import { Button, Container, Tag } from '../../components/ui'
+import { ArrowRightIcon, Icon } from '../../components/ui/icons'
 import { hero } from '../../content/content'
 import { HeroScene } from './HeroScene'
 import styles from './Hero.module.css'
@@ -33,6 +33,15 @@ export function Hero() {
           <p className={styles.role}>{hero.role}</p>
 
           <p className={styles.tagline}>{hero.tagline}</p>
+
+          <ul className={styles.tools} aria-label={hero.toolsLabel}>
+            {hero.tools.map((tool) => (
+              <Tag key={tool.label} className={styles.tool}>
+                <Icon name={tool.icon} width={15} height={15} />
+                {tool.label}
+              </Tag>
+            ))}
+          </ul>
 
           <div className={styles.actions}>
             <Button href={hero.primaryAction.href} iconEnd={<ArrowRightIcon className={styles.arrow} />}>

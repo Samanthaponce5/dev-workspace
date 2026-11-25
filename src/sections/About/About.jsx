@@ -1,5 +1,4 @@
-import { Card, IconTile, Section, Tag } from '../../components/ui'
-import { Icon } from '../../components/ui/icons'
+import { Card, IconTile, Section } from '../../components/ui'
 import { about } from '../../content/content'
 import { useCountUp } from '../../hooks/useCountUp'
 import { useInView } from '../../hooks/useInView'
@@ -48,9 +47,9 @@ function Highlight({ stat, index, start, reduced }) {
 }
 
 /**
- * Who I am professionally: a headline with a short introduction and the
- * tools I use most beside it, three highlights at a glance, and three
- * short notes on what I bring, where I'm growing and how I work.
+ * Who I am professionally: a headline with a short introduction beside
+ * it, three highlights at a glance, and three short notes on what I
+ * bring, where I'm growing and how I work.
  */
 export function About() {
   const [statsRef, statsSeen] = useInView({ once: true, threshold: 0.4 })
@@ -71,19 +70,7 @@ export function About() {
           {about.title.lead} <span className={styles.highlight}>{about.title.highlight}</span>
         </>
       }
-      aside={
-        <>
-          <p className={styles.intro}>{about.intro}</p>
-          <ul className={styles.tools} aria-label={about.toolsLabel}>
-            {about.tools.map((tool) => (
-              <Tag key={tool.label} className={styles.tool}>
-                <Icon name={tool.icon} width={15} height={15} />
-                {tool.label}
-              </Tag>
-            ))}
-          </ul>
-        </>
-      }
+      aside={<p className={styles.intro}>{about.intro}</p>}
     >
       <div className={styles.stack}>
         <dl ref={statsRef} className={styles.stats} aria-label={about.statsLabel} data-phase={phase}>

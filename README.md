@@ -81,6 +81,9 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
    accent dot lands beside them with one soft glow and a few sparks, and a
    tiny duck hops in reply. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
+   A small inline script plays it at 1.2x the speed its keyframes are
+   written at, and skips it entirely when the page opens at a section's
+   address (see below): the intro is for the home page only.
 2. **Prerendered page.** `npm run build` renders the React app once and writes
    the result into `dist/index.html`, so the text is in the HTML for search
    engines, link previews and visitors without JavaScript. React then attaches
@@ -97,6 +100,16 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
 If WebGL is missing, the device is low-powered, or the scene takes unusually
 long, the reveal goes ahead with a still image of the scene in the same place.
 A scene that arrives late fades in over the image without moving anything.
+
+### Section addresses
+
+The sections have their own addresses: `/work`, `/about`, `/experience` and
+`/contact`, with no `#` in them. It is still one page: following a link to one
+scrolls there without a reload (`src/hooks/useSectionRoutes.js`), the back
+and forward buttons move between them, and opening one directly starts at
+that section, without the intro. The address also follows the scroll (without
+adding to the history), so a reload comes back to the same spot. [`vercel.json`](vercel.json) serves the page
+at each address; another host needs the same rewrite.
 
 Rendering pauses when the hero is off screen or the tab is hidden. Visitors
 who prefer reduced motion get the logo already in place, a quick fade

@@ -1,4 +1,5 @@
 {
+  "rewrites": [{ "source": "/(work|about|experience|contact)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/assets/(.*)",

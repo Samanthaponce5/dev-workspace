@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Samantha Ponce · Software Engineer</title>
+    <title>Samantha Ponce · Front-End Software Engineer</title>
     <meta
       name="description"
-      content="Samantha Ponce is a software engineer in New York with five years of production React: data-heavy interfaces, major upgrades and the APIs behind them."
+      content="Samantha Ponce is a front-end software engineer in New York with five years of production React: data-heavy interfaces, major upgrades and the APIs behind them."
     />
     <meta name="theme-color" content="#0b1721" />
 
@@ -27,17 +27,17 @@
     -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Samantha Ponce" />
-    <meta property="og:title" content="Samantha Ponce · Software Engineer" />
+    <meta property="og:title" content="Samantha Ponce · Front-End Software Engineer" />
     <meta
       property="og:description"
-      content="Software engineer with five years of production React: data-heavy interfaces, major upgrades and the APIs behind them. Come say hi at my tiny 3D desk."
+      content="Front-end software engineer with five years of production React: data-heavy interfaces, major upgrades and the APIs behind them. Come say hi at my tiny 3D desk."
     />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Samantha Ponce · Software Engineer" />
+    <meta name="twitter:title" content="Samantha Ponce · Front-End Software Engineer" />
     <meta
       name="twitter:description"
-      content="Software engineer with five years of production React: data-heavy interfaces, major upgrades and the APIs behind them. Come say hi at my tiny 3D desk."
+      content="Front-end software engineer with five years of production React: data-heavy interfaces, major upgrades and the APIs behind them. Come say hi at my tiny 3D desk."
     />
 
     <!--
@@ -56,6 +56,16 @@
         if (saved && saved.motion === 'reduced') root.dataset.motion = 'reduced'
       } catch (error) {
         /* No storage, or nothing usable in it: the defaults apply. */
+      }
+
+      /*
+        The intro plays only on the home page. Opened at a section's address
+        (/work, /contact...), the page shows straight away and scrolls there.
+        Keep the test in step with sectionOf() in src/utils/routes.js.
+      */
+      if (!/^\/(index\.html)?$/.test(location.pathname)) {
+        document.documentElement.classList.remove('intro-pending')
+        document.documentElement.classList.add('intro-skip')
       }
     </script>
 
@@ -85,6 +95,10 @@
     <style>
       .intro-pending [data-site-logo] {
         visibility: hidden;
+      }
+
+      .intro-skip #intro {
+        display: none;
       }
 
       #intro {
@@ -533,6 +547,15 @@
         </div>
       </div>
     </div>
+    <script>
+      ;(function () {
+        var overlay = document.getElementById('intro')
+        // Skipped (see the script in <head>): take it out, so the page knows there is no intro to wait for.
+        if (document.documentElement.classList.contains('intro-skip')) return overlay.remove()
+        // Plays the assembly a little faster than its keyframes are written (1x, by `npm run posters`).
+        if (overlay.getAnimations) overlay.getAnimations({ subtree: true }).forEach(function (animation) { animation.playbackRate = 1.2 })
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

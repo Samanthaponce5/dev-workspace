@@ -1,8 +1,7 @@
 .controls {
   position: absolute;
   right: max(var(--space-gutter), var(--safe-right));
-  /* Above the Display settings button, which is fixed to the same corner. */
-  bottom: calc(var(--settings-launcher) + var(--space-4) + var(--space-3) + var(--safe-bottom));
+  bottom: calc(var(--space-4) + var(--safe-bottom));
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -11,6 +10,13 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--duration-base) var(--ease-out);
+}
+
+/* Tablets up: above the Display settings button, which is fixed to the same corner (phones have it in the menu). */
+@media (min-width: 48rem) {
+  .controls {
+    bottom: calc(var(--settings-launcher) + var(--space-4) + var(--space-3) + var(--safe-bottom));
+  }
 }
 
 .controls:focus-within {

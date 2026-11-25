@@ -1,10 +1,14 @@
-/* Clear of the screen edge and of a phone's home indicator; the footer leaves room for it. */
+/*
+ * Tablets and desktops only: on phones it would cover the text, so the
+ * phone menu has a Display settings item instead. Clear of the screen
+ * edge and of the home indicator; the footer leaves room for it.
+ */
 .launcher {
+  display: none;
   position: fixed;
   right: max(var(--space-4), var(--safe-right));
   bottom: calc(var(--space-4) + var(--safe-bottom));
   z-index: var(--layer-settings);
-  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   justify-content: center;
@@ -37,27 +41,10 @@
   }
 }
 
-/* Phones: the icon alone. The label stays in the page for screen readers. */
-.label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-@media (min-width: 40rem) {
+@media (min-width: 48rem) {
   .launcher {
+    display: inline-flex;
     right: max(var(--space-gutter), var(--safe-right));
     padding-inline: var(--space-4);
-  }
-
-  .label {
-    position: static;
-    width: auto;
-    height: auto;
-    overflow: visible;
-    clip-path: none;
   }
 }

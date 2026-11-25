@@ -17,8 +17,8 @@ import { getSceneDuckRect, showSceneDuck } from '../utils/sceneBridge'
  * isn't available the duck hops in place instead.
  */
 
-const DIP_MS = 110 // the duck crouches...
-const HOP_MS = 640 // ...then everything moves together
+const DIP_MS = 90 // the duck crouches...
+const HOP_MS = 540 // ...then everything moves together
 const SWAP_FADE_MS = 90 // the moving pieces fade over their real counterparts
 const WIPE_SOFTNESS = 56 // px of feathering on the sweep's edge (see .intro-bg)
 const SWEEP_TRAIL = 170 // px the light behind the rim reaches back (see .intro-edge)

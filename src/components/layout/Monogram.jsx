@@ -1,4 +1,5 @@
 import { site } from '../../content/content'
+import { HOME_PATH } from '../../utils/routes'
 import { LOGO_HEIGHT, LOGO_LETTERS, LOGO_WIDTH, STROKE } from './logoShape'
 import styles from './Monogram.module.css'
 
@@ -18,7 +19,7 @@ const initials = site.name
  */
 export function Monogram() {
   return (
-    <a className={styles.monogram} href="#top" aria-label={`${initials}: ${site.name}, back to top`} data-site-logo>
+    <a className={styles.monogram} href={HOME_PATH} aria-label={`${initials}: ${site.name}, back to top`} data-site-logo>
       <svg
         className={styles.letters}
         viewBox={`0 0 ${LOGO_WIDTH} ${LOGO_HEIGHT}`}

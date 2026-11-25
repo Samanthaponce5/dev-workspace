@@ -1,10 +1,15 @@
 import { useEffect, useRef } from 'react'
+import { displaySettings } from '../../content/content'
+import { pathOf } from '../../utils/routes'
+import { OPEN_DISPLAY_SETTINGS } from '../settings/DisplaySettings'
+import { SlidersIcon } from '../ui/icons'
 import styles from './MobileMenu.module.css'
 
 /**
- * Dropdown panel with every section link, for phones and tablets.
- * Closes on Escape, on a click outside, and when a link is followed.
- * Focus moves to the first link on open; the caller restores it on close.
+ * Dropdown panel with every section link, for phones, and the Display
+ * settings (which have no floating button on phones). Closes on Escape,
+ * on a click outside, and when a link is followed. Focus moves to the
+ * first link on open; the caller restores it on close.
  */
 export function MobileMenu({ id, items, activeId, onClose, ignoreRef }) {
   const panelRef = useRef(null)
@@ -36,7 +41,7 @@ export function MobileMenu({ id, items, activeId, onClose, ignoreRef }) {
           <li key={item.id}>
             <a
               className={styles.link}
-              href={`#${item.id}`}
+              href={pathOf(item.id)}
               aria-current={activeId === item.id ? 'true' : undefined}
               onClick={() => onClose({ restoreFocus: false })}
             >
@@ -45,6 +50,17 @@ export function MobileMenu({ id, items, activeId, onClose, ignoreRef }) {
           </li>
         ))}
       </ul>
+      <button
+        type="button"
+        className={styles.settings}
+        onClick={() => {
+          onClose({ restoreFocus: false })
+          window.dispatchEvent(new CustomEvent(OPEN_DISPLAY_SETTINGS, { detail: { returnFocus: ignoreRef.current } }))
+        }}
+      >
+        <SlidersIcon />
+        {displaySettings.title}
+      </button>
     </div>
   )
 }

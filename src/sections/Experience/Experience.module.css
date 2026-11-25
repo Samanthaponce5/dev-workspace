@@ -9,7 +9,7 @@
   --marker: 0.875rem;
   --rail-gap: var(--space-5); /* between the rail and the text */
   --stage-gap: var(--space-6);
-  --step: 300ms; /* the reveal: how far apart the stages appear */
+  --step: 370ms; /* the reveal: how far apart the stages appear */
   --header-height: max(1.75rem, calc(var(--text-lg) * 1.35));
 
   position: relative;
@@ -101,7 +101,7 @@
 
 @media (min-width: 64rem) {
   .timeline {
-    --step: 260ms;
+    --step: 320ms;
     --column-gap: clamp(var(--space-7), 6vw, var(--space-9));
     --line-room: var(--space-6); /* between the line and the columns */
 
@@ -199,17 +199,17 @@
 
 :global([data-reveal='in']) .stage::before {
   animation: draw-down var(--step) linear both;
-  animation-delay: calc(var(--i) * var(--step) + 120ms);
+  animation-delay: calc(var(--i) * var(--step) + 150ms);
 }
 
 :global([data-reveal='in']) .marker {
-  animation: marker-in 320ms var(--ease-out) both;
+  animation: marker-in 400ms var(--ease-out) both;
   animation-delay: calc(var(--i) * var(--step));
 }
 
 :global([data-reveal='in']) .stage::after {
-  animation: rule-in 560ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * var(--step) + 100ms);
+  animation: rule-in 700ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * var(--step) + 120ms);
 }
 
 @keyframes rule-in {
@@ -219,8 +219,8 @@
 }
 
 :global([data-reveal='in']) .body > * {
-  animation: stage-in 560ms var(--ease-out) both;
-  animation-delay: calc(var(--i) * var(--step) + 100ms);
+  animation: stage-in 700ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * var(--step) + 120ms);
 }
 
 @keyframes draw-across {
@@ -317,9 +317,24 @@
   color: var(--color-accent);
 }
 
-/* Moves to its own line as a whole when it doesn't fit beside the label. */
+/* Each part moves to a new line as a whole when it doesn't fit, never breaking inside. */
 .roleValue {
   display: inline-block;
+}
+
+.roleSeparator {
+  white-space: pre;
+}
+
+/* Phones: the company and the role on lines of their own, under the label. */
+@media (max-width: 29.99rem) {
+  .roleValue {
+    display: block;
+  }
+
+  .roleSeparator {
+    display: none;
+  }
 }
 
 /* On phones the résumé button takes the full width, under the role. */

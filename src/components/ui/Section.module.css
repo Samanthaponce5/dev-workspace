@@ -15,6 +15,20 @@
   scroll-margin-top: calc((var(--nav-height) + var(--space-4)) * -1);
 }
 
+/*
+ * Phones: a section is as tall as its content, so a short one doesn't
+ * leave a band of empty screen around it. Links land just under the
+ * header (the page's scroll padding applies again).
+ */
+@media (max-width: 47.99rem) {
+  .section {
+    align-items: start;
+    min-height: 0;
+    padding-block: var(--space-8) var(--space-6);
+    scroll-margin-top: 0;
+  }
+}
+
 /* The grid would otherwise shrink the container to its content. */
 .section > * {
   width: 100%;

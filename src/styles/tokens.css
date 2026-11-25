@@ -32,7 +32,6 @@
   --color-accent-strong: #c9ece2;
   --color-aqua: #71c9c8; /* LED light */
   --color-glow: #14606a; /* pool of teal light behind the desk */
-  --color-lime: #c8f55a;
   --color-on-accent: #0b1721;
   --color-scrim: #040a10; /* dims the page behind a dialog */
   --color-hero-base: var(--color-bg); /* what the hero's glow sits on */
@@ -111,7 +110,6 @@
   --color-accent-strong: #163c39;
   --color-aqua: #2a8f95;
   --color-glow: #c3ded8; /* the mint the page gathers behind the desk */
-  --color-lime: #86b64e;
   --color-on-accent: #ffffff;
   --color-scrim: #152a2f;
   --color-hero-base: transparent; /* the page's own wash shows through */

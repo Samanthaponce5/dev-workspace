@@ -7,8 +7,11 @@ import { Contact } from './sections/Contact/Contact'
 import { Experience } from './sections/Experience/Experience'
 import { Hero } from './sections/Hero/Hero'
 import { Work } from './sections/Work/Work'
+import { useSectionRoutes } from './hooks/useSectionRoutes'
 
 export default function App() {
+  useSectionRoutes()
+
   return (
     <>
       <SkipLink />

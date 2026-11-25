@@ -112,6 +112,11 @@ canvas {
   border-radius: var(--radius-sm);
 }
 
+/* Whole regions focused by a jump within the page (the skip link, a section link): no ring round the region. */
+[tabindex='-1']:focus-visible {
+  box-shadow: none;
+}
+
 /* Readable by screen readers, invisible on screen. */
 .visually-hidden {
   position: absolute;

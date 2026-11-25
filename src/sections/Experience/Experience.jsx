@@ -44,7 +44,11 @@ export function Experience() {
         <p className={styles.role}>
           <span className={styles.live} aria-hidden="true" />
           <span className={styles.roleLabel}>{experience.currentRole.label}</span>{' '}
-          <span className={styles.roleValue}>{experience.currentRole.value}</span>
+          <span className={styles.roleValue}>{experience.currentRole.company}</span>
+          <span className={styles.roleSeparator} aria-hidden="true">
+            {' · '}
+          </span>
+          <span className={styles.roleValue}>{experience.currentRole.role}</span>
         </p>
         <Button href={resume.href} target="_blank" rel="noopener" iconEnd={<ArrowRightIcon />} className={styles.resume}>
           {experience.resumeLabel}

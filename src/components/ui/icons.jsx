@@ -84,6 +84,16 @@ export function CheckIcon(props) {
   )
 }
 
+/* Two overlapping sheets: copy to the clipboard. */
+export function CopyIcon(props) {
+  return (
+    <svg {...baseProps} strokeWidth={1.75} {...props}>
+      <rect x="7" y="7" width="10" height="10" rx="2" />
+      <path d="M13 4.5V4a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 4v7a1.5 1.5 0 0 0 1.5 1.5H5" />
+    </svg>
+  )
+}
+
 /* Thinner line icons for the Experience stages and the Contact list. */
 const fineProps = { ...baseProps, width: 24, height: 24, strokeWidth: 1.5 }
 
@@ -140,6 +150,16 @@ export function MailIcon(props) {
     <svg {...fineProps} {...props}>
       <rect x="2.4" y="4.4" width="15.2" height="11.2" rx="2" />
       <path d="m3 6 7 5.2L17 6" />
+    </svg>
+  )
+}
+
+/* A page with a folded corner and two lines of text: a document (the résumé). */
+export function DocumentIcon(props) {
+  return (
+    <svg {...fineProps} {...props}>
+      <path d="M5.5 2.5h6l3.5 3.5v10a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 4 16V4a1.5 1.5 0 0 1 1.5-1.5Z" />
+      <path d="M11.5 2.5V6H15M7 10.5h6M7 13.5h4" />
     </svg>
   )
 }
@@ -240,6 +260,7 @@ const GLYPHS = {
   flask: FlaskIcon,
   cycle: CycleIcon,
   database: DatabaseIcon,
+  document: DocumentIcon,
   gear: GearIcon,
   github: GitHubIcon,
   layers: LayersIcon,

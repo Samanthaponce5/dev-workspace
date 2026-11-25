@@ -3,6 +3,7 @@ import { nav } from '../../content/content'
 import { useActiveSection } from '../../hooks/useActiveSection'
 import { useScrolled } from '../../hooks/useScrolled'
 import { cx } from '../../utils/cx'
+import { pathOf } from '../../utils/routes'
 import { Container } from '../ui'
 import { CloseIcon, MenuIcon } from '../ui/icons'
 import { MobileMenu } from './MobileMenu'
@@ -38,7 +39,7 @@ export function Nav() {
           <ul className={styles.links}>
             {nav.map((item) => (
               <li key={item.id} className={cx(!item.pinned && styles.desktopOnly)}>
-                <a className={styles.link} href={`#${item.id}`} aria-current={activeId === item.id ? 'true' : undefined}>
+                <a className={styles.link} href={pathOf(item.id)} aria-current={activeId === item.id ? 'true' : undefined}>
                   {item.label}
                 </a>
               </li>

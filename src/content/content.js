@@ -15,7 +15,7 @@ export const site = {
  * phones; the rest live in the menu there.
  */
 export const nav = [
-  { id: 'work', label: 'Work', pinned: true },
+  { id: 'work', label: 'Skills', pinned: true },
   { id: 'about', label: 'About' },
   { id: 'experience', label: 'Experience' },
   { id: 'contact', label: 'Contact' },
@@ -24,10 +24,20 @@ export const nav = [
 export const hero = {
   /* The big heading. The full name stays in the page title, the navbar logo and search results. */
   title: 'Sam',
-  role: 'Software Engineer, front-end focused',
+  role: 'Front-End Software Engineer',
   /* Shown on tablet and desktop only, to keep the phone hero compact. */
   tagline: 'I build and upgrade production React apps.',
-  primaryAction: { label: 'View work', href: '#work' },
+  /* The core tools, at a glance. Each skill appears once on the site: the rest are under What I do. `icon` names one in components/ui/icons.jsx. */
+  toolsLabel: 'Tools I use most',
+  tools: [
+    { label: 'React', icon: 'atom' },
+    { label: 'JavaScript', icon: 'code' },
+    { label: 'Redux-Saga', icon: 'cycle' },
+    { label: 'Jest', icon: 'flask' },
+    { label: 'Node.js', icon: 'server' },
+    { label: 'HTML & CSS', icon: 'layers' },
+  ],
+  primaryAction: { label: 'View skills', href: '/work' },
 }
 
 /* Text and settings used inside the 3D desk scene. */
@@ -84,21 +94,13 @@ export const about = {
     highlight: 'from new features to major upgrades.',
   },
   intro:
-    'I’m a software engineer in New York. Today I work on a large React and Redux product: I build data-heavy pages like search, charts and tables, keep the codebase current, and track bugs to their root cause, whether that’s in the UI, the API data or the build.',
-  /* `icon` names one in components/ui/icons.jsx. */
-  toolsLabel: 'Tools I use most',
-  tools: [
-    { label: 'React', icon: 'atom' },
-    { label: 'Redux-Saga', icon: 'cycle' },
-    { label: 'Jest', icon: 'flask' },
-    { label: 'Node.js', icon: 'server' },
-    { label: 'AI-assisted', icon: 'sparkles' },
-  ],
+    'I’m based in New York, working on a large React and Redux product: I build data-heavy pages like search, charts and tables, keep the codebase current, and track bugs to their root cause, whether that’s in the UI, the API data or the build.',
   statsLabel: 'At a glance',
   /* A number counts up when first seen; a word fades in. No invented figures. */
   stats: [
     { id: 'years', value: 5, suffix: '+', label: 'Years of experience' },
-    { id: 'pages', value: 15, suffix: '+', label: 'Pages and workflows owned' },
+    /* Samantha's own figure: approximate code changes merged at Acast / Podchaser. */
+    { id: 'merged', value: 700, suffix: '+', label: 'Code changes merged' },
     { id: 'upgrade', value: '17 → 19', label: 'React upgrade I led' },
   ],
   notes: [
@@ -126,28 +128,29 @@ export const about = {
 export const skills = {
   eyebrow: 'What I do',
   title: 'Front-end first, comfortable across the stack.',
-  intro: 'I build user-focused products, connect front-ends to the right data, and use AI tooling to ship faster and smarter.',
+  intro: 'Where I spend my time, and the tools I reach for.',
+  /* The tags leave out the core tools the hero already shows, so no skill is listed twice. */
   groups: [
     {
       id: 'front-end',
       icon: 'layers',
       title: 'Front-end',
-      description: 'Fast, accessible interfaces that scale and feel great to use.',
-      tags: ['React', 'Redux-Saga', 'Complex UI', 'Accessibility', 'Performance'],
+      description: 'Interfaces that stay fast and accessible as the product grows, built from reusable components.',
+      tags: ['React Router', 'Next.js', 'React Testing Library', 'Accessibility', 'Responsive design'],
     },
     {
       id: 'back-end',
       icon: 'database',
       title: 'APIs and back-end',
-      description: 'The services behind the UI: designing endpoints, integrating data, and keeping it reliable.',
-      tags: ['REST APIs', 'Laravel', 'Integrations', 'Data access', 'Caching'],
+      description: 'Connecting the UI to its data, and making the backend changes a feature needs.',
+      tags: ['REST APIs', 'GraphQL', 'Laravel', 'Express'],
     },
     {
       id: 'ai-tooling',
       icon: 'gear',
       title: 'AI and tooling',
-      description: 'Turning AI experiments into useful, reliable features and better workflows.',
-      tags: ['AI-assisted development', 'Prototyping', 'Developer workflows', 'AI features'],
+      description: 'I’ve shipped an AI-powered feature, and I use AI every day to prototype, build and debug.',
+      tags: ['AI features', 'Prototyping', 'Developer workflows'],
     },
   ],
 }
@@ -193,7 +196,7 @@ export const experience = {
       examples: 'charts, search, discovery and filtering on REST APIs, root-cause fixes backed by regression tests, and Laravel changes behind the features I build.',
     },
   ],
-  currentRole: { label: 'Current role:', value: `${site.company} · ${site.role}` },
+  currentRole: { label: 'Current role:', company: site.company, role: site.role },
   resumeLabel: 'View Résumé',
 }
 
@@ -203,11 +206,13 @@ export const contact = {
   intro: 'I’d love to hear about your team and what you’re working on.',
   linksLabel: 'Ways to reach me',
   links: [
-    { id: 'email', icon: 'mail', label: 'Email', href: 'mailto:samanthaponce.dev@gmail.com' },
+    /* The address is shown and can be copied: an email link alone does nothing for anyone without a mail app set up. */
+    { id: 'email', icon: 'mail', label: 'Email', address: 'samanthaponce.dev@gmail.com', href: 'mailto:samanthaponce.dev@gmail.com' },
     { id: 'linkedin', icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/samantha-ponce-0bb6ba1a9/', external: true },
     { id: 'github', icon: 'github', label: 'GitHub', href: 'https://github.com/Samanthaponce5', external: true },
+    { id: 'resume', icon: 'document', label: 'Résumé', href: resume.href, external: true },
   ],
-  resumeLabel: 'Résumé',
+  copy: { done: 'Copied', name: 'Copy email address', announce: 'Email address copied.' },
 }
 
 /* The navbar's theme switch. Each label says what pressing it will do. */
@@ -256,6 +261,8 @@ export const displaySettings = {
 }
 
 export const footer = {
-  note: 'Designed and built by Samantha Ponce. Andy supervised.',
+  note: 'Designed and built by Samantha Ponce.',
+  /* How the site itself is made: the engineering a visitor can't see. */
+  built: 'Hand-built with React and React Three Fiber: prerendered for a fast first paint, usable by keyboard, with adjustable text size, contrast and motion.',
   backToTop: 'Back to top',
 }
