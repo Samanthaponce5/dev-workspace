@@ -72,6 +72,14 @@
   font-weight: var(--weight-bold);
 }
 
+/* Where and when, right under the role. */
+.meta {
+  margin-top: calc(-1 * var(--space-2));
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+}
+
 .summary {
   max-width: 34rem;
   color: var(--color-text);
@@ -98,7 +106,7 @@
     --line-room: var(--space-6); /* between the line and the columns */
 
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto auto auto; /* title, summary, examples: shared, so they line up across the columns */
+    grid-template-rows: auto auto auto auto; /* role, where and when, summary, highlights: shared, so they line up across the columns */
     gap: 0 var(--column-gap);
     padding-left: 0;
     padding-top: calc(var(--marker) + var(--line-room));
@@ -118,7 +126,7 @@
 
   .stage {
     display: grid;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
     grid-template-rows: subgrid;
     row-gap: var(--space-3);
   }

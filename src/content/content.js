@@ -23,9 +23,9 @@ export const nav = [
 export const hero = {
   /* The big heading. The full name stays in the page title, the navbar logo and search results. */
   title: 'Sam',
-  role: `${site.role} at ${site.company}`,
+  role: 'Software Engineer, front-end focused',
   /* Shown on tablet and desktop only, to keep the phone hero compact. */
-  tagline: 'I build fast, accessible interfaces.',
+  tagline: 'I build and upgrade production React apps.',
   primaryAction: { label: 'View work', href: '#work' },
 }
 
@@ -79,11 +79,11 @@ export const about = {
   eyebrow: 'About me',
   /* The highlight is shown in the accent colour. */
   title: {
-    lead: 'Software engineer who turns complex problems into',
-    highlight: 'reliable, user-focused products.',
+    lead: 'Five years of production React,',
+    highlight: 'from new features to major upgrades.',
   },
   intro:
-    'I’m a software engineer with 5+ years of experience building and shipping production features at scale. I enjoy solving real user problems, improving existing systems, and turning complex requirements into clean, maintainable solutions.',
+    'I’m a software engineer in New York. Today I work on a large React and Redux product: I build data-heavy pages like search, charts and tables, keep the codebase current, and track bugs to their root cause, whether that’s in the UI, the API data or the build.',
   /* `icon` names one in components/ui/icons.jsx. */
   toolsLabel: 'Tools I use most',
   tools: [
@@ -97,21 +97,21 @@ export const about = {
   /* A number counts up when first seen; a word fades in. No invented figures. */
   stats: [
     { id: 'years', value: 5, suffix: '+', label: 'Years of experience' },
-    { id: 'production', value: 'Production', label: 'Features shipped' },
-    { id: 'ownership', value: 'End-to-end', label: 'Feature ownership' },
+    { id: 'pages', value: 15, suffix: '+', label: 'Pages and workflows owned' },
+    { id: 'upgrade', value: '17 → 19', label: 'React upgrade I led' },
   ],
   notes: [
     {
       id: 'bring',
       icon: 'target',
       title: 'What I bring',
-      text: 'End-to-end delivery, a user-focused mindset, and a bias for practical solutions with real impact.',
+      text: 'Patient, methodical debugging. I follow a problem until I find what actually causes it, then add the test that keeps it fixed.',
     },
     {
       id: 'growing',
       icon: 'chart',
       title: 'What I’m growing into',
-      text: 'Deeper system design, architecture and product thinking, with broader ownership of what I build.',
+      text: 'Deeper system design and architecture, and owning more of each feature, from the API to the screen.',
     },
     {
       id: 'how',
@@ -124,29 +124,29 @@ export const about = {
 
 export const skills = {
   eyebrow: 'What I do',
-  title: 'Front-end first, comfortable across the stack.',
-  intro: 'I build user-focused products, connect front-ends to the right data, and use AI tooling to ship faster and smarter.',
+  title: 'Data-heavy interfaces, built to last.',
+  intro: 'Most of my work is the front end of data-rich products, with enough reach into the API and the backend to see a feature all the way through.',
   groups: [
     {
       id: 'front-end',
       icon: 'layers',
-      title: 'Front-end',
-      description: 'Fast, accessible interfaces that scale and feel great to use.',
-      tags: ['React', 'Redux-Saga', 'Complex UI', 'Accessibility', 'Performance'],
+      title: 'Product interfaces',
+      description: 'Charts, search, discovery, tables, filters and pagination, responsive on every screen and built from reusable components.',
+      tags: ['React', 'Redux', 'React Router', 'Responsive design', 'Accessibility'],
     },
     {
       id: 'back-end',
       icon: 'database',
-      title: 'APIs and back-end',
-      description: 'The services behind the UI: designing endpoints, integrating data, and keeping it reliable.',
-      tags: ['REST APIs', 'Laravel', 'Integrations', 'Data access', 'Caching'],
+      title: 'APIs and data',
+      description: 'Wiring the UI to REST and GraphQL APIs, with loading, empty and error states handled, and backend changes when a feature needs them.',
+      tags: ['REST APIs', 'GraphQL', 'Node.js', 'Laravel', 'Async state'],
     },
     {
       id: 'ai-tooling',
       icon: 'gear',
-      title: 'AI and tooling',
-      description: 'Turning AI experiments into useful, reliable features and better workflows.',
-      tags: ['AI-assisted development', 'Prototyping', 'Developer workflows', 'AI features'],
+      title: 'Upgrades and quality',
+      description: 'Keeping a large codebase healthy: major version upgrades, root-cause fixes and the regression tests that stop bugs coming back.',
+      tags: ['React 17 → 19', 'React Router v5 → v6', 'Jest', 'Testing Library', 'Performance'],
     },
   ],
 }
@@ -163,31 +163,33 @@ export const resume = {
 export const experience = {
   eyebrow: 'Experience',
   title: 'How my scope has grown',
-  intro:
-    'I started out building React interfaces. Now I also collaborate across the stack and ship backend changes of my own.',
-  examplesLabel: 'Examples:',
-  /* In order: each stage builds on the one before it. `icon` names one in components/ui/icons.jsx. */
+  intro: 'Three roles, each with more ownership than the last: from a small intern team, to client apps, to a large production product.',
+  examplesLabel: 'Highlights:',
+  /* In order, oldest first: each role builds on the one before it. `icon` names one in components/ui/icons.jsx. */
   stages: [
     {
-      id: 'react',
-      icon: 'atom',
-      title: 'React interfaces',
-      summary: 'Build and maintain user-facing experiences in React.',
-      examples: 'search and filter controls, content discovery UI, and reusable components.',
-    },
-    {
-      id: 'cross-stack',
-      icon: 'layers',
-      title: 'Cross-stack collaboration',
-      summary: 'Work across the frontend and backend to connect features end to end.',
-      examples: 'integrate APIs with the UI, align changes across the stack, and troubleshoot feature issues.',
-    },
-    {
-      id: 'backend',
+      id: 'mren',
       icon: 'code',
-      title: 'Backend contributions',
-      summary: 'Make backend changes to support product features and improvements.',
-      examples: 'contribute Laravel changes (e.g., endpoints and data updates) to support frontend experiences.',
+      title: 'Software Engineer Intern',
+      meta: 'Mren · 2020 – 2021',
+      summary: 'Built and tested web features with React, TypeScript and Node.js.',
+      examples: 'coordinated four intern developers through planning and code reviews, and refactored code for quality and performance.',
+    },
+    {
+      id: 'zvn',
+      icon: 'layers',
+      title: 'Software Engineer',
+      meta: 'ZVN DEV · 2021 – 2023',
+      summary: 'Built client-facing web apps and storefronts for a range of clients.',
+      examples: 'React, Next.js and GraphQL apps, Shopify storefronts with Liquid templates, and cross-browser fixes in Chrome, Safari and Firefox.',
+    },
+    {
+      id: 'podchaser',
+      icon: 'atom',
+      title: site.role,
+      meta: `${site.company} · Dec 2022 – present`,
+      summary: 'Own pages and workflows in a large React and Redux app, from requirements to release.',
+      examples: 'charts, search, discovery and filtering on REST APIs, root-cause fixes backed by regression tests, and Laravel changes behind the features I build.',
     },
   ],
   currentRole: { label: 'Current role:', value: `${site.company} · ${site.role}` },

@@ -15,6 +15,7 @@ function Stage({ stage, index }) {
             {stage.title}
           </Heading>
         </div>
+        <p className={styles.meta}>{stage.meta}</p>
         <p className={styles.summary}>{stage.summary}</p>
         <p className={styles.examples}>
           <span className={styles.examplesLabel}>{experience.examplesLabel}</span> {stage.examples}
