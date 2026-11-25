@@ -164,7 +164,7 @@ export const experience = {
   eyebrow: 'Experience',
   title: 'How my scope has grown',
   intro:
-    'My work at Podchaser has expanded from building React interfaces to collaborating across the stack and contributing backend changes.',
+    'I started out building React interfaces. Now I also collaborate across the stack and ship backend changes of my own.',
   examplesLabel: 'Examples:',
   /* In order: each stage builds on the one before it. `icon` names one in components/ui/icons.jsx. */
   stages: [
