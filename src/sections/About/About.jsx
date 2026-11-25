@@ -1,7 +1,46 @@
 import { Card, IconTile, Section, Tag } from '../../components/ui'
 import { Icon } from '../../components/ui/icons'
 import { about } from '../../content/content'
+import { useCountUp } from '../../hooks/useCountUp'
+import { useInView } from '../../hooks/useInView'
+import { useIntroDone } from '../../hooks/useIntroDone'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import styles from './About.module.css'
+
+const STAGGER_MS = 80
+
+/*
+ * One number at a glance. It counts up once, the first time the numbers
+ * are seen. An invisible copy of the final number holds the space, so the
+ * digits never move the layout; screen readers get the final number only.
+ */
+function Stat({ stat, index, start, reduced }) {
+  const shown = useCountUp(stat.value, { start, delay: index * STAGGER_MS, reduced })
+
+  return (
+    <div className={styles.stat}>
+      <Icon name={stat.icon} className={styles.statIcon} width={22} height={22} />
+      <dt className={styles.statLabel}>
+        {stat.label}
+        <span className="visually-hidden">, </span>
+        <span className={styles.statScope}>{stat.scope}</span>
+      </dt>
+      <dd className={styles.statValue}>
+        <span aria-hidden="true">
+          <span className={styles.statNumber}>
+            <span className={styles.statHold}>{stat.value}</span>
+            <span className={styles.statCount}>{shown}</span>
+          </span>
+          {stat.suffix}
+        </span>
+        <span className="visually-hidden">
+          {stat.value}
+          {stat.suffix}
+        </span>
+      </dd>
+    </div>
+  )
+}
 
 /**
  * Who I am professionally: a headline with a short introduction and the
@@ -9,6 +48,12 @@ import styles from './About.module.css'
  * short notes on what I bring, where I'm growing and how I work.
  */
 export function About() {
+  const [statsRef, statsSeen] = useInView({ once: true, threshold: 0.4 })
+  const introDone = useIntroDone()
+  const reduced = useReducedMotion()
+  // Wait for the intro too, in case the page opens with the numbers already on screen behind it.
+  const start = statsSeen && introDone
+
   return (
     <Section
       id="about"
@@ -33,13 +78,9 @@ export function About() {
       }
     >
       <div className={styles.stack}>
-        <dl className={styles.stats} aria-label={about.statsLabel} data-rise style={{ '--i': 1 }}>
-          {about.stats.map((stat) => (
-            <div key={stat.id} className={styles.stat}>
-              <Icon name={stat.icon} className={styles.statIcon} width={22} height={22} />
-              <dt className={styles.statLabel}>{stat.label}</dt>
-              <dd className={styles.statValue}>{stat.value}</dd>
-            </div>
+        <dl ref={statsRef} className={styles.stats} aria-label={about.statsLabel} data-rise style={{ '--i': 1 }}>
+          {about.stats.map((stat, index) => (
+            <Stat key={stat.id} stat={stat} index={index} start={start} reduced={reduced} />
           ))}
         </dl>
 
