@@ -173,38 +173,6 @@ export function GitHubIcon(props) {
   )
 }
 
-/* A calendar: years of experience. */
-export function CalendarIcon(props) {
-  return (
-    <svg {...baseProps} strokeWidth={1.75} {...props}>
-      <rect x="3" y="4" width="14" height="13" rx="2" />
-      <path d="M3 8.5h14M7 2.5v3M13 2.5v3" />
-    </svg>
-  )
-}
-
-/* A merge: two branches joining, for merged changes. */
-export function MergeIcon(props) {
-  return (
-    <svg {...baseProps} strokeWidth={1.75} {...props}>
-      <circle cx="6" cy="4.5" r="2" />
-      <circle cx="6" cy="15.5" r="2" />
-      <circle cx="14.5" cy="10" r="2" />
-      <path d="M6 6.5v7M6 6.5c0 2.6 2.4 3.5 6.5 3.5" />
-    </svg>
-  )
-}
-
-/* A repository: a bound book of code. */
-export function RepositoryIcon(props) {
-  return (
-    <svg {...baseProps} strokeWidth={1.75} {...props}>
-      <path d="M5 16V4.5A1.5 1.5 0 0 1 6.5 3H16v11H6.5A1.5 1.5 0 0 0 5 15.5 1.5 1.5 0 0 0 6.5 17H16" />
-      <path d="M8 6.5h5" />
-    </svg>
-  )
-}
-
 /* A target: focus on outcomes. */
 export function TargetIcon(props) {
   return (
@@ -257,7 +225,6 @@ export function ServerIcon(props) {
 
 const GLYPHS = {
   atom: AtomIcon,
-  calendar: CalendarIcon,
   chart: ChartIcon,
   code: CodeIcon,
   compass: CompassIcon,
@@ -268,8 +235,6 @@ const GLYPHS = {
   layers: LayersIcon,
   linkedin: LinkedInIcon,
   mail: MailIcon,
-  merge: MergeIcon,
-  repository: RepositoryIcon,
   server: ServerIcon,
   sparkles: SparklesIcon,
   target: TargetIcon,

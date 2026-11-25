@@ -94,14 +94,11 @@ export const about = {
     { label: 'AI-assisted', icon: 'sparkles' },
   ],
   statsLabel: 'At a glance',
-  /*
-   * Only real numbers. `scope` says what each covers, so overall
-   * experience is not mixed up with work at one company.
-   */
+  /* A number counts up when first seen; a word fades in. No invented figures. */
   stats: [
-    { id: 'years', icon: 'calendar', value: 5, suffix: '+', label: 'Years of experience', scope: 'Career' },
-    { id: 'merged', icon: 'merge', value: 700, suffix: '+', label: 'Changes merged', scope: `At ${site.company}` },
-    { id: 'repositories', icon: 'repository', value: 4, label: 'Repositories contributed to', scope: `At ${site.company}` },
+    { id: 'years', value: 5, suffix: '+', label: 'Years of experience' },
+    { id: 'production', value: 'Production', label: 'Features shipped' },
+    { id: 'ownership', value: 'End-to-end', label: 'Feature ownership' },
   ],
   notes: [
     {

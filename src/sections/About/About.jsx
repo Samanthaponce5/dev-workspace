@@ -4,39 +4,44 @@ import { about } from '../../content/content'
 import { useCountUp } from '../../hooks/useCountUp'
 import { useInView } from '../../hooks/useInView'
 import { useIntroDone } from '../../hooks/useIntroDone'
+import { useHydrated } from '../../hooks/useHydrated'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
+import { cx } from '../../utils/cx'
 import styles from './About.module.css'
 
-const STAGGER_MS = 80
+const STAGGER_MS = 90
 
 /*
- * One number at a glance. It counts up once, the first time the numbers
- * are seen. An invisible copy of the final number holds the space, so the
- * digits never move the layout; screen readers get the final number only.
+ * One highlight. A number counts up the first time the highlights are
+ * seen; a word fades up instead. An invisible copy of the final number
+ * holds its space, so nothing moves the layout, and screen readers get
+ * the final number only.
  */
-function Stat({ stat, index, start, reduced }) {
-  const shown = useCountUp(stat.value, { start, delay: index * STAGGER_MS, reduced })
+function Highlight({ stat, index, start, reduced }) {
+  const counts = typeof stat.value === 'number'
+  const shown = useCountUp(counts ? stat.value : 0, { start: counts && start, delay: index * STAGGER_MS, reduced })
 
   return (
-    <div className={styles.stat}>
-      <Icon name={stat.icon} className={styles.statIcon} width={22} height={22} />
-      <dt className={styles.statLabel}>
-        {stat.label}
-        <span className="visually-hidden">, </span>
-        <span className={styles.statScope}>{stat.scope}</span>
-      </dt>
-      <dd className={styles.statValue}>
-        <span aria-hidden="true">
-          <span className={styles.statNumber}>
-            <span className={styles.statHold}>{stat.value}</span>
-            <span className={styles.statCount}>{shown}</span>
-          </span>
-          {stat.suffix}
-        </span>
-        <span className="visually-hidden">
-          {stat.value}
-          {stat.suffix}
-        </span>
+    <div className={styles.stat} style={{ '--delay': `${index * STAGGER_MS}ms` }}>
+      <dt className={styles.statLabel}>{stat.label}</dt>
+      <dd className={cx(styles.statValue, !counts && styles.statWord)}>
+        {counts ? (
+          <>
+            <span aria-hidden="true">
+              <span className={styles.statNumber}>
+                <span className={styles.statHold}>{stat.value}</span>
+                <span className={styles.statCount}>{shown}</span>
+              </span>
+              {stat.suffix}
+            </span>
+            <span className="visually-hidden">
+              {stat.value}
+              {stat.suffix}
+            </span>
+          </>
+        ) : (
+          stat.value
+        )}
       </dd>
     </div>
   )
@@ -44,15 +49,18 @@ function Stat({ stat, index, start, reduced }) {
 
 /**
  * Who I am professionally: a headline with a short introduction and the
- * tools I use most beside it, a row of numbers at a glance, and three
+ * tools I use most beside it, three highlights at a glance, and three
  * short notes on what I bring, where I'm growing and how I work.
  */
 export function About() {
   const [statsRef, statsSeen] = useInView({ once: true, threshold: 0.4 })
   const introDone = useIntroDone()
   const reduced = useReducedMotion()
-  // Wait for the intro too, in case the page opens with the numbers already on screen behind it.
+  const hydrated = useHydrated()
+  // Wait for the intro too, in case the page opens with the highlights already on screen behind it.
   const start = statsSeen && introDone
+  // The words wait hidden until then (only in the browser, and not with reduced motion), then fade up once.
+  const phase = hydrated && !reduced ? (start ? 'in' : 'waiting') : undefined
 
   return (
     <Section
@@ -78,9 +86,9 @@ export function About() {
       }
     >
       <div className={styles.stack}>
-        <dl ref={statsRef} className={styles.stats} aria-label={about.statsLabel} data-rise style={{ '--i': 1 }}>
+        <dl ref={statsRef} className={styles.stats} aria-label={about.statsLabel} data-phase={phase}>
           {about.stats.map((stat, index) => (
-            <Stat key={stat.id} stat={stat} index={index} start={start} reduced={reduced} />
+            <Highlight key={stat.id} stat={stat} index={index} start={start} reduced={reduced} />
           ))}
         </dl>
 
