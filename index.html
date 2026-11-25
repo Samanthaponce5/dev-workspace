@@ -3,21 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Samantha Ponce · Front-End Developer</title>
+    <title>Samantha Ponce · Software Engineer</title>
     <meta
       name="description"
-      content="Samantha Ponce is a front-end developer growing into full-stack, currently at Podchaser. React, accessible UI, APIs and AI tooling."
+      content="Samantha Ponce is a software engineer who builds reliable, user-focused web products, from React interfaces to the APIs behind them."
     />
     <meta name="theme-color" content="#0b1721" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!--
+      The SP logo with its dot, made from the navbar's own letters by
+      scripts/capture-brand.mjs: an SVG for current browsers, an .ico for
+      everything else, and larger PNGs for home screens (see the manifest).
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!--
+      Link previews (iMessage, WhatsApp, LinkedIn, Slack, Discord, X...).
+      og:image, og:url and twitter:image need the site's full address, so
+      vite.config.js adds them at build time (see socialMeta there).
+    -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Samantha Ponce · Front-End Developer" />
+    <meta property="og:site_name" content="Samantha Ponce" />
+    <meta property="og:title" content="Samantha Ponce · Software Engineer" />
     <meta
       property="og:description"
-      content="Front-end developer growing into full-stack, currently at Podchaser. Come say hi to me and Andy at my tiny desk."
+      content="Software engineer building reliable, user-focused web products, from React interfaces to the APIs behind them. Come say hi at my tiny 3D desk."
     />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Samantha Ponce · Software Engineer" />
+    <meta
+      name="twitter:description"
+      content="Software engineer building reliable, user-focused web products, from React interfaces to the APIs behind them. Come say hi at my tiny 3D desk."
+    />
 
     <!--
       The theme and display settings the visitor saved earlier, put on

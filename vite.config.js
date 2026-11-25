@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { scene } from './src/content/content.js'
+import { site } from './src/content/content.js'
 
 /*
  * Adds preload hints to the built index.html for two things the browser
@@ -40,15 +40,20 @@ function preloadCriticalAssets() {
 
 /*
  * Adds the link-preview image tags (and, when the site's address is
- * known, the canonical URL). Preview crawlers want absolute URLs, so the
- * address comes from the environment: SITE_URL if set, otherwise the
- * production domain Vercel provides at build time. Without either, the
- * image path is left relative, which is fine for local builds.
+ * known, og:url and the canonical URL) to the built page, so preview
+ * crawlers, which don't run JavaScript, find them in the HTML itself.
+ * They want absolute URLs, so the address comes from the environment:
+ * SITE_URL if set, otherwise the production domain Vercel provides at
+ * build time (the custom domain, once there is one). Without either, the
+ * image path is left relative, which is fine for local builds only.
+ *
+ * The image is a screenshot of the home page (scripts/capture-brand.mjs).
  */
 function socialMeta() {
   const domain = process.env.VERCEL_PROJECT_PRODUCTION_URL
   const siteUrl = (process.env.SITE_URL ?? (domain ? `https://${domain}` : '')).replace(/\/$/, '')
   const image = `${siteUrl}/og-image.jpg`
+  const alt = `The home page of ${site.name}’s portfolio: the heading “Sam” beside a tiny 3D model of ${site.name.split(' ')[0]}’s desk at night.`
   const meta = (key, name, content) => ({ tag: 'meta', attrs: { [key]: name, content }, injectTo: 'head' })
 
   return {
@@ -56,10 +61,12 @@ function socialMeta() {
     transformIndexHtml() {
       const tags = [
         meta('property', 'og:image', image),
+        meta('property', 'og:image:type', 'image/jpeg'),
         meta('property', 'og:image:width', '1200'),
         meta('property', 'og:image:height', '630'),
-        meta('property', 'og:image:alt', scene.description),
+        meta('property', 'og:image:alt', alt),
         meta('name', 'twitter:image', image),
+        meta('name', 'twitter:image:alt', alt),
       ]
       if (siteUrl) {
         tags.push(meta('property', 'og:url', `${siteUrl}/`))
