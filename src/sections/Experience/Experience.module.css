@@ -1,110 +1,244 @@
 /*
- * Three stages in order. Stacked on phones and tablets with an arrow
- * pointing down between them; side by side on wide screens with the
- * arrows pointing across.
+ * The timeline. On phones and tablets it runs down the left: a thin rail
+ * from each stage's marker to the next, with the stage beside it. On wide
+ * screens it runs across: one line over three even columns, each marker
+ * on the line exactly above where its column's text starts, with hairline
+ * rules between the columns.
  */
-.stages {
-  --stage-gap: var(--space-7);
+.timeline {
+  --marker: 0.875rem;
+  --rail-gap: var(--space-5); /* between the rail and the text */
+  --stage-gap: var(--space-6);
+  --step: 300ms; /* the reveal: how far apart the stages appear */
+  --header-height: max(1.75rem, calc(var(--text-lg) * 1.35));
 
+  position: relative;
   display: grid;
   gap: var(--stage-gap);
+  padding-left: calc(var(--marker) + var(--rail-gap));
 }
 
 .stage {
+  position: relative;
+}
+
+/* The marker: a small teal ring, level with the stage's title. The current stage's is filled. */
+.marker {
+  position: absolute;
+  top: calc((var(--header-height) - var(--marker)) / 2);
+  left: calc(-1 * (var(--marker) + var(--rail-gap)));
+  width: var(--marker);
+  height: var(--marker);
+  border: 2px solid var(--color-aqua);
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+
+.stage:last-child .marker {
+  background: var(--color-aqua);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-aqua) 18%, transparent);
+}
+
+/* The rail: from this marker's centre down to the next one's. */
+.stage:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--header-height) / 2);
+  left: calc(-1 * (var(--marker) + var(--rail-gap)) + var(--marker) / 2 - 0.5px);
+  width: 1px;
+  height: calc(100% + var(--stage-gap));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-aqua) 70%, transparent), color-mix(in srgb, var(--color-aqua) 35%, transparent));
+  transform-origin: top;
+}
+
+.body {
   display: grid;
-  align-content: start;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .stageHeader {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
+  min-height: var(--header-height);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--color-aqua);
+}
+
+.title {
+  font-weight: var(--weight-bold);
 }
 
 .summary {
+  max-width: 34rem;
   color: var(--color-text);
   text-wrap: pretty;
 }
 
 .examples {
+  max-width: 34rem;
+  font-size: var(--text-sm);
+  line-height: 1.6;
   color: var(--color-text-muted);
   text-wrap: pretty;
 }
 
-.examples strong {
-  color: var(--color-text);
+.examplesLabel {
   font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+@media (min-width: 64rem) {
+  .timeline {
+    --step: 260ms;
+    --column-gap: clamp(var(--space-7), 6vw, var(--space-9));
+    --line-room: var(--space-6); /* between the line and the columns */
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto auto; /* title, summary, examples: shared, so they line up across the columns */
+    gap: 0 var(--column-gap);
+    padding-left: 0;
+    padding-top: calc(var(--marker) + var(--line-room));
+  }
+
+  /* The line, across the whole timeline, through the markers' centres. */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--marker) / 2 - 0.5px);
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--color-aqua) 75%, transparent), color-mix(in srgb, var(--color-aqua) 30%, transparent));
+    transform-origin: left;
+  }
+
+  .stage {
+    display: grid;
+    grid-row: 1 / span 3;
+    grid-template-rows: subgrid;
+    row-gap: var(--space-3);
+  }
+
+  .body {
+    display: contents;
+  }
+
+  /* Titles start together even when one wraps; the icon stays level with the first line. */
+  .stageHeader {
+    align-self: start;
+    align-items: flex-start;
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+
+  .icon {
+    margin-top: calc((1lh - 20px) / 2);
+  }
+
+  .stage:not(:last-child)::before {
+    display: none;
+  }
+
+  /* A hairline between the columns, in the middle of the gap. */
+  .stage + .stage::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--column-gap) / -2);
+    width: 1px;
+    background: var(--color-border);
+  }
+
+  .marker {
+    top: calc(-1 * (var(--marker) + var(--line-room)));
+    left: 0;
+  }
+
+  .summary,
+  .examples {
+    max-width: none;
+  }
 }
 
 /*
- * A strip of light along the top of each stage. When the section scrolls
- * into view they switch on one after another, left to right, and each
- * arrow lights as the signal passes it.
+ * The reveal, once, when the section first scrolls into view (the
+ * section sets data-reveal; without JavaScript nothing is hidden, and
+ * with reduced motion every step simply shows). The line draws in; each
+ * marker appears as it reaches it, then its stage fades up.
  */
-.stage::after {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: var(--radius-lg);
-  right: var(--radius-lg);
-  height: 2px;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--color-aqua), var(--color-accent));
-  box-shadow: 0 0 14px var(--color-aqua);
-  transform-origin: left;
-}
-
-:global([data-reveal='pending']) .stage::after {
+:global([data-reveal='pending']) .timeline::before {
   transform: scaleX(0);
 }
 
+:global([data-reveal='pending']) .stage::before {
+  transform: scaleY(0);
+}
+
+:global([data-reveal='pending']) .marker,
+:global([data-reveal='pending']) .body > *,
+:global([data-reveal='pending']) .stage::after {
+  opacity: 0;
+}
+
+:global([data-reveal='in']) .timeline::before {
+  animation: draw-across calc(var(--step) * 3) linear both;
+}
+
+:global([data-reveal='in']) .stage::before {
+  animation: draw-down var(--step) linear both;
+  animation-delay: calc(var(--i) * var(--step) + 120ms);
+}
+
+:global([data-reveal='in']) .marker {
+  animation: marker-in 320ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * var(--step));
+}
+
 :global([data-reveal='in']) .stage::after {
-  animation: light-strip 0.7s var(--ease-out) both;
-  animation-delay: calc(var(--i) * 380ms);
+  animation: rule-in 560ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * var(--step) + 100ms);
 }
 
-:global([data-reveal='in']) .next {
-  animation: light-arrow 0.6s var(--ease-out) both;
-  animation-delay: calc(var(--i) * 380ms + 420ms);
+@keyframes rule-in {
+  from {
+    opacity: 0;
+  }
 }
 
-@keyframes light-strip {
+:global([data-reveal='in']) .body > * {
+  animation: stage-in 560ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * var(--step) + 100ms);
+}
+
+@keyframes draw-across {
   from {
     transform: scaleX(0);
-    opacity: 0.4;
-  }
-
-  to {
-    transform: scaleX(1);
-    opacity: 1;
   }
 }
 
-@keyframes light-arrow {
+@keyframes draw-down {
   from {
-    color: var(--color-text-subtle);
-    opacity: 0.3;
-  }
-
-  to {
-    color: var(--color-aqua);
-    opacity: 1;
+    transform: scaleY(0);
   }
 }
 
-/* The arrow sits in the gap after each stage but the last. */
-.next {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  translate: -50% calc((var(--stage-gap) - 100%) / 2);
-  rotate: 90deg;
-  color: var(--color-aqua);
+@keyframes marker-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
 }
 
-.stage:last-child .next {
-  display: none;
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 
 /* Current role, with the résumé link. */
@@ -114,7 +248,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4) var(--space-5);
-  margin-top: var(--space-6);
+  margin-top: var(--space-7);
   padding: var(--space-5) clamp(var(--space-5), 4vw, var(--space-6));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -127,7 +261,7 @@
   line-height: var(--leading-snug);
 }
 
-/* The logo's lime dot, pulsing: this is what she is doing now. */
+/* The logo's dot, pulsing: this is what she is doing now. */
 .live {
   position: relative;
   display: inline-block;
@@ -135,7 +269,7 @@
   height: 0.6rem;
   margin-inline-end: var(--space-3);
   border-radius: 50%;
-  background: var(--color-lime);
+  background: var(--color-accent);
   vertical-align: 0.12em;
 }
 
@@ -144,7 +278,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--color-lime);
+  background: var(--color-accent);
   animation: ping 2.2s var(--ease-out) infinite;
 }
 
@@ -180,17 +314,10 @@
   display: inline-block;
 }
 
-@media (min-width: 64rem) {
-  .stages {
-    --stage-gap: var(--space-8);
-
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .next {
-    top: 50%;
-    left: 100%;
-    translate: calc((var(--stage-gap) - 100%) / 2) -50%;
-    rotate: none;
+/* On phones the résumé button takes the full width, under the role. */
+@media (max-width: 39.99rem) {
+  .resume {
+    width: 100%;
+    justify-content: center;
   }
 }

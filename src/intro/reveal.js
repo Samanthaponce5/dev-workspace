@@ -4,7 +4,7 @@ import { getSceneDuckRect, showSceneDuck } from '../utils/sceneBridge'
 /*
  * The intro's reveal.
  *
- * The overlay (see index.html) assembles the SP logo, bounces its lime dot
+ * The overlay (see index.html) assembles the SP logo, bounces its dot
  * into place and has the tiny duck react, all in CSS, from the first
  * frame. When that has played and the page behind is ready, this plays
  * one short move: the duck dips and hops in an arc to the real duck's spot

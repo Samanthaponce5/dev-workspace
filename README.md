@@ -77,7 +77,7 @@ Component styles use CSS Modules (`Component.module.css` next to `Component.jsx`
    strokes, S first and then P, with one soft settle. The letters are drawn
    lines, defined once in `src/components/layout/logoShape.js` and shared
    with the navbar logo, so the intro lands on exactly the same shapes. The
-   lime dot lands beside them with one soft glow and a few sparks, and a
+   accent dot lands beside them with one soft glow and a few sparks, and a
    tiny duck hops in reply. It is all CSS, so it plays from the first frame
    without any JavaScript, in the visitor's theme (it uses the theme tokens).
 2. **Prerendered page.** `npm run build` renders the React app once and writes

@@ -1,34 +1,39 @@
-import { Button, Card, Heading, IconTile, Section } from '../../components/ui'
-import { ArrowRightIcon } from '../../components/ui/icons'
+import { Button, Heading, Section } from '../../components/ui'
+import { ArrowRightIcon, Icon } from '../../components/ui/icons'
 import { experience, resume } from '../../content/content'
 import styles from './Experience.module.css'
 
 function Stage({ stage, index }) {
   return (
-    <Card as="li" className={styles.stage} style={{ '--i': index + 1 }} data-rise>
-      <div className={styles.stageHeader}>
-        <IconTile name={stage.icon} />
-        <Heading level={3}>{stage.title}</Heading>
+    <li className={styles.stage} style={{ '--i': index }}>
+      {/* The stage's point on the timeline. Decorative: the list is already ordered. */}
+      <span className={styles.marker} aria-hidden="true" />
+      <div className={styles.body}>
+        <div className={styles.stageHeader}>
+          <Icon name={stage.icon} className={styles.icon} width={20} height={20} />
+          <Heading level={3} size="sm" className={styles.title}>
+            {stage.title}
+          </Heading>
+        </div>
+        <p className={styles.summary}>{stage.summary}</p>
+        <p className={styles.examples}>
+          <span className={styles.examplesLabel}>{experience.examplesLabel}</span> {stage.examples}
+        </p>
       </div>
-      <p className={styles.summary}>{stage.summary}</p>
-      <p className={styles.examples}>
-        <strong>{experience.examplesLabel}</strong> {stage.examples}
-      </p>
-      {/* Points on to the next stage. Decorative: the list is already ordered. */}
-      <ArrowRightIcon className={styles.next} width={24} height={24} />
-    </Card>
+    </li>
   )
 }
 
 /**
- * How the work has widened, as three stages in order, then the current
- * role with a link to the résumé. When the section scrolls into view, a
- * strip of light switches on across the top of each stage in turn.
+ * How the work has widened: three stages on one timeline (across on wide
+ * screens, down on narrow ones), then the current role with a link to the
+ * résumé. When the section first scrolls into view, the line draws in and
+ * each stage appears as it reaches it.
  */
 export function Experience() {
   return (
     <Section id="experience" eyebrow={experience.eyebrow} title={experience.title} intro={experience.intro}>
-      <ol className={styles.stages}>
+      <ol className={styles.timeline}>
         {experience.stages.map((stage, index) => (
           <Stage key={stage.id} stage={stage} index={index} />
         ))}
@@ -40,7 +45,7 @@ export function Experience() {
           <span className={styles.roleLabel}>{experience.currentRole.label}</span>{' '}
           <span className={styles.roleValue}>{experience.currentRole.value}</span>
         </p>
-        <Button href={resume.href} target="_blank" rel="noopener" iconEnd={<ArrowRightIcon />}>
+        <Button href={resume.href} target="_blank" rel="noopener" iconEnd={<ArrowRightIcon />} className={styles.resume}>
           {experience.resumeLabel}
           <span className="visually-hidden"> {resume.newTabNote}</span>
         </Button>

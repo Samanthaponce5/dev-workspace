@@ -40,7 +40,7 @@
 
     <!--
       Intro overlay: the SP logo swirling together from five pieces of its
-      own letters, with rounded joins, its lime dot landing beside it with
+      own letters, with rounded joins, its dot landing beside it with
       one soft glow, and a tiny duck that reacts to it, on the page's own
       background. All of that is CSS, so it plays from the first frame
       without waiting for any JavaScript, while the 3D scene loads behind it.
@@ -69,7 +69,7 @@
       #intro {
         /* intro-geometry */ --dot-ratio: 0.4505; --gap-ratio: 0.1261; --drop-ratio: 0; /* /intro-geometry */
         --h: clamp(3.5rem, 9vw, 6.5rem); /* height of the letters */
-        --lime: var(--color-lime, #c8f55a);
+        --dot: var(--color-accent, #aeded1); /* the logo dot's colour: the theme's mint (deep teal in light mode) */
         --wipe-x: 50%;
         --wipe-y: 50%;
         --wipe-r: -1px;
@@ -128,12 +128,12 @@
       }
 
       .intro-trail-glow {
-        stroke: color-mix(in srgb, var(--lime) 35%, transparent);
+        stroke: color-mix(in srgb, var(--dot) 35%, transparent);
         stroke-width: 6px;
       }
 
       .intro-trail-core {
-        stroke: var(--lime);
+        stroke: var(--dot);
         stroke-width: 1.5px;
       }
 
@@ -315,9 +315,9 @@
         position: absolute;
         inset: 0;
         border-radius: 50%;
-        background: var(--lime);
+        background: var(--dot);
         /* The navbar dot's glow, in proportion, so the two match when this one lands on it. */
-        box-shadow: 0 0 calc(var(--h) * var(--dot-ratio) * 1.7) color-mix(in srgb, var(--lime) 60%, transparent);
+        box-shadow: 0 0 calc(var(--h) * var(--dot-ratio) * 1.7) color-mix(in srgb, var(--dot) 60%, transparent);
         transform-origin: 50% 100%;
         animation: intro-drop 320ms linear 900ms both;
       }
@@ -333,7 +333,7 @@
         }
         60% {
           transform: translateY(0) scale(1.06, 0.94);
-          box-shadow: 0 0 calc(var(--h) * 0.42) color-mix(in srgb, var(--lime) 80%, transparent);
+          box-shadow: 0 0 calc(var(--h) * 0.42) color-mix(in srgb, var(--dot) 80%, transparent);
           animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
         }
         80% {
@@ -346,7 +346,7 @@
         }
       }
 
-      /* A few small lime sparks fly off the dot as it lands: the soft pop. */
+      /* A few small sparks fly off the dot as it lands: the soft pop. */
       .intro-spark {
         position: absolute;
         left: 25%;
@@ -354,7 +354,7 @@
         width: 150%;
         height: 150%;
         overflow: visible;
-        stroke: var(--lime);
+        stroke: var(--dot);
         stroke-width: 2.2;
         stroke-linecap: round;
         pointer-events: none;

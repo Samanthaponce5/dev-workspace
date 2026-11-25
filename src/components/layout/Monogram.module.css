@@ -24,8 +24,8 @@
   width: 0.32em;
   height: 0.32em;
   border-radius: 50%;
-  background: var(--color-lime);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--color-lime) 60%, transparent);
+  background: var(--color-accent); /* the theme's mint (deep teal in light mode) */
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 60%, transparent);
   transition: transform var(--duration-base) var(--ease-out);
 }
 

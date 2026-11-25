@@ -8,7 +8,7 @@ const initials = site.name
   .join('')
 
 /**
- * "SP" home link with a small lime accent dot. The letters are drawn as
+ * "SP" home link with a small accent dot, in the theme's mint. The letters are drawn as
  * rounded lines (see logoShape.js), the same shapes the intro assembles.
  * Its accessible name starts with the visible letters, so voice-control
  * users can say what they see.
