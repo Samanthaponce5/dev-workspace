@@ -6,7 +6,8 @@
 export const site = {
   name: 'Samantha Ponce',
   role: 'Front-End Developer',
-  company: 'Podchaser',
+  /* Podchaser was acquired by Acast; written the same way as on the résumé. */
+  company: 'Acast / Podchaser',
 }
 
 /*
@@ -124,29 +125,29 @@ export const about = {
 
 export const skills = {
   eyebrow: 'What I do',
-  title: 'Data-heavy interfaces, built to last.',
-  intro: 'Most of my work is the front end of data-rich products, with enough reach into the API and the backend to see a feature all the way through.',
+  title: 'Front-end first, comfortable across the stack.',
+  intro: 'I build user-focused products, connect front-ends to the right data, and use AI tooling to ship faster and smarter.',
   groups: [
     {
       id: 'front-end',
       icon: 'layers',
-      title: 'Product interfaces',
-      description: 'Charts, search, discovery, tables, filters and pagination, responsive on every screen and built from reusable components.',
-      tags: ['React', 'Redux', 'React Router', 'Responsive design', 'Accessibility'],
+      title: 'Front-end',
+      description: 'Fast, accessible interfaces that scale and feel great to use.',
+      tags: ['React', 'Redux-Saga', 'Complex UI', 'Accessibility', 'Performance'],
     },
     {
       id: 'back-end',
       icon: 'database',
-      title: 'APIs and data',
-      description: 'Wiring the UI to REST and GraphQL APIs, with loading, empty and error states handled, and backend changes when a feature needs them.',
-      tags: ['REST APIs', 'GraphQL', 'Node.js', 'Laravel', 'Async state'],
+      title: 'APIs and back-end',
+      description: 'The services behind the UI: designing endpoints, integrating data, and keeping it reliable.',
+      tags: ['REST APIs', 'Laravel', 'Integrations', 'Data access', 'Caching'],
     },
     {
       id: 'ai-tooling',
       icon: 'gear',
-      title: 'Upgrades and quality',
-      description: 'Keeping a large codebase healthy: major version upgrades, root-cause fixes and the regression tests that stop bugs coming back.',
-      tags: ['React 17 → 19', 'React Router v5 → v6', 'Jest', 'Testing Library', 'Performance'],
+      title: 'AI and tooling',
+      description: 'Turning AI experiments into useful, reliable features and better workflows.',
+      tags: ['AI-assisted development', 'Prototyping', 'Developer workflows', 'AI features'],
     },
   ],
 }
