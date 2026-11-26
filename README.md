@@ -208,8 +208,10 @@ added at build time; see [The site's address](#the-sites-address).
 5. In the project's **Custom domains**, add the domain. When its DNS is on
    Cloudflare, the record is created for you.
 
-[`public/_redirects`](public/_redirects) serves the page at each section's
-address, and [`public/_headers`](public/_headers) sets the caching.
+Pages serves the page at each section's address by itself (a site with no
+`404.html` is treated as a single-page app), so no redirect rules are needed:
+a `_redirects` rewrite to `/index.html` actually bounces those addresses back
+to `/`. [`public/_headers`](public/_headers) sets the caching.
 
 ## Deploy to Vercel
 

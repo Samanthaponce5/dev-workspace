@@ -1,6 +1,0 @@
-# Cloudflare Pages: the sections' addresses serve the page (it scrolls to
-# the section itself). Same as the rewrite in vercel.json.
-/work        /index.html  200
-/about       /index.html  200
-/experience  /index.html  200
-/contact     /index.html  200
