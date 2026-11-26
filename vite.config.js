@@ -48,7 +48,7 @@ function preloadCriticalAssets() {
  * build time (the custom domain, once there is one). Without either, the
  * image path is left relative, which is fine for local builds only.
  *
- * The image is a screenshot of the home page (scripts/capture-brand.mjs).
+ * The image is the intro's logo and duck (scripts/capture-brand.mjs).
  */
 function socialMeta() {
   const domain = process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -56,7 +56,7 @@ function socialMeta() {
   // Cloudflare Pages doesn't provide the site's address: it has to be set as SITE_URL in the project's settings.
   if (process.env.CF_PAGES && !siteUrl) console.warn('\n  SITE_URL is not set: link previews will have no image. Add it in Cloudflare Pages > Settings > Variables.\n')
   const image = `${siteUrl}/og-image.jpg`
-  const alt = `The home page of ${site.name}’s portfolio: the heading “Sam” beside a tiny 3D desk scene at night.`
+  const alt = `${site.name}’s SP logo, with its mint dot and a tiny rubber duck, on a dark background.`
   const meta = (key, name, content) => ({ tag: 'meta', attrs: { [key]: name, content }, injectTo: 'head' })
 
   return {

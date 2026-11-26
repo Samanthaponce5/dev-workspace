@@ -7,15 +7,17 @@
  *     (src/styles/tokens.css), on the page's dark background. It writes
  *     favicon.svg, favicon.ico (16, 32 and 48 px), apple-touch-icon.png
  *     and the 192 and 512 px icons the web manifest lists.
- *   - The preview image is a screenshot of the real home page, in the Dark
- *     theme, once the intro has finished and the 3D scene is drawn,
- *     scaled down from a sharp 2x capture to 1200 x 630 (og-image.jpg).
+ *   - The preview image is the real intro, captured once it has assembled:
+ *     the SP logo with its dot and the tiny duck on the page's dark
+ *     background, in the Dark theme, the logo drawn a little larger than
+ *     on screen, scaled down from a sharp 2x capture to 1200 x 630
+ *     (og-image.jpg).
  *
  *   1. Build and serve the production site:  npm run build && npm run preview
  *   2. In another terminal:                  npm run brand
  *      (or: node scripts/capture-brand.mjs http://localhost:4173/)
  *
- * Run it again when the logo, the theme colours or the home page change.
+ * Run it again when the logo, the duck or the theme colours change.
  * Needs Node 22+ and Google Chrome. Set CHROME_PATH if Chrome isn't in
  * the default macOS location.
  */
@@ -189,26 +191,35 @@ await rasterizer.close()
 
 /* --- The link-preview image --- */
 
-const PREVIEW = { width: 1200, height: 630, scale: 2, quality: 0.88 }
+const PREVIEW = { width: 1200, height: 630, scale: 2, quality: 0.9 }
+const PREVIEW_LOGO_HEIGHT = 150 // px, the letters' height in the 1200 x 630 picture (about 104 on a desktop screen)
 
 const site = await openPage(PREVIEW)
 await site.page('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] })
+// Hold the intro once it has assembled: with the 3D scene and its still images kept from loading, the
+// page is never ready, so the logo doesn't fly off to the navbar (that waits for the scene, or for
+// several seconds without it, far longer than the capture takes).
+await site.page('Network.enable')
+await site.page('Network.setBlockedURLs', { urls: ['*DeskScene*', '*scene-desktop*', '*scene-mobile*'] })
+// The logo drawn larger than on screen, so it reads at the small sizes previews are shown at.
+await site.page('Page.addScriptToEvaluateOnNewDocument', {
+  source: `document.addEventListener('DOMContentLoaded', () => document.head.append(Object.assign(document.createElement('style'), { textContent: '#intro { --h: ${PREVIEW_LOGO_HEIGHT}px !important; }' })))`,
+})
 // A fresh profile, so no saved display settings: the Dark theme, normal text, full motion.
 await site.page('Page.navigate', { url })
 
-// Wait for the intro to hand over to the page and for the scene's first complete frame.
-const ready = await site.evaluate(`(async () => {
+// Wait for the logo to assemble, its dot to land and the duck to arrive (everything but the duck's endless bob).
+const assembled = await site.evaluate(`(async () => {
   const start = Date.now()
-  const done = () => document.querySelector('[data-ready]') && !document.documentElement.classList.contains('intro-pending') && !document.querySelector('#intro')
-  while (!done()) { if (Date.now() - start > 60000) return false; await new Promise(r => setTimeout(r, 50)) }
+  while (!document.getElementById('intro')) { if (Date.now() - start > 10000) return false; await new Promise(r => setTimeout(r, 30)) }
   await document.fonts.ready
-  return true
+  const overlay = document.getElementById('intro')
+  const playing = overlay.getAnimations({ subtree: true }).filter((animation) => animation.effect?.getComputedTiming().endTime !== Infinity)
+  await Promise.all(playing.map((animation) => animation.finished.catch(() => {})))
+  return Boolean(document.getElementById('intro'))
 })()`)
-if (!ready) throw new Error(`The home page never finished loading at ${url}. Is the site being served (npm run build && npm run preview)?`)
-await sleep(9000) // the page's rise-in, and the duck's hello has come and gone, so no speech bubble is caught mid-fade
-// The floating Display settings button is a control, not part of the view: leave it out of the picture.
-await site.evaluate(`document.querySelectorAll('button[aria-haspopup="dialog"]').forEach((button) => (button.style.visibility = 'hidden'))`)
-await sleep(100)
+if (!assembled) throw new Error(`The intro never assembled at ${url}. Is the site being served (npm run build && npm run preview)?`)
+await sleep(250)
 
 const shot = (await site.page('Page.captureScreenshot', { format: 'png' })).data
 const jpeg = await site.evaluate(`(async () => {

@@ -262,6 +262,53 @@
   animation: flow-text 600ms var(--ease-out) calc(920ms + var(--i) * 90ms) both;
 }
 
+/*
+ * Phones: the branches are stacked down the side, taller than the screen,
+ * so each one waits, undrawn, until it is scrolled to (data-seen, from
+ * useBranchesSeen.js) and then draws out, its circle and words following.
+ * The code circle and trunk still appear with the section, as above.
+ */
+@media (max-width: 37.49rem) {
+  :global([data-reveal]) .branchLines:not([data-seen]) .line,
+  :global([data-reveal]) .branchLines:not([data-seen]) .glow {
+    stroke-dashoffset: 1;
+    opacity: 0; /* not even the rounded tip of the undrawn line */
+    animation: none;
+  }
+
+  :global([data-reveal]) .branchLines:not([data-seen]) .pulse {
+    animation: none;
+  }
+
+  :global([data-reveal]) .branchLines:not([data-seen]) .end,
+  :global([data-reveal]) .branch:not([data-seen]) .node,
+  :global([data-reveal]) .branch:not([data-seen]) .text > * {
+    opacity: 0;
+    animation: none;
+  }
+
+  :global([data-reveal]) .branchLines[data-seen] .line,
+  :global([data-reveal]) .branchLines[data-seen] .glow {
+    animation: flow-draw 300ms cubic-bezier(0.3, 0, 0.3, 1) both;
+  }
+
+  :global([data-reveal]) .branchLines[data-seen] .pulse {
+    animation: flow-pulse 560ms cubic-bezier(0.3, 0, 0.3, 1) both;
+  }
+
+  :global([data-reveal]) .branchLines[data-seen] .end {
+    animation: flow-light 300ms var(--ease-out) 300ms both;
+  }
+
+  :global([data-reveal]) .branch[data-seen] .node {
+    animation: flow-node 520ms var(--ease-out) 310ms both;
+  }
+
+  :global([data-reveal]) .branch[data-seen] .text > * {
+    animation: flow-text 600ms var(--ease-out) 370ms both;
+  }
+}
+
 @keyframes flow-draw {
   from {
     stroke-dashoffset: 1;

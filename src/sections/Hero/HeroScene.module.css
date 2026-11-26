@@ -24,7 +24,18 @@
   transition: opacity 600ms var(--ease-out);
 }
 
-/* Let vertical swipes scroll the page even when they start on the scene. */
+/*
+ * Taps on the characters are for the scene alone: no blue tap flash, no
+ * selection highlight and no long-press menu on phones.
+ */
+.scene {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
 .canvas canvas {
+  /* Let vertical swipes scroll the page even when they start on the scene. */
   touch-action: pan-y;
+  outline: none;
 }
