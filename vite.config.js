@@ -53,7 +53,7 @@ function socialMeta() {
   const domain = process.env.VERCEL_PROJECT_PRODUCTION_URL
   const siteUrl = (process.env.SITE_URL ?? (domain ? `https://${domain}` : '')).replace(/\/$/, '')
   const image = `${siteUrl}/og-image.jpg`
-  const alt = `The home page of ${site.name}’s portfolio: the heading “Sam” beside a tiny 3D model of ${site.name.split(' ')[0]}’s desk at night.`
+  const alt = `The home page of ${site.name}’s portfolio: the heading “Sam” beside a tiny 3D desk scene at night.`
   const meta = (key, name, content) => ({ tag: 'meta', attrs: { [key]: name, content }, injectTo: 'head' })
 
   return {

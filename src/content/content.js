@@ -4,7 +4,10 @@
  */
 
 export const site = {
-  name: 'Samantha Ponce',
+  /* First name only, everywhere on the site. */
+  name: 'Samantha',
+  /* The letters of the logo (drawn, see components/layout/logoShape.js), for its accessible name. */
+  initials: 'SP',
   role: 'Front-End Developer',
   /* Podchaser was acquired by Acast; written the same way as on the résumé. */
   company: 'Acast / Podchaser',
@@ -175,7 +178,7 @@ export const experience = {
       id: 'mren',
       icon: 'code',
       title: 'Software Engineer Intern',
-      meta: 'Mren · 2020 – 2021',
+      meta: 'Mren · Nov 2020 – Feb 2021',
       summary: 'Built and tested web features with React, TypeScript and Node.js.',
       examples: 'coordinated four intern developers through planning and code reviews, and refactored code for quality and performance.',
     },
@@ -183,7 +186,7 @@ export const experience = {
       id: 'zvn',
       icon: 'layers',
       title: 'Software Engineer',
-      meta: 'ZVN DEV · 2021 – 2023',
+      meta: 'ZVN DEV · Mar 2021 – Dec 2022',
       summary: 'Built client-facing web apps and storefronts for a range of clients.',
       examples: 'React, Next.js and GraphQL apps, Shopify storefronts with Liquid templates, and cross-browser fixes in Chrome, Safari and Firefox.',
     },
@@ -261,7 +264,7 @@ export const displaySettings = {
 }
 
 export const footer = {
-  note: 'Designed and built by Samantha Ponce.',
+  note: `Designed and built by ${site.name}.`,
   /* How the site itself is made: the engineering a visitor can't see. */
   built: 'Hand-built with React and React Three Fiber: prerendered for a fast first paint, usable by keyboard, with adjustable text size, contrast and motion.',
   backToTop: 'Back to top',

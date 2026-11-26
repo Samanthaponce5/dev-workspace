@@ -1,6 +1,6 @@
-# Samantha Ponce · Portfolio
+# Samantha · Portfolio
 
-Personal portfolio for Samantha Ponce, front-end developer. The hero is a small
+Personal portfolio for Samantha, front-end developer. The hero is a small
 3D model of her desk at night, with a mini Samantha, her dog Andy and a rubber
 duck that talks back. The rest of the page is calm and easy to scan.
 

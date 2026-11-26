@@ -3,11 +3,6 @@ import { HOME_PATH } from '../../utils/routes'
 import { LOGO_HEIGHT, LOGO_LETTERS, LOGO_WIDTH, STROKE } from './logoShape'
 import styles from './Monogram.module.css'
 
-const initials = site.name
-  .split(' ')
-  .map((word) => word[0])
-  .join('')
-
 /**
  * "SP" home link with a small accent dot, in the theme's mint. The letters are drawn as
  * rounded lines (see logoShape.js), the same shapes the intro assembles.
@@ -19,7 +14,7 @@ const initials = site.name
  */
 export function Monogram() {
   return (
-    <a className={styles.monogram} href={HOME_PATH} aria-label={`${initials}: ${site.name}, back to top`} data-site-logo>
+    <a className={styles.monogram} href={HOME_PATH} aria-label={`${site.initials}: ${site.name}, back to top`} data-site-logo>
       <svg
         className={styles.letters}
         viewBox={`0 0 ${LOGO_WIDTH} ${LOGO_HEIGHT}`}
