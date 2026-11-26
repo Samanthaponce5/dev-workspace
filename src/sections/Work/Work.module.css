@@ -289,23 +289,23 @@
 
   :global([data-reveal]) .branchLines[data-seen] .line,
   :global([data-reveal]) .branchLines[data-seen] .glow {
-    animation: flow-draw 300ms cubic-bezier(0.3, 0, 0.3, 1) both;
+    animation: flow-draw 230ms cubic-bezier(0.3, 0, 0.3, 1) both;
   }
 
   :global([data-reveal]) .branchLines[data-seen] .pulse {
-    animation: flow-pulse 560ms cubic-bezier(0.3, 0, 0.3, 1) both;
+    animation: flow-pulse 430ms cubic-bezier(0.3, 0, 0.3, 1) both;
   }
 
   :global([data-reveal]) .branchLines[data-seen] .end {
-    animation: flow-light 300ms var(--ease-out) 300ms both;
+    animation: flow-light 230ms var(--ease-out) 210ms both;
   }
 
   :global([data-reveal]) .branch[data-seen] .node {
-    animation: flow-node 520ms var(--ease-out) 310ms both;
+    animation: flow-node 400ms var(--ease-out) 220ms both;
   }
 
   :global([data-reveal]) .branch[data-seen] .text > * {
-    animation: flow-text 600ms var(--ease-out) 370ms both;
+    animation: flow-text 460ms var(--ease-out) 260ms both;
   }
 }
 

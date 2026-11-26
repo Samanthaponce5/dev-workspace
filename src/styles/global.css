@@ -8,6 +8,8 @@
 
 html {
   color-scheme: dark;
+  /* No grey or blue flash over whatever is tapped on a phone (Android picks the parent it highlights itself); controls show their own pressed and focus states. */
+  -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--nav-height) + var(--space-4));
   -webkit-text-size-adjust: 100%;

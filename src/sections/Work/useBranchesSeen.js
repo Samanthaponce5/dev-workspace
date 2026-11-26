@@ -37,7 +37,7 @@ export function useBranchesSeen(flowRef) {
           setSeen((before) => new Set([...before, ...newlySeen]))
           entries.forEach((entry) => entry.isIntersecting && observer.unobserve(entry.target))
         },
-        { rootMargin: '0px 0px -15% 0px', threshold: 0.2 },
+        { rootMargin: '0px 0px -6% 0px', threshold: 0.1 }, // as soon as a branch starts coming into view
       )
       branches.forEach((branch) => observer.observe(branch))
     }
