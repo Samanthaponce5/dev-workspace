@@ -8,27 +8,30 @@ import { usePageVisible } from '../../hooks/usePageVisible'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useRelativeFrame } from '../../hooks/useRelativeFrame'
 import { revealIntro } from '../../intro/reveal'
-import { isIntroDone } from '../../utils/intro'
+import { isIntroDone, lettersAssembled } from '../../utils/intro'
 import { SceneControls } from './SceneControls'
 import { ScenePoster } from './ScenePoster'
 import styles from './HeroScene.module.css'
 
 /*
- * The 3D bundle starts downloading the moment this file is evaluated,
- * alongside the first render, rather than waiting for the hero to mount.
- * (index.html also preloads it, so on a slow connection it is usually
- * already on its way.)
+ * The 3D bundle downloads from the start (index.html preloads it), but it
+ * only runs, and the scene only sets up, once the intro's letters have
+ * come together: evaluating the bundle and compiling the scene are heavy
+ * enough to stall the letters' swirl for a moment on a phone. It is still
+ * ready before the reveal needs it.
  */
 const liveScene = { Component: null, failed: false }
 const liveSceneSettled = canRender3D
-  ? import('../../components/three/DeskScene').then(
-      (module) => {
-        liveScene.Component = module.default
-      },
-      () => {
-        liveScene.failed = true // offline, or the file could not be fetched: the still image takes over
-      },
-    )
+  ? lettersAssembled()
+      .then(() => import('../../components/three/DeskScene'))
+      .then(
+        (module) => {
+          liveScene.Component = module.default
+        },
+        () => {
+          liveScene.failed = true // offline, or the file could not be fetched: the still image takes over
+        },
+      )
   : null
 
 /* How long after the page opened to keep waiting for the live scene before revealing with the still image. */
