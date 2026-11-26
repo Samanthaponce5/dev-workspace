@@ -265,7 +265,7 @@
 /*
  * Phones: the branches are stacked down the side, taller than the screen,
  * so each one waits, undrawn, until it is scrolled to (data-seen, from
- * useBranchesSeen.js) and then draws out, its circle and words following.
+ * hooks/useSeenOnScroll.js) and then draws out, its circle and words following.
  * The code circle and trunk still appear with the section, as above.
  */
 @media (max-width: 37.49rem) {

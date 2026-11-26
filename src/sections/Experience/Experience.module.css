@@ -223,6 +223,42 @@
   animation-delay: calc(var(--i) * var(--step) + 120ms);
 }
 
+/*
+ * Phones and tablets: the timeline runs down the page, taller than the
+ * screen, so each role waits until it is scrolled to (data-seen, from
+ * hooks/useSeenOnScroll.js): its marker appears, its words fade up and the
+ * rail draws down towards the next role. The current-role bar waits too.
+ */
+@media (max-width: 63.99rem) {
+  :global([data-reveal]) .stage:not([data-seen])::before {
+    transform: scaleY(0);
+    animation: none;
+  }
+
+  :global([data-reveal]) .stage:not([data-seen]) .marker,
+  :global([data-reveal]) .stage:not([data-seen]) .body > *,
+  :global([data-reveal]) .current:not([data-seen]) {
+    opacity: 0;
+    animation: none;
+  }
+
+  :global([data-reveal]) .stage[data-seen]::before {
+    animation: draw-down var(--step) linear 150ms both;
+  }
+
+  :global([data-reveal]) .stage[data-seen] .marker {
+    animation: marker-in 400ms var(--ease-out) both;
+  }
+
+  :global([data-reveal]) .stage[data-seen] .body > * {
+    animation: stage-in 700ms var(--ease-out) 120ms both;
+  }
+
+  :global([data-reveal]) .current[data-seen] {
+    animation: stage-in 700ms var(--ease-out) both;
+  }
+}
+
 @keyframes draw-across {
   from {
     transform: scaleX(0);

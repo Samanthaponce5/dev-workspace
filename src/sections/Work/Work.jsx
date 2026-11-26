@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { Heading, Section, Tag } from '../../components/ui'
 import { CodeIcon, Icon } from '../../components/ui/icons'
 import { skills } from '../../content/content'
-import { useBranchesSeen } from './useBranchesSeen'
+import { useSeenOnScroll } from '../../hooks/useSeenOnScroll'
 import { useFlowLines } from './useFlowLines'
 import { useSpotlight } from './useSpotlight'
 import styles from './Work.module.css'
@@ -49,7 +49,7 @@ function Lines({ lines, active, ids, seen }) {
  * back-end, and AI and tooling. When the section scrolls into view a
  * pulse travels the lines and each branch appears as it arrives; on
  * phones, where the branches are stacked taller than the screen, each one
- * draws out as it is scrolled to (see useBranchesSeen.js).
+ * draws out as it is scrolled to (see hooks/useSeenOnScroll.js).
  * Hovering, tapping or focusing a branch picks it out and dims the rest.
  *
  * The lines are measured from where the circles really are (see
@@ -62,7 +62,8 @@ export function Work() {
   const nodeRefs = useRef([])
   const lines = useFlowLines(flowRef, sourceRef, nodeRefs)
   const { active, handlersFor } = useSpotlight()
-  const seen = useBranchesSeen(flowRef)
+  // Phones: each branch draws as it is scrolled to, once the trunk has drawn (see Work.module.css).
+  const seen = useSeenOnScroll(flowRef, '[data-branch]', { after: 600 })
   const ids = skills.groups.map((group) => group.id)
 
   return (
