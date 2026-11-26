@@ -43,7 +43,8 @@ function preloadCriticalAssets() {
  * known, og:url and the canonical URL) to the built page, so preview
  * crawlers, which don't run JavaScript, find them in the HTML itself.
  * They want absolute URLs, so the address comes from the environment:
- * SITE_URL if set, otherwise the production domain Vercel provides at
+ * SITE_URL if set (on Cloudflare Pages it must be: set it in the
+ * project's settings), otherwise the production domain Vercel provides at
  * build time (the custom domain, once there is one). Without either, the
  * image path is left relative, which is fine for local builds only.
  *
@@ -52,6 +53,8 @@ function preloadCriticalAssets() {
 function socialMeta() {
   const domain = process.env.VERCEL_PROJECT_PRODUCTION_URL
   const siteUrl = (process.env.SITE_URL ?? (domain ? `https://${domain}` : '')).replace(/\/$/, '')
+  // Cloudflare Pages doesn't provide the site's address: it has to be set as SITE_URL in the project's settings.
+  if (process.env.CF_PAGES && !siteUrl) console.warn('\n  SITE_URL is not set: link previews will have no image. Add it in Cloudflare Pages > Settings > Variables.\n')
   const image = `${siteUrl}/og-image.jpg`
   const alt = `The home page of ${site.name}’s portfolio: the heading “Sam” beside a tiny 3D desk scene at night.`
   const meta = (key, name, content) => ({ tag: 'meta', attrs: { [key]: name, content }, injectTo: 'head' })

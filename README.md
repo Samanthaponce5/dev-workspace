@@ -196,6 +196,21 @@ added at build time; see [The site's address](#the-sites-address).
 | `@fontsource-variable/geist`       | Self-hosted typeface, no third-party font requests               |
 | `@fontsource-variable/geist-mono`  | Self-hosted monospace for small labels and tags                  |
 
+## Deploy to Cloudflare Pages
+
+1. In the Cloudflare dashboard, open **Workers & Pages**, choose **Create**,
+   then the **Pages** tab and **Connect to Git**, and pick this repository.
+2. Build settings: build command `npm run build`, output directory `dist`,
+   production branch `main`. The Node version comes from `.node-version`.
+3. Under **Variables**, add `SITE_URL` with the site's address, such as
+   `https://example.com` (no trailing slash). Link previews need it.
+4. **Save and Deploy**. Every later push to `main` redeploys.
+5. In the project's **Custom domains**, add the domain. When its DNS is on
+   Cloudflare, the record is created for you.
+
+[`public/_redirects`](public/_redirects) serves the page at each section's
+address, and [`public/_headers`](public/_headers) sets the caching.
+
 ## Deploy to Vercel
 
 ### From the Vercel dashboard
