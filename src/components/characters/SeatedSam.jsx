@@ -8,6 +8,7 @@ import { Chair } from '../three/Chair'
 import { SpeechBubble } from '../three/SpeechBubble'
 import { facingAngle, INTRO, setWorkingPose, writeHoverPose, writeIntroPose } from './greeting'
 import { MiniSam } from './MiniSam'
+import { track } from '../../utils/analytics'
 
 /* The bubble's tail points here: above her head, clear of the waving hand. */
 const BUBBLE_ANCHOR = [0, 2.04, 0]
@@ -84,6 +85,7 @@ export function SeatedSam({ position, cameraAzimuth, introStarted, animate = tru
         }}
         onClick={(event) => {
           event.stopPropagation()
+          track('tap_sam')
           greet()
         }}
       >

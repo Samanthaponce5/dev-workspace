@@ -3,6 +3,7 @@ import { nav } from '../../content/content'
 import { useActiveSection } from '../../hooks/useActiveSection'
 import { useScrolled } from '../../hooks/useScrolled'
 import { cx } from '../../utils/cx'
+import { track } from '../../utils/analytics'
 import { pathOf } from '../../utils/routes'
 import { Container } from '../ui'
 import { CloseIcon, MenuIcon } from '../ui/icons'
@@ -39,7 +40,7 @@ export function Nav() {
           <ul className={styles.links}>
             {nav.map((item) => (
               <li key={item.id} className={cx(!item.pinned && styles.desktopOnly)}>
-                <a className={styles.link} href={pathOf(item.id)} aria-current={activeId === item.id ? 'true' : undefined}>
+                <a className={styles.link} href={pathOf(item.id)} aria-current={activeId === item.id ? 'true' : undefined} data-track={`click_nav_${item.label.toLowerCase()}`}>
                   {item.label}
                 </a>
               </li>
@@ -55,7 +56,10 @@ export function Nav() {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls={MENU_ID}
-            onClick={() => setMenuOpen((open) => !open)}
+            onClick={() => {
+              if (!menuOpen) track('open_mobile_menu')
+              setMenuOpen((open) => !open)
+            }}
           >
             {menuOpen ? <CloseIcon width={24} height={24} /> : <MenuIcon width={24} height={24} />}
           </button>

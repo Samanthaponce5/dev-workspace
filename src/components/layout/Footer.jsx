@@ -13,10 +13,10 @@ export function Footer() {
           <p className={styles.built}>{footer.built}</p>
         </div>
         <div className={styles.links}>
-          <a className={styles.top} href="/privacy">
+          <a className={styles.top} href="/privacy" data-track="click_privacy_policy">
             {footer.privacy}
           </a>
-          <a className={styles.top} href={HOME_PATH}>
+          <a className={styles.top} href={HOME_PATH} data-track="click_back_to_top">
             {footer.backToTop}
           </a>
         </div>

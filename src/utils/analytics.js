@@ -17,15 +17,12 @@
  *   - Google's advertising features (Google signals, ad personalisation,
  *     ad storage) are off. Nothing personal is ever sent.
  *
- * Events (on top of the page view and Google's automatic scroll, outbound
- * link and file download events, set up in the GA property):
- *   section_view   { section }         the first time each section is reached
- *   resume_open    { from }            a Résumé link was followed
- *   contact_click  { method }          Send email, LinkedIn or GitHub
- *   copy_email     {}                  the email address was copied
- * Links carry these in data-track (the event) and data-track-* (its
- * parameters); see trackClicks(). Events sent before the decision is made
- * wait, and are dropped if the answer is no.
+ * Events: every button and link has its own plain-English event name, so
+ * the Events report reads like a list of what visitors did (the full list
+ * is in the README). Links carry theirs in data-track (see trackClicks());
+ * others call track() directly. Events sent before analytics has decided
+ * whether it may run wait, and are dropped if the answer is no. Whether a
+ * visitor is on a phone or a computer is Google's own "Device category".
  */
 import { isIntroDone, onIntroDone } from './intro'
 

@@ -14,7 +14,7 @@ import styles from './Monogram.module.css'
  */
 export function Monogram() {
   return (
-    <a className={styles.monogram} href={HOME_PATH} aria-label={`${site.initials}: ${site.name}, back to top`} data-site-logo>
+    <a className={styles.monogram} href={HOME_PATH} aria-label={`${site.initials}: ${site.name}, back to top`} data-site-logo data-track="click_logo_home">
       <svg
         className={styles.letters}
         viewBox={`0 0 ${LOGO_WIDTH} ${LOGO_HEIGHT}`}

@@ -43,6 +43,7 @@ export function MobileMenu({ id, items, activeId, onClose, ignoreRef }) {
               className={styles.link}
               href={pathOf(item.id)}
               aria-current={activeId === item.id ? 'true' : undefined}
+              data-track={`click_nav_${item.label.toLowerCase()}`}
               onClick={() => onClose({ restoreFocus: false })}
             >
               {item.label}

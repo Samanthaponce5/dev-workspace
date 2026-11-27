@@ -25,7 +25,7 @@ export function ConsentBanner() {
     <section className={styles.banner} aria-label={consent.label}>
       <p className={styles.text}>
         {consent.text}{' '}
-        <a className={styles.link} href="/privacy">
+        <a className={styles.link} href="/privacy" data-track="click_privacy_policy">
           {consent.privacy}
         </a>
       </p>

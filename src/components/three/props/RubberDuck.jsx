@@ -9,6 +9,7 @@ import { registerSceneDuck } from '../../../utils/sceneBridge'
 import { playSqueak } from '../../../utils/squeak'
 import { palette } from '../materials'
 import { SpeechBubble } from '../SpeechBubble'
+import { track } from '../../../utils/analytics'
 
 const BUBBLE_MS = 2600
 const INTRO_BUBBLE_MS = 3000
@@ -129,6 +130,7 @@ export function RubberDuck({ position, quotes, introQuote, animate = true }) {
         {...hover}
         onClick={(event) => {
           event.stopPropagation()
+          track('tap_duck')
           squeak()
         }}
       >

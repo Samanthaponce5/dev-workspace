@@ -9,7 +9,8 @@ const NEW_TAB = { target: '_blank', rel: 'noopener noreferrer' }
 const COPIED_MS = 2000
 
 /* What following each row sends to analytics (see utils/analytics.js). */
-const trackingFor = (link) => (link.id === 'resume' ? { 'data-track': 'resume_open', 'data-track-from': 'contact' } : { 'data-track': 'contact_click', 'data-track-method': link.id })
+const TRACKING = { email: 'click_send_email', linkedin: 'click_linkedin', github: 'click_github', resume: 'click_resume_contact' }
+const trackingFor = (link) => ({ 'data-track': TRACKING[link.id] })
 
 /*
  * The email row: a row like the others (it opens the visitor's mail app),
@@ -28,10 +29,10 @@ function EmailRow({ link }) {
   }, [copied])
 
   const copy = async () => {
+    track('copy_email') // they pressed Copy, whether the clipboard or the hand-copy fallback does the copying
     try {
       await navigator.clipboard.writeText(link.address)
       setCopied(true)
-      track('copy_email')
     } catch {
       const range = document.createRange()
       range.selectNodeContents(addressRef.current)

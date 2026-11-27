@@ -44,7 +44,7 @@ export function Hero() {
           </ul>
 
           <div className={styles.actions}>
-            <Button href={hero.primaryAction.href} iconEnd={<ArrowRightIcon className={styles.arrow} />}>
+            <Button href={hero.primaryAction.href} iconEnd={<ArrowRightIcon className={styles.arrow} />} data-track="click_view_skills">
               {hero.primaryAction.label}
             </Button>
           </div>

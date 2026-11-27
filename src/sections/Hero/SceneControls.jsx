@@ -17,7 +17,7 @@ export function SceneControls({ labels }) {
     <ul className={styles.controls} aria-label="Desk scene interactions">
       {ACTIONS.map(({ key, event }) => (
         <li key={key}>
-          <button type="button" className={styles.control} data-scene-action={key} onClick={() => emitSceneEvent(event)}>
+          <button type="button" className={styles.control} data-scene-action={key} onClick={() => emitSceneEvent(event)} data-track={`tap_${key}`}>
             {labels[key]}
           </button>
         </li>

@@ -57,7 +57,7 @@ export function Experience() {
             </span>
             <span className={styles.roleValue}>{experience.currentRole.role}</span>
           </p>
-          <Button href={resume.href} target="_blank" rel="noopener" iconEnd={<ArrowRightIcon />} className={styles.resume} data-track="resume_open" data-track-from="experience">
+          <Button href={resume.href} target="_blank" rel="noopener" iconEnd={<ArrowRightIcon />} className={styles.resume} data-track="click_resume_experience">
             {experience.resumeLabel}
             <span className="visually-hidden"> {resume.newTabNote}</span>
           </Button>

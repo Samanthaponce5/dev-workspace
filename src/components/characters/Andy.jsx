@@ -9,6 +9,7 @@ import { andyPalette as colors } from '../three/materials'
 import { ANDY_FACE, ANDY_LEG, onAndyHead, paintAndyBody, paintAndyLeg, placeAndyBody, placeAndyEar, placeAndyHead, placeAndyLeg } from './andyShape'
 import { createShapedSphere } from './geometry/shapedSphere'
 import { SpeechBubble } from '../three/SpeechBubble'
+import { track } from '../../utils/analytics'
 
 const SCALE = 1.3
 const HOP_SECONDS = 0.95
@@ -192,6 +193,7 @@ export function Andy({ position, facingAngle = 0, animate = true, shadows }) {
         {...hover}
         onClick={(event) => {
           event.stopPropagation()
+          track('tap_andy')
           hop()
         }}
       >

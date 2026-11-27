@@ -1,5 +1,6 @@
 import { themeToggle as copy } from '../../content/content'
 import { useDisplaySettings } from '../../hooks/useDisplaySettings'
+import { track } from '../../utils/analytics'
 import { applySettings } from '../../utils/displaySettings'
 import { MoonIcon, SunIcon } from '../ui/icons'
 import styles from './ThemeToggle.module.css'
@@ -21,7 +22,10 @@ export function ThemeToggle() {
       type="button"
       className={styles.toggle}
       aria-label={isLight ? copy.toDark : copy.toLight}
-      onClick={() => applySettings({ appearance: isLight ? 'dark' : 'light' })}
+      onClick={() => {
+        track(isLight ? 'switch_to_dark_mode' : 'switch_to_light_mode')
+        applySettings({ appearance: isLight ? 'dark' : 'light' })
+      }}
     >
       <SunIcon className={styles.sun} width={22} height={22} />
       <MoonIcon className={styles.moon} width={22} height={22} />

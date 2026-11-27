@@ -203,15 +203,30 @@ keep the two in step):
 - `?notrack` turns it off in that browser; `?track` forgets the choice (and
   asks again where asking applies).
 
-Besides the page view and Google's automatic scroll, outbound-link and
-file-download events, it sends:
+Every button and link sends its own plain-English event, so Google Analytics'
+Events report (Reports → Engagement → Events) reads like a list of what
+visitors did:
 
-| Event | Parameters | When |
-| --- | --- | --- |
-| `section_view` | `section` | The first time each section is reached |
-| `resume_open` | `from` (`experience`, `contact`) | A Résumé link is followed |
-| `contact_click` | `method` (`email`, `linkedin`, `github`) | A contact row is followed |
-| `copy_email` | | The email address is copied |
+| Event | What the visitor did |
+| --- | --- |
+| `click_logo_home` | Clicked the SP logo |
+| `click_nav_skills`, `click_nav_about`, `click_nav_experience`, `click_nav_contact` | Clicked a section in the menu (desktop bar or phone menu) |
+| `open_mobile_menu` | Opened the phone menu |
+| `click_view_skills` | Clicked "View skills" in the hero |
+| `reached_skills`, `reached_about`, `reached_experience`, `reached_contact` | Reached a section (first time per visit, by scrolling or a link) |
+| `switch_to_light_mode`, `switch_to_dark_mode` | Used the theme switch |
+| `open_display_settings` | Opened Display settings (button or phone menu) |
+| `apply_display_settings` | Applied Display settings (with `text_size`, `contrast`, `motion`) |
+| `set_large_text`, `set_high_contrast`, `set_reduced_motion` | Applied with that setting turned on |
+| `click_send_email`, `copy_email` | Opened an email, or copied the address |
+| `click_linkedin`, `click_github` | Followed LinkedIn or GitHub |
+| `click_resume_experience`, `click_resume_contact` | Opened the résumé from Experience or from Contact |
+| `tap_sam`, `tap_andy`, `tap_duck` | Tapped a character in the 3D scene |
+| `click_privacy_policy`, `click_back_to_top` | Footer (or banner) links |
+
+Phone, tablet or computer is Google's own "Device category" dimension. Google
+also adds its automatic events: `page_view`, `session_start`, `first_visit`,
+`user_engagement`, `scroll`, `click` (outbound links) and `file_download`.
 
 Links carry their event in `data-track` attributes. In the GA property,
 "Page changes based on browser history events" is off, because the address
