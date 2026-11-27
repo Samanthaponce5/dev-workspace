@@ -263,9 +263,19 @@ export const displaySettings = {
   applied: 'Display settings applied.',
 }
 
+/* The cookie question, shown only to visitors from the EU/EEA, the UK and Switzerland (see utils/analytics.js). */
+export const consent = {
+  label: 'Cookie choice',
+  text: 'May I use Google Analytics cookies to count visits and see which sections are read? Nothing that identifies you is collected.',
+  privacy: 'Privacy',
+  allow: 'Allow',
+  decline: 'No thanks',
+}
+
 export const footer = {
   note: `Designed and built by ${site.name}.`,
   /* How the site itself is made: the engineering a visitor can't see. */
   built: 'Hand-built with React and React Three Fiber: prerendered for a fast first paint, usable by keyboard, with adjustable text size, contrast and motion.',
+  privacy: 'Privacy',
   backToTop: 'Back to top',
 }

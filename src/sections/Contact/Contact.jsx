@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Card, Section } from '../../components/ui'
 import { ArrowUpRightIcon, CheckIcon, CopyIcon, Icon } from '../../components/ui/icons'
 import { contact, resume } from '../../content/content'
+import { track } from '../../utils/analytics'
 import styles from './Contact.module.css'
 
 const NEW_TAB = { target: '_blank', rel: 'noopener noreferrer' }
 const COPIED_MS = 2000
+
+/* What following each row sends to analytics (see utils/analytics.js). */
+const trackingFor = (link) => (link.id === 'resume' ? { 'data-track': 'resume_open', 'data-track-from': 'contact' } : { 'data-track': 'contact_click', 'data-track-method': link.id })
 
 /*
  * The email row: a row like the others (it opens the visitor's mail app),
@@ -27,6 +31,7 @@ function EmailRow({ link }) {
     try {
       await navigator.clipboard.writeText(link.address)
       setCopied(true)
+      track('copy_email')
     } catch {
       const range = document.createRange()
       range.selectNodeContents(addressRef.current)
@@ -37,7 +42,7 @@ function EmailRow({ link }) {
 
   return (
     <li className={styles.emailRow}>
-      <a className={styles.link} href={link.href}>
+      <a className={styles.link} href={link.href} {...trackingFor(link)}>
         <Icon name={link.icon} className={styles.linkIcon} width={28} height={28} />
         <span className={styles.linkLabel}>
           {link.label}
@@ -67,7 +72,7 @@ function EmailRow({ link }) {
 function ContactLink({ link }) {
   return (
     <li>
-      <a className={styles.link} href={link.href} {...(link.external ? NEW_TAB : {})}>
+      <a className={styles.link} href={link.href} {...(link.external ? NEW_TAB : {})} {...trackingFor(link)}>
         <Icon name={link.icon} className={styles.linkIcon} width={28} height={28} />
         <span className={styles.linkLabel}>
           {link.label}

@@ -40,6 +40,8 @@ const isReload = () => performance.getEntriesByType?.('navigation')[0]?.type ===
  *
  * Links opened in a new tab or window, or with a modifier key, are left to
  * the browser, which loads the page at that address.
+ *
+ * @returns {string | null} The section being read (null in the hero).
  */
 export function useSectionRoutes() {
   const activeId = useActiveSection(SECTION_IDS)
@@ -92,4 +94,6 @@ export function useSectionRoutes() {
       window.removeEventListener('popstate', onPopState)
     }
   }, [])
+
+  return activeId
 }

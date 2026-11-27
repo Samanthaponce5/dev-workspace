@@ -32,6 +32,11 @@
   line-height: 1.6;
 }
 
+.links {
+  display: flex;
+  gap: var(--space-5);
+}
+
 .top {
   display: inline-flex;
   align-items: center;

@@ -1,3 +1,4 @@
+import { ConsentBanner } from './components/layout/ConsentBanner'
 import { Footer } from './components/layout/Footer'
 import { Nav } from './components/layout/Nav'
 import { DisplaySettings } from './components/settings/DisplaySettings'
@@ -7,10 +8,12 @@ import { Contact } from './sections/Contact/Contact'
 import { Experience } from './sections/Experience/Experience'
 import { Hero } from './sections/Hero/Hero'
 import { Work } from './sections/Work/Work'
+import { useAnalytics } from './hooks/useAnalytics'
 import { useSectionRoutes } from './hooks/useSectionRoutes'
 
 export default function App() {
-  useSectionRoutes()
+  const activeId = useSectionRoutes()
+  useAnalytics(activeId)
 
   return (
     <>
@@ -25,6 +28,7 @@ export default function App() {
       </main>
       <Footer />
       <DisplaySettings />
+      <ConsentBanner />
     </>
   )
 }

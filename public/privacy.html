@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Privacy · Samantha</title>
+    <meta name="description" content="How samanthaponce.dev uses Google Analytics and cookies, and how to turn them off." />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!--
+      Keep this page in step with src/utils/analytics.js: what is collected,
+      who is asked first, and the ?notrack / ?track links.
+    -->
+    <script>
+      try {
+        var saved = JSON.parse(localStorage.getItem('display-settings'))
+        if (saved && saved.appearance === 'light') document.documentElement.dataset.theme = 'light'
+      } catch (error) {
+        /* The Dark theme. */
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1721;
+        --raised: #0f1e2a;
+        --text: #eef7f6;
+        --muted: #a9bdc1;
+        --accent: #aeded1;
+        --border: rgb(174 222 209 / 14%);
+      }
+
+      :root[data-theme='light'] {
+        color-scheme: light;
+        --bg: #f6f5f0;
+        --raised: #ffffff;
+        --text: #152a2f;
+        --muted: #3d565b;
+        --accent: #224f4b;
+        --border: rgb(21 42 47 / 14%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 1.0625rem;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 3rem max(1.25rem, env(safe-area-inset-left)) 4rem max(1.25rem, env(safe-area-inset-right));
+      }
+
+      a {
+        color: var(--accent);
+        text-underline-offset: 0.2em;
+      }
+
+      .back {
+        display: inline-block;
+        margin-bottom: 2.5rem;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        margin: 2.5rem 0 0.75rem;
+        font-size: 1.25rem;
+        line-height: 1.3;
+      }
+
+      p,
+      ul {
+        margin: 0 0 1rem;
+        color: var(--muted);
+      }
+
+      ul {
+        padding-left: 1.25rem;
+      }
+
+      li + li {
+        margin-top: 0.4rem;
+      }
+
+      strong,
+      code {
+        color: var(--text);
+      }
+
+      code {
+        font-size: 0.9em;
+      }
+
+      .updated {
+        margin-bottom: 2rem;
+        font-size: 0.9375rem;
+      }
+
+      .choices {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 1.25rem 0 1rem;
+        padding: 0;
+        list-style: none;
+      }
+
+      .choices li + li {
+        margin-top: 0;
+      }
+
+      .choices a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.75rem;
+        padding: 0.5rem 1.1rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--raised);
+        font-weight: 600;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="/">← Back to the portfolio</a>
+
+      <h1>Privacy</h1>
+      <p class="updated">Last updated November 27, 2026</p>
+
+      <p>
+        This is Samantha’s personal portfolio at <strong>samanthaponce.dev</strong>. It doesn’t ask you for any
+        information, has no accounts and no forms, and doesn’t sell or share anything about you. The one thing it
+        measures is how the site is used, with Google Analytics, as described below.
+      </p>
+
+      <h2>What Google Analytics collects</h2>
+      <p>To see how many people visit and which parts of the site they look at, the site uses Google Analytics. It records:</p>
+      <ul>
+        <li>which pages and sections are viewed, how far down the page you scroll, and clicks on the résumé, email, LinkedIn and GitHub links;</li>
+        <li>the site that sent you (for example LinkedIn or a search engine);</li>
+        <li>your device type, browser, operating system and screen size;</li>
+        <li>your approximate location (country, region and city), which Google works out from your IP address. Google Analytics doesn’t store IP addresses.</li>
+      </ul>
+      <p>
+        It never collects your name, email address or anything you type. The figures are seen only in aggregate, and
+        they’re kept for up to 14 months. Google’s advertising features (Google signals and ad personalisation) are
+        turned off, so this information isn’t used to show you ads.
+      </p>
+      <p>
+        Google processes this data on the site’s behalf. You can read
+        <a href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites that use its services</a>
+        and <a href="https://policies.google.com/privacy">Google’s privacy policy</a>.
+      </p>
+
+      <h2>Cookies and similar storage</h2>
+      <p>If analytics runs, Google Analytics sets two cookies on this site:</p>
+      <ul>
+        <li><code>_ga</code> and <code>_ga_HMT3FWC1FW</code>, which tell visits apart and count returning visitors. They last up to 2 years.</li>
+      </ul>
+      <p>
+        The site also keeps two small settings in your browser’s own storage, which never leave your device: your
+        display settings (theme, text size, contrast and motion) and, if you’ve made one, your analytics choice.
+      </p>
+
+      <h2>Your choices</h2>
+      <ul>
+        <li>
+          <strong>Visitors in the EU, the rest of the EEA, the UK and Switzerland</strong> are asked first. Google
+          Analytics doesn’t load, and no analytics cookies are set, unless you choose <strong>Allow</strong>.
+        </li>
+        <li>If your browser sends a <strong>Do Not Track</strong> or <strong>Global Privacy Control</strong> signal, the site doesn’t use Google Analytics at all.</li>
+        <li>You can turn analytics off in your browser at any time, or forget the choice you made so that you’re asked again:</li>
+      </ul>
+      <ul class="choices">
+        <li><a href="/?notrack">Turn analytics off in this browser</a></li>
+        <li><a href="/?track">Forget my choice</a></li>
+      </ul>
+      <p>
+        Turning analytics off stops new data being collected; any analytics cookies already set expire on their own, or
+        you can clear them in your browser’s settings. Google also offers a
+        <a href="https://tools.google.com/dlpage/gaoptout">browser add-on that opts you out of Google Analytics</a> on every site.
+      </p>
+
+      <h2>Hosting</h2>
+      <p>
+        The site is hosted on Cloudflare, which, like any web host, processes your IP address to deliver the pages and
+        protect the site from attacks. Cloudflare also tells the site which country you’re visiting from, so it knows
+        whether to ask you about cookies first. The site doesn’t store that.
+      </p>
+
+      <h2>Children</h2>
+      <p>The site isn’t aimed at children and doesn’t knowingly collect information about anyone under 13.</p>
+
+      <h2>Questions</h2>
+      <p>
+        If you have a question about this page or your information, email
+        <a href="mailto:samanthaponce.dev@gmail.com">samanthaponce.dev@gmail.com</a>. If this page changes, the date at the
+        top will change too.
+      </p>
+    </main>
+  </body>
+</html>

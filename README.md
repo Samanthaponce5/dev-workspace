@@ -186,6 +186,38 @@ npm run brand                      # in another; needs Google Chrome installed
 The preview tags with full URLs (`og:image`, `og:url`, `twitter:image`) are
 added at build time; see [The site's address](#the-sites-address).
 
+## Analytics
+
+Google Analytics 4 (`src/utils/analytics.js`, measurement ID `G-HMT3FWC1FW`)
+runs only on the live site (`samanthaponce.dev`), never locally or on preview
+deployments, and loads after the intro so it can't make it stutter.
+
+Privacy (explained to visitors on `public/privacy.html`, linked in the footer;
+keep the two in step):
+
+- Visitors in the EU/EEA, the UK and Switzerland are asked first
+  (`ConsentBanner.jsx`); nothing loads unless they allow it. The country comes
+  from Cloudflare's `/cdn-cgi/trace`; if it can't be told, nothing is tracked.
+- Do Not Track and Global Privacy Control signals turn it off.
+- Google signals, ad personalisation and ad storage are off.
+- `?notrack` turns it off in that browser; `?track` forgets the choice (and
+  asks again where asking applies).
+
+Besides the page view and Google's automatic scroll, outbound-link and
+file-download events, it sends:
+
+| Event | Parameters | When |
+| --- | --- | --- |
+| `section_view` | `section` | The first time each section is reached |
+| `resume_open` | `from` (`experience`, `contact`) | A Résumé link is followed |
+| `contact_click` | `method` (`email`, `linkedin`, `github`) | A contact row is followed |
+| `copy_email` | | The email address is copied |
+
+Links carry their event in `data-track` attributes. In the GA property,
+"Page changes based on browser history events" is off, because the address
+follows the scroll and would count every section as a page; data retention is
+set to 14 months, as the privacy page says.
+
 ## Dependencies
 
 | Package                            | Why it is here                                                   |

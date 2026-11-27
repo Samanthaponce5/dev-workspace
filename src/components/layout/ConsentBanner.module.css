@@ -1,0 +1,81 @@
+/*
+ * A small card at the bottom of the screen: across the full width on
+ * phones, in the bottom-left corner on wider screens (clear of the Display
+ * settings button on the right). The two answers look the same, so neither
+ * is pushed.
+ */
+.banner {
+  position: fixed;
+  right: max(var(--space-3), var(--safe-right));
+  bottom: calc(var(--space-3) + var(--safe-bottom));
+  left: max(var(--space-3), var(--safe-left));
+  z-index: var(--layer-settings);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-raised);
+  box-shadow: var(--shadow-overlay);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  animation: banner-in var(--duration-base) var(--ease-out) both;
+}
+
+.text {
+  color: var(--color-text-muted);
+}
+
+.link {
+  color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.button {
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.button:focus-visible {
+  border-radius: var(--radius-pill);
+}
+
+@media (hover: hover) {
+  .button:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+}
+
+@media (min-width: 48rem) {
+  .banner {
+    right: auto;
+    left: max(var(--space-gutter), var(--safe-left));
+    bottom: calc(var(--space-4) + var(--safe-bottom));
+    max-width: 26rem;
+  }
+}
+
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
