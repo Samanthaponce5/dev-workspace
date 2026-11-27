@@ -101,6 +101,23 @@ If WebGL is missing, the device is low-powered, or the scene takes unusually
 long, the reveal goes ahead with a still image of the scene in the same place.
 A scene that arrives late fades in over the image without moving anything.
 
+### Andy's nap
+
+Andy sits up and watches the visitor until Samantha turns back to her desk
+(`SeatedSam.jsx` emits `sam:turning-to-desk`); then he lies down and dozes off,
+breathing slowly. A click wakes him: he sits up and barks, and after five quiet
+seconds he settles down again, as long as she's still working.
+
+He is one jointed body (`Andy.jsx`): the torso pivots inside him and the front
+legs (from the shoulders), hind legs (from the hips), tail and head (on the
+neck) all hang off it, so no part can come away from another. Lying down is the
+torso tipping forward; the front legs swing out just far enough to keep the
+paws on the floor, and the neck keeps his face to the visitor. One "sleepiness"
+value drives the joints through overlapping stages (`SLEEP_STAGES`), so waking
+is the same motion in reverse and a click part-way just turns it round. With
+reduced motion he stays sitting up. On the dev server, `window.__andyNap.s = 0.5`
+holds him at any point of a nap, for tuning.
+
 ### Section addresses
 
 The sections have their own addresses: `/work`, `/about`, `/experience` and

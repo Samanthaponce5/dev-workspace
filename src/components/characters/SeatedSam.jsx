@@ -6,7 +6,7 @@ import { useSceneEvent } from '../../hooks/useSceneEvent'
 import { emitSceneEvent } from '../../utils/sceneEvents'
 import { Chair } from '../three/Chair'
 import { SpeechBubble } from '../three/SpeechBubble'
-import { facingAngle, INTRO, setWorkingPose, writeHoverPose, writeIntroPose } from './greeting'
+import { facingAngle, HOVER, INTRO, setWorkingPose, writeHoverPose, writeIntroPose } from './greeting'
 import { MiniSam } from './MiniSam'
 import { track } from '../../utils/analytics'
 
@@ -23,6 +23,10 @@ const BUBBLE_ANCHOR = [0, 2.04, 0]
  * the chair round and wave again. A greeting in progress is never interrupted
  * or restarted, so hover can't cut the intro short.
  *
+ * For Andy, who naps while she works, she also emits "sam:greeting" when
+ * she turns to the visitor and "sam:turning-to-desk" the moment she starts
+ * turning back to her work.
+ *
  * `cameraAzimuth` is the camera's angle around the desk, used to work
  * out how far the chair turns to face the visitor.
  */
@@ -31,7 +35,7 @@ export function SeatedSam({ position, cameraAzimuth, introStarted, animate = tru
   const face = facingAngle(cameraAzimuth)
   const poseRef = useRef({ angle: face, typing: 0, wave: 0, bounce: 0, bubble: false, bubbleLeaving: false })
   // kind: 'intro' | 'hover' | null (working). start: ms timestamp, or null while the intro waits.
-  const greeting = useRef({ kind: 'intro', start: null })
+  const greeting = useRef({ kind: 'intro', start: null, turningBack: false })
   // 'hidden' | 'shown' | 'leaving' (fading out). Follows the greeting timeline.
   const [bubble, setBubble] = useState('hidden')
   const bubbleState = useRef('hidden')
@@ -46,7 +50,8 @@ export function SeatedSam({ position, cameraAzimuth, introStarted, animate = tru
 
   const greet = useCallback(() => {
     if (greeting.current.kind) return
-    greeting.current = { kind: 'hover', start: performance.now() }
+    greeting.current = { kind: 'hover', start: performance.now(), turningBack: false }
+    emitSceneEvent('sam:greeting')
   }, [])
   useSceneEvent('sam:greet', greet)
 
@@ -59,8 +64,13 @@ export function SeatedSam({ position, cameraAzimuth, introStarted, animate = tru
     if (kind) {
       const t = start === null ? -1 : (performance.now() - start) / 1000
       const write = kind === 'intro' ? writeIntroPose : writeHoverPose
+      // The wave is over and she starts turning back to the desk: Andy's cue to settle down.
+      if (!greeting.current.turningBack && t >= (kind === 'intro' ? INTRO.waveEnd : HOVER.waveEnd)) {
+        greeting.current.turningBack = true
+        emitSceneEvent('sam:turning-to-desk')
+      }
       if (write(pose, t, face, animate)) {
-        greeting.current = { kind: null, start: null }
+        greeting.current = { kind: null, start: null, turningBack: false }
         if (kind === 'intro') emitSceneEvent('intro:finished')
       }
     }
