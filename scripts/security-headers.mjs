@@ -14,7 +14,7 @@
  * Run by `npm run build`, after prerendering.
  */
 import { createHash } from 'node:crypto'
-import { appendFileSync, readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const dist = (file) => fileURLToPath(new URL(`../dist/${file}`, import.meta.url))
@@ -42,5 +42,8 @@ const policy = [
   'upgrade-insecure-requests',
 ].join('; ')
 
-appendFileSync(dist('_headers'), `\n/*\n  Content-Security-Policy: ${policy}\n`)
+// Into the existing /* rule (the last one in the file): Cloudflare keeps only one of two identical rules.
+const headers = readFileSync(dist('_headers'), 'utf8')
+if (!/\n\/\*\n(?: {2}.*\n?)+$/.test(headers)) throw new Error('security-headers: dist/_headers must end with the /* rule')
+writeFileSync(dist('_headers'), `${headers.trimEnd()}\n  Content-Security-Policy: ${policy}\n`)
 console.log(`security headers: CSP with ${hashes.size} inline script fingerprints (${policy.length} characters)`)
