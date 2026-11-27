@@ -27,6 +27,96 @@
   color: var(--color-text-muted);
 }
 
+.title {
+  margin: 0;
+  padding-right: var(--space-6);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
+
+/* The Off / On switch: the current setting filled in mint. */
+.setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.settingLabel {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+.switch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+.option {
+  min-width: 3.5rem;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.option:focus-visible {
+  border-radius: var(--radius-pill);
+}
+
+.selected {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.note {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+/* Settings only: the panel can be closed without changing anything. */
+.close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus-visible {
+  color: var(--color-text);
+}
+
+.close + .text {
+  padding-right: var(--space-6);
+}
+
+@media (hover: hover) {
+  .option:not(.selected):hover {
+    color: var(--color-text);
+  }
+}
+
 .link {
   color: var(--color-accent);
   text-underline-offset: 0.2em;

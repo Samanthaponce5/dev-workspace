@@ -267,15 +267,24 @@ export const displaySettings = {
 export const consent = {
   label: 'Cookie choice',
   text: 'May I use Google Analytics cookies to count visits and see which sections are read? Nothing that identifies you is collected.',
+  /* "Cookie settings", opened from the footer: an Off / On switch. */
+  settingsTitle: 'Cookie settings',
+  settingsText: 'Google Analytics cookies help me see how visitors use this site. Nothing that identifies you is collected.',
+  settingLabel: 'Analytics cookies',
+  off: 'Off',
+  on: 'On',
+  browserNote: 'Off because your browser asks sites not to track you. You can still turn it on here.',
+  close: 'Close cookie settings',
   privacy: 'Privacy',
   allow: 'Allow',
   decline: 'No thanks',
 }
 
 export const footer = {
-  note: `Designed and built by ${site.name}.`,
+  note: `Designed and built by ${site.name}`, // followed by a small spinning heart (Footer.jsx)
   /* How the site itself is made: the engineering a visitor can't see. */
   built: 'Hand-built with React and React Three Fiber: prerendered for a fast first paint, usable by keyboard, with adjustable text size, contrast and motion.',
   privacy: 'Privacy',
+  cookieSettings: 'Cookie settings',
   backToTop: 'Back to top',
 }

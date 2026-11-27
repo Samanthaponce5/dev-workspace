@@ -26,6 +26,73 @@
   max-width: 40rem;
 }
 
+/* The heart after "Designed and built by Samantha": it beats softly all the time, and every few seconds turns slowly once in 3D. */
+.heart {
+  display: inline-block;
+  margin-left: 0.35em;
+  font-size: 1.05em;
+  line-height: 0;
+  vertical-align: -0.12em;
+  perspective: 4em;
+  animation: heart-beat 1.6s ease-in-out infinite;
+}
+
+.heart svg {
+  display: block;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-aqua) 55%, transparent));
+  transform-style: preserve-3d;
+  animation: heart-spin 7s ease-in-out infinite;
+}
+
+.heartLight {
+  stop-color: var(--color-accent);
+}
+
+.heartDeep {
+  stop-color: var(--color-aqua);
+}
+
+/* Lub-dub, then a rest. */
+@keyframes heart-beat {
+  0%,
+  40%,
+  100% {
+    transform: scale(1);
+  }
+
+  12% {
+    transform: scale(1.16);
+  }
+
+  26% {
+    transform: scale(1.08);
+  }
+}
+
+/* One slow turn (about 2.5 seconds), then a long rest. */
+@keyframes heart-spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  35%,
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart,
+  .heart svg {
+    animation: none;
+  }
+}
+
+:global([data-motion='reduced']) .heart,
+:global([data-motion='reduced']) .heart svg {
+  animation: none;
+}
+
 .built {
   color: var(--color-text-muted);
   font-size: var(--text-xs);
@@ -34,15 +101,22 @@
 
 .links {
   display: flex;
-  gap: var(--space-5);
+  flex-wrap: wrap;
+  gap: 0 var(--space-5);
 }
 
 .top {
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--color-text-muted);
+  font: inherit;
+  text-decoration: underline;
   text-underline-offset: 0.25em;
+  cursor: pointer;
 }
 
 @media (hover: hover) {

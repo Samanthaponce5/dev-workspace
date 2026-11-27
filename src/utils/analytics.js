@@ -12,8 +12,10 @@
  *     allow it. Their country comes from Cloudflare, which hosts the site.
  *     If it can't be told, nothing is tracked.
  *   - A browser's Do Not Track or Global Privacy Control signal turns it
- *     off, as does a visitor's own choice: ?notrack in the address turns it
- *     off in that browser, ?track forgets the choice.
+ *     off. Anyone can allow or refuse it at any time from "Cookie settings"
+ *     in the footer (the same panel as the banner); turning it off stops it
+ *     at once and deletes its cookies. For the owner's own devices, ?notrack
+ *     in the address turns it off and ?track forgets the choice.
  *   - Google's advertising features (Google signals, ad personalisation,
  *     ad storage) are off. Nothing personal is ever sent.
  *
@@ -40,7 +42,17 @@ const CONSENT_COUNTRIES = new Set([
 let state = 'pending' // 'pending' until decided, then 'on' or 'off'
 let queue = []
 let landing = ''
+let live = false // on the live site (see ANALYTICS_HOSTS)
+let loaded = false // Google's tag has been set up on this page
+let reason = null // why it is off without the visitor saying so: 'browser' (Do Not Track / GPC) or 'local' (not the live site)
 const askListeners = new Set()
+const settingsListeners = new Set()
+const stateListeners = new Set()
+
+const setState = (next) => {
+  state = next
+  stateListeners.forEach((listener) => listener())
+}
 
 const readChoice = () => {
   try {
@@ -88,7 +100,16 @@ async function visitorCountry() {
 
 /* Turns tracking on: Google's tag with advertising features off, the page view for the address the page opened at, then anything waiting. */
 function turnOn() {
-  state = 'on'
+  reason = null
+  setState('on')
+  if (!live) return // the setting only: away from the live site nothing loads and nothing is sent
+  window[`ga-disable-${ANALYTICS_ID}`] = false
+  if (loaded) {
+    // Switched back on during the same visit: Google's tag is already here, but needs setting up again after being switched off.
+    window.gtag('config', ANALYTICS_ID, { page_location: window.location.href })
+    return
+  }
+  loaded = true
   window.dataLayer = window.dataLayer || []
   window.gtag = function gtag() {
     window.dataLayer.push(arguments) // Google's tag reads the arguments object itself, not an array
@@ -102,15 +123,29 @@ function turnOn() {
   document.head.append(Object.assign(document.createElement('script'), { async: true, src: `https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_ID}` }))
 }
 
-function turnOff() {
-  state = 'off'
-  queue = []
+/* Deletes Google Analytics' cookies (_ga and _ga_<id>), set on this domain and its parent. */
+function deleteAnalyticsCookies() {
+  const domain = window.location.hostname.replace(/^www\./, '')
+  for (const name of document.cookie.split(';').map((cookie) => cookie.split('=')[0].trim())) {
+    if (!name.startsWith('_ga')) continue
+    for (const scope of ['', `; domain=.${domain}`, `; domain=${domain}`]) document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/${scope}`
+  }
 }
 
-/** Sends an event. Waits while the decision is pending; does nothing when analytics is off. */
+function turnOff(why = null) {
+  reason = why
+  setState('off')
+  queue = []
+  if (!loaded) return
+  window[`ga-disable-${ANALYTICS_ID}`] = true // Google's own switch: the tag sends nothing more
+  deleteAnalyticsCookies()
+}
+
+/** Sends an event. Waits while the decision is pending; does nothing when analytics is off (or away from the live site). */
 export function track(event, params = {}) {
-  if (state === 'on') window.gtag('event', event, params)
-  else if (state === 'pending') queue.push([event, params])
+  if (state === 'on') {
+    if (loaded) window.gtag('event', event, params)
+  } else if (state === 'pending') queue.push([event, params])
 }
 
 /** Calls `listener` if this visitor needs to be asked. Returns an unsubscribe function. */
@@ -119,20 +154,52 @@ export function onConsentNeeded(listener) {
   return () => askListeners.delete(listener)
 }
 
-/** The visitor's answer to the banner. */
+/** Calls `listener` when "Cookie settings" is opened. Returns an unsubscribe function. */
+export function onOpenCookieSettings(listener) {
+  settingsListeners.add(listener)
+  return () => settingsListeners.delete(listener)
+}
+
+/** Opens the cookie settings panel (the footer's "Cookie settings"). */
+export function openCookieSettings() {
+  settingsListeners.forEach((listener) => listener())
+}
+
+/**
+ * Where analytics stands in this browser: { state, reason, live }. `state`
+ * is the setting the visitor sees ('pending' until decided, then 'on' or
+ * 'off'); `reason` says why it is off when they didn't choose that
+ * ('browser': Do Not Track / GPC); `live` is false away from the live site,
+ * where the setting can be changed but nothing is ever sent.
+ */
+export const analyticsStatus = () => ({ state, reason, live })
+
+/** Calls `listener` whenever analytics turns on or off. Returns an unsubscribe function. */
+export function onAnalyticsChange(listener) {
+  stateListeners.add(listener)
+  return () => stateListeners.delete(listener)
+}
+
+/** The visitor's answer, from the banner or Cookie settings. Remembered in this browser, and it takes priority over the browser's signal. */
 export function setConsent(allowed) {
   saveChoice(allowed ? 'on' : 'off')
   if (allowed) turnOn()
   else turnOff()
 }
 
-/* Decides, once the intro has gone and the browser is idle: track, ask, or don't. */
+/*
+ * Decides, once the intro has gone and the browser is idle: track, ask, or
+ * don't. A choice the visitor made comes first; then the browser's privacy
+ * signal; then where they are.
+ */
 async function decide(choice) {
-  if (choice === 'off' || browserSaysNo()) return turnOff()
+  if (choice === 'off') return turnOff()
+  if (choice === 'on') return turnOn()
+  if (browserSaysNo()) return turnOff('browser')
   const country = await visitorCountry()
   if (!country) return turnOff()
   if (!CONSENT_COUNTRIES.has(country)) return turnOn()
-  if (choice === 'on') return turnOn()
+  turnOff() // not until they answer
   askListeners.forEach((listener) => listener())
 }
 
@@ -144,7 +211,9 @@ export function startAnalytics() {
   started = true
   landing = window.location.href
   const choice = readAddressChoice()
-  if (!ANALYTICS_HOSTS.includes(window.location.hostname)) return turnOff()
+  live = ANALYTICS_HOSTS.includes(window.location.hostname)
+  // Away from the live site the switch still works (it shows the saved choice, on by default), but nothing is sent.
+  if (!live) return choice === 'off' ? turnOff() : turnOn()
 
   const go = () => decide(choice)
   const whenIdle = () => (window.requestIdleCallback ? window.requestIdleCallback(go, { timeout: 2000 }) : window.setTimeout(go, 200))

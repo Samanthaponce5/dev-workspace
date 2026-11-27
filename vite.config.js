@@ -80,7 +80,29 @@ function socialMeta() {
   }
 }
 
+/*
+ * Serves public/privacy.html at /privacy on the dev and preview servers, as
+ * Cloudflare Pages does in production (it drops the .html). Without this the
+ * dev server answers /privacy with the home page.
+ */
+function cleanPageUrls() {
+  const rewrite = (req, _res, next) => {
+    if (req.url === '/privacy' || req.url?.startsWith('/privacy?')) req.url = req.url.replace('/privacy', '/privacy.html')
+    next()
+  }
+  return {
+    name: 'clean-page-urls',
+    // Block bodies on purpose: a function returned from these hooks would be run later by Vite.
+    configureServer(server) {
+      server.middlewares.use(rewrite)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(rewrite)
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), preloadCriticalAssets(), socialMeta()],
+  plugins: [react(), preloadCriticalAssets(), socialMeta(), cleanPageUrls()],
 })
