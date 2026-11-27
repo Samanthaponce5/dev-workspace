@@ -1,4 +1,4 @@
-# Cloudflare Pages: caching. Same as the headers in vercel.json.
+# Cloudflare Pages: caching (same as vercel.json) and security headers.
 
 # Hashed build files never change, so they are kept for a year.
 /assets/*
@@ -11,3 +11,13 @@
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 /og-image.jpg
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Security, on every page. The Content-Security-Policy is added at build
+# time by scripts/security-headers.mjs, which fingerprints the inline scripts.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()
+  Cross-Origin-Opener-Policy: same-origin

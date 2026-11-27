@@ -233,6 +233,17 @@ Links carry their event in `data-track` attributes. In the GA property,
 follows the scroll and would count every section as a page; data retention is
 set to 14 months, as the privacy page says.
 
+## Security headers
+
+`public/_headers` sets HTTPS-only (HSTS), no framing by other sites,
+`nosniff`, a strict referrer policy and a permissions policy that turns off
+camera, microphone, location and the like. `npm run build` then adds a
+Content-Security-Policy (`scripts/security-headers.mjs`) that allows only the
+site's own files, its inline scripts by their exact fingerprint (worked out
+from the built pages, so editing one can't silently break the site), Google
+Analytics and Cloudflare Web Analytics. If you add a new third-party script or
+service, add its domain there.
+
 ## Dependencies
 
 | Package                            | Why it is here                                                   |
